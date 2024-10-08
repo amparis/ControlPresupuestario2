@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+
+</head>
+
+<body>
+<div id="wrapper" th:fragment="sidebar">
+
+    <!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+        <div class="sidebar-brand-icon rotate-n-15">
+            <span class="material-symbols-outlined">
+                calculate
+            </span>
+        </div>
+        <div class="sidebar-brand-text mx-3">Control Presupuestario</div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item active">
+        <a class="nav-link" href="/">
+            <span class="material-symbols-outlined">
+                home
+            </span>
+            <span>Home</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Administrables
+    </div>
+
+    <!-- Menús asociados al rol -->
+    <div class="py-2 collapse-inner rounded">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
+               
+            <li th:each="menuRole : ${menuRoles}" class="nav-item active">
+                <a class="nav-link" th:href="${menuRole.menu.url}" th:attr="target=${menuRole.menu.url == '/'} ? '_blank' : null">
+                    <span class="material-symbols-outlined"
+                        th:text="${menuRole.menu.icono}">
+                    </span>
+                    <span th:text="${menuRole.menu.nombre}"></span> 
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+</ul>
+
+    <!-- End of Sidebar -->
+</div>
+</body>
+
+</html>
