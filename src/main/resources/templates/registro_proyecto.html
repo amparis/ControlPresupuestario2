@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+
+    <title>Sistema de Control Presupuestario de Ingresos y Egresos</title>
+    <script>
+        // Función para hacer desaparecer el mensaje después de 4 segundos
+        function hideMessage() {
+            setTimeout(function() {
+                var message = document.getElementById("notificationMessage");
+                if (message) {
+                    message.style.display = 'none';
+                }
+            }, 4000);  // 4000 milisegundos = 4 segundos
+        }
+    </script>
+</head>
+
+<body class="bg-gradient-primary" onload="hideMessage()">
+    <!-- Mostrar el mensaje si está presente -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+    </div>
+<div class="container" style="max-width: 500px;">
+    <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div>
+                <div>
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${project.id==0}">Registrar Proyecto</h1>
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${project.id!=0}">Modificar Proyecto</h1>
+                        </div>
+                        <form class="user" th:action="@{/project}" th:method="post" th:object="${project}" onsubmit="return validateDates()">
+                        
+                            <input type="hidden" th:if="${project.id!=0}" th:field="*{id}" th:value="${project.id}">
+                            <div class="form-group">
+                                <label for="inputnombre" class="form-label">Nombre</label>
+                                <input th:field="*{nombre}" type="text" class="form-control form-control-user"
+                                       id="inputnombre"
+                                       placeholder="Nombre del Proyecto" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputdescripcion" class="form-label">Descripcion</label>
+                                <input th:field="*{descripcion}" type="text" class="form-control form-control-user"
+                                       id="inputdescripcion"
+                                       placeholder="Breve descripcion del proyecto"  value="Mark" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputmontoContrato" class="form-label">Monto en USD del Proyecto</label>
+                                <input th:field="*{montoContrato}" type="number" step="0.01" class="form-control form-control-user"
+                                       id="inputmontoContrato"
+                                       placeholder="0.00"  min="1">
+                                <small id="errorMonto" class="text-danger" style="display: none;">El monto no puede ser menor a 0</small>
+                                       
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                <label for="inputfechaInicial" class="form-label">Fecha Inicial</label>
+                                <input th:field="*{fechaInicial}" type="date" class="form-control form-control-user"
+                                           id="inputfechaInicial"  value="Mark" required>
+                                </div>
+                                <div class="col-sm-6">
+								 <label for="inputfechaFin" class="form-label">Fecha de Finalizacion</label>
+                                 <input th:field="*{fechaFin}" type="date" class="form-control form-control-user"
+                                           id="inputfechaFin"  value="Mark" required>
+                                </div>
+                            </div>
+ 							<!-- Mostrar mensaje de error si existe -->
+                            <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
+                                <p th:text="${error}"></p>
+                            </div>
+                             <button class="btn btn-primary btn-user btn-block">
+                                GUARDAR PROYECTO
+                             </button>
+							<div class="text-center">
+                                <a class="small" href="/lista-proyectos">Regresar!</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="design/script :: scripts"></div>
+<script>
+    function validateDates() {
+        var startDate = document.getElementById("inputfechaInicial").value;
+        var endDate = document.getElementById("inputfechaFin").value;
+
+        if (new Date(startDate) >= new Date(endDate)) {
+            alert("La fecha inicial debe ser menor a la fecha de finalización.");
+            return false;  // Evita que el formulario se envíe
+        }
+        return true;  // Permite el envío del formulario
+    }
+</script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+

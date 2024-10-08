@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+    <title>Administración de Roles</title>
+</head>
+
+<body class="bg-gradient-primary">
+
+<div class="container" style="max-width: 800px;">
+    <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div>
+                <div>
+                    <div class="p-5">
+                        <div class="text-center">
+                        </div>
+                        <div th:if="${perfilGuardado == null}">
+                        <form class="user" th:action="@{/perfil}" th:method="post" th:object="${perfil}">
+                            <input type="hidden" th:if="${perfil.id!=0}" th:field="*{id}" th:value="${perfil.id}">
+                            <div class="form-group">
+                                <input th:field="*{name}" type="text" class="form-control form-control-user"
+                                       id="inputname"
+                                       placeholder="Nombre de Rol">
+                            </div>
+                            
+                            <button  id="btnform-rol" class="btn btn-primary btn-user btn-block" >
+                                GUARDAR ROL
+                            </button>
+                            <div class="text-center">
+                                <a class="small" href="/home">Regresar!</a>
+                            </div>
+
+                        </form>
+                        </div>
+                        <!-- Mostrar información del rol guardado -->
+                        <div class="text-center">
+	                        <div th:if="${perfilGuardado != null}">
+							    <p>Rol guardado con éxito</p>
+							    <p>ID: <span th:text="${perfilGuardado.id}"></span></p>
+							    <p>Nombre: <span th:text="${perfilGuardado.name}"></span></p>
+						<!-- Formulario para asignar permisos -->
+                        <form class="user" th:action="@{/perfil/guardar-permisos}" th:method="post">
+                              	<!-- <input type="text" th:field="*{rolId}" th:value="${perfilGuardado.id}"> -->
+                              	<input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                              	     
+                              	
+                              	                            
+                              	<div class="form-group">
+                                <label>Asigne los permisos:</label>
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                    	<th><input type="hidden" th:value="${perfilGuardado.id}" name="rolId"></th>
+                                        <th>Menú</th>
+                                        <th>Crear</th>
+                                        <th>Leer</th>
+                                        <th>Editar</th>
+                                        <th>Eliminar</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                     <!-- Iterar sobre los menús -->
+                              <tr th:each="menu : ${menus}">
+                                                    <td>
+                                                        <input type="checkbox" th:if="${menu.url != '/'}"
+                                                               th:id="'menuCheckbox-' + ${menu.id}"
+                                                               th:onclick="'togglePermissions(' + ${menu.id} + ')'">
+                                                    </td>
+                                                    <td th:text="${menu.nombre}"></td>
+                                                    <td>
+                                                        <input type="checkbox" th:id="'crearCheckbox-' + ${menu.id}"
+                                                               name="permisos['${menu.id}'][CREATE]" disabled>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" th:id="'leerCheckbox-' + ${menu.id}"
+                                                               name="permisos['${menu.id}'][READ]" disabled>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" th:id="'editarCheckbox-' + ${menu.id}"
+                                                               name="permisos['${menu.id}'][UPDATE]" disabled>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" th:id="'eliminarCheckbox-' + ${menu.id}"
+                                                               name="permisos['${menu.id}'][DELETE]" disabled>
+                                                    </td>
+                                                </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                           <button  id="btnform-rolMenu" class="btn btn-primary btn-user btn-block" >
+                                GUARDAR PERMISOS
+                            </button>
+                         </form>
+
+                        	</div>
+						</div>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div th:replace="design/script :: scripts"></div>
+<script>
+    // Función para habilitar/deshabilitar los permisos según si el menú está seleccionado
+    function togglePermissions(menuId) {
+        // Obtener el estado del checkbox del menú
+        const menuCheckbox = document.getElementById(`menuCheckbox-${menuId}`);
+        
+        // Obtener los checkboxes de permisos asociados a ese menú
+        const crearCheckbox = document.getElementById(`crearCheckbox-${menuId}`);
+        const leerCheckbox = document.getElementById(`leerCheckbox-${menuId}`);
+        const editarCheckbox = document.getElementById(`editarCheckbox-${menuId}`);
+        const eliminarCheckbox = document.getElementById(`eliminarCheckbox-${menuId}`);
+        
+        // Habilitar o deshabilitar los checkboxes de permisos según el estado del checkbox del menú
+        const isChecked = menuCheckbox.checked;
+        crearCheckbox.disabled = !isChecked;
+        leerCheckbox.disabled = !isChecked;
+        editarCheckbox.disabled = !isChecked;
+        eliminarCheckbox.disabled = !isChecked;
+        
+        // Marcar "Leer" y hacerlo obligatorio si el menú está seleccionado
+        if (isChecked) {
+            leerCheckbox.checked = true; // Marcar "Leer"
+            leerCheckbox.disabled = true; // Deshabilitar para que no se pueda desmarcar
+        } else {
+        	crearCheckbox.checked = false;
+            leerCheckbox.checked = false; // Desmarcar "Leer" cuando se desmarque la opción del menú
+            editarCheckbox.checked = false;
+            eliminarCheckbox.checkefd= false;
+        }
+    }
+</script>
+</body>
+
+</html>
