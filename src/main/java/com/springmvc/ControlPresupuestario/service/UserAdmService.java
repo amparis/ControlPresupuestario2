@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 import java.sql.Timestamp;
 
 @Service
@@ -50,16 +51,13 @@ public class UserAdmService {
     	long millis = System.currentTimeMillis();
         newUser.setDateCreation(new Timestamp(millis));
         newUser.setPassword(CryptPasswordEncoder.getPasswordEncoder(newUser.getPassword()));
-
-       // newUser.setPerfil(pefilService.getRoles().get(1));//asignar de un combo
+        newUser.setEstado("V");
 
         return this.userRepository.save(newUser);
     }
 
     public void updateUser(long id, UserAdm newUser) {
-    	
-
-        UserAdm UserUpdate = this.userRepository.findById(id).get();
+         UserAdm UserUpdate = this.userRepository.findById(id).get();
 
         if (this.userRepository.findById(id).isPresent()) {
 
@@ -81,5 +79,10 @@ public class UserAdmService {
     	
     	this.userRepository.deleteById(id);
     }
+
+	public Optional<UserAdm> getUserByBeneficiaryId(Integer beneficiaryId) {
+		// TODO Auto-generated method stub
+		return userRepository.findByBeneficiario(beneficiaryId);
+	}
 
 }

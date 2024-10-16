@@ -5,23 +5,18 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@ToString
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "tbl_rol_menu")
 @Entity
-@IdClass(RolMenuId.class)  // Composite key class
+@IdClass(RolMenuId.class)  // Clave compuesta
 public class RolMenu {
 
     @Id
     @Column(name = "rm_rol_id", nullable = false)
-    private Long roleId;
+    private Long roleId; // Mapeo de la clave foránea
 
     @Id
     @Column(name = "rm_me_id", nullable = false)
-    private Long menuId;
+    private Long menuId; // Mapeo de la clave foránea
 
     @Column(name = "rm_estado")
     private String estado;
@@ -38,13 +33,15 @@ public class RolMenu {
     @Column(name = "adelete")
     private Boolean adelete;
 
+    // Relación con Menu
     @ManyToOne
     @JoinColumn(name = "rm_me_id", insertable = false, updatable = false)
-    private Menu menu;
+    private Menu menu; // Relación con Menu
 
+    // Relación con Perfil
     @ManyToOne
     @JoinColumn(name = "rm_rol_id", insertable = false, updatable = false)
-    private Perfil role;
+    private Perfil role; // Relación con Perfil
 
 	/**
 	 * @return the roleId
@@ -89,56 +86,56 @@ public class RolMenu {
 	}
 
 	/**
-	 * @return the create
+	 * @return the acreate
 	 */
 	public Boolean getAcreate() {
 		return acreate;
 	}
 
 	/**
-	 * @param create the create to set
+	 * @param acreate the acreate to set
 	 */
 	public void setAcreate(Boolean acreate) {
 		this.acreate = acreate;
 	}
 
 	/**
-	 * @return the read
+	 * @return the aread
 	 */
 	public Boolean getAread() {
 		return aread;
 	}
 
 	/**
-	 * @param read the read to set
+	 * @param aread the aread to set
 	 */
 	public void setAread(Boolean aread) {
 		this.aread = aread;
 	}
 
 	/**
-	 * @return the update
+	 * @return the aupdate
 	 */
 	public Boolean getAupdate() {
 		return aupdate;
 	}
 
 	/**
-	 * @param update the update to set
+	 * @param aupdate the aupdate to set
 	 */
 	public void setAupdate(Boolean aupdate) {
 		this.aupdate = aupdate;
 	}
 
 	/**
-	 * @return the delete
+	 * @return the adelete
 	 */
 	public Boolean getAdelete() {
 		return adelete;
 	}
 
 	/**
-	 * @param delete the delete to set
+	 * @param adelete the adelete to set
 	 */
 	public void setAdelete(Boolean adelete) {
 		this.adelete = adelete;
@@ -171,7 +168,8 @@ public class RolMenu {
 	public void setRole(Perfil role) {
 		this.role = role;
 	}
-    
-    
+
+    // Getters y Setters
+
 
 }

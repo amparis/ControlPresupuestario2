@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+        <style>
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+        .col {
+            flex: 0 0 50%;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body class="bg-gradient-primary" onload="hideMessage()">
+    <!-- Mostrar el mensaje si está presente -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+    </div>
+
+    <div class="container" style="max-width: 800px;">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <div>
+                    <div>
+                        <div class="p-5">
+                            <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${beneficiary.id==0}">Registrar Beneficiario</h1>
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${beneficiary.id!=0}">Modificar Beneficiario</h1>
+                            </div>
+                            <form class="user" th:action="@{/beneficiarios/guardar-beneficiario}" th:method="post" th:object="${beneficiary}">
+                        
+                                <input type="hidden" th:if="${beneficiary.id != 0}" th:field="*{id}" th:value="${beneficiary.id}">
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="inputtipo" class="form-label">Tipo</label>
+											<select th:field="*{tipo}" class="form-control form-control-user" id="inputtipo" required>
+											    <option value="" th:if="${beneficiary.id == 0}">Seleccionar tipo</option>
+											    <option value="Persona Natural" th:selected="${beneficiary.tipo == 'Persona Natural'}">Persona Natural</option>
+											    <option value="Persona Juridica" th:selected="${beneficiary.tipo == 'Persona Juridica'}">Persona Jurídica</option>
+											    <option value="Personal" th:selected="${beneficiary.tipo == 'Personal'}">Personal</option>
+											</select>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label  class="form-label"></label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="inputdocumento" class="form-label">Documento</label>
+                                            <input th:field="*{documento}" type="text" class="form-control form-control-user" id="inputdocumento" placeholder="Número de Documento" required>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="inputnombreCompleto" class="form-label">Nombre Completo</label>
+                                            <input th:field="*{nombreCompleto}" type="text" class="form-control form-control-user" id="inputnombreCompleto" placeholder="Nombre Completo" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="inputrazonSocial" class="form-label">Razón Social</label>
+                                            <input th:field="*{razonSocial}" type="text" class="form-control form-control-user" id="inputrazonSocial" placeholder="Razón Social Si corresponde">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="inputpaisProcedencia" class="form-label">País de Procedencia</label>
+											<select th:field="*{paisProcedencia}" class="form-control form-control-user" id="inputpaisProcedencia" required>
+											    <option value="" th:if="${beneficiary.id == 0}">Seleccionar país</option>
+											    <option value="Argentina" th:selected="${beneficiary.paisProcedencia == 'Argentina'}">Argentina</option>
+											    <option value="Chile" th:selected="${beneficiary.paisProcedencia == 'Chile'}">Chile</option>
+											    <option value="Colombia" th:selected="${beneficiary.paisProcedencia == 'Colombia'}">Colombia</option>
+											    <option value="Perú" th:selected="${beneficiary.paisProcedencia == 'Perú'}">Perú</option>
+											    <option value="Bolivia" th:selected="${beneficiary.paisProcedencia == 'Bolivia'}">Bolivia</option>
+											</select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="inputemail" class="form-label">Email</label>
+                                            <input th:field="*{email}" type="email" class="form-control form-control-user" id="inputemail" placeholder="Correo Electrónico" required>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="inputtelefonoContacto" class="form-label">Teléfono de Contacto</label>
+                                            <input th:field="*{telefonoContacto}" type="text" class="form-control form-control-user" id="inputtelefonoContacto" placeholder="Teléfono de Contacto">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="inputfechaIngreso" class="form-label">Fecha de Ingreso</label>
+                                            <input th:field="*{fechaIngreso}" type="date" class="form-control form-control-user" id="inputfechaIngreso" >
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="inputobservacion" class="form-label">Observación</label>
+                                            <textarea th:field="*{observacion}" class="form-control form-control-user" id="inputobservacion" placeholder="Observaciones" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mostrar mensaje de error si existe -->
+                                <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
+                                    <p th:text="${error}"></p>
+                                </div>
+
+                                <button class="btn btn-primary btn-user btn-block">
+                                    GUARDAR BENEFICIARIO
+                                </button>
+                                <div class="text-center">
+                                    <a class="small" href="/beneficiarios/lista-beneficiarios">Regresar!</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="design/script :: scripts"></div>
+</body>
+</html>
+
+
+
+
+
+

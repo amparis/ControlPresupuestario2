@@ -60,6 +60,7 @@
                                             <th>Nombre Completo</th>
                                             <th>Email</th>
                                             <th>Rol</th>
+                                            <th>Estado</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -69,6 +70,10 @@
                                             <td th:text="${userAdm.fullname}"></td>
                                             <td th:text="${userAdm.email}"></td>
                                             <td th:text="${userAdm.perfil.name}"></td>
+                                            <td>
+                                                <span th:text="${userAdm.estado == 'V' ? 'ACTIVO' : 'INACTIVO'}"
+         							 				th:classappend="${userAdm.estado == 'V' ? 'badge bg-success' : 'badge bg-danger'}"></span>
+                                            </td>
                                             <td>
                                                         <!-- Iterar sobre menuRoles para comprobar permiso de actualización -->
 				            <span th:each="menuRole : ${menuRoles}">

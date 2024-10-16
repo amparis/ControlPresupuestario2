@@ -1,5 +1,6 @@
 package com.springmvc.ControlPresupuestario.controller;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.springmvc.ControlPresupuestario.model.Menu;
 import com.springmvc.ControlPresupuestario.model.Perfil;
 import com.springmvc.ControlPresupuestario.model.RolMenu;
+import com.springmvc.ControlPresupuestario.service.MenuService;
 import com.springmvc.ControlPresupuestario.service.PefilService;
 import com.springmvc.ControlPresupuestario.service.RolMenuService;
 
@@ -25,6 +28,8 @@ public class PerfilController {
 	@Autowired
     private RolMenuService rolMenuService;
 	
+	@Autowired
+    private MenuService menuService;
 	
 	@PostMapping("")
 	public RedirectView postPerfil(@ModelAttribute Perfil newPerfil) {
@@ -40,65 +45,91 @@ public class PerfilController {
         return new RedirectView("/registro-rol?rolId=" + savedPerfil.getId());
 	}
 
-	@PostMapping("/guardar-permisos")
-    public RedirectView guardarPermisos(//@RequestParam("rolId") Long rolId, 
-							    		@RequestParam Map<String, String[]> permisos,
-							    		@RequestParam(name = "_csrf", required = false) String csrfToken) {
-        // Eliminar permisos previos asociados a este rol
-        ///////rolMenuService.eliminarPermisosPorRol(rolId);
-		 try {
-        // Procesar los nuevos permisos seleccionados y guardarlos en la base de datos
-        for (Map.Entry<String, String[]> entry : permisos.entrySet()) {
-        	
-            String key = entry.getKey();
+   @PostMapping("/guardar-permisos")
+	public RedirectView  guardarPermisos(@RequestParam("rolId") Long rolId,
+									@RequestParam Map<String, String> permisos) {
+		System.out.println("*** **** ENTRANDO EN EL METODO guardarPermisos con rolId: " + rolId);
+        
+		try {
+		// Obtener el perfil (rol) por el rolId
 
-            // Ignorar el campo _csrf
-            if (key.equals("_csrf")) {
-                continue;
-            }
-        	
-            Long menuId = Long.parseLong(entry.getKey());
-            String[] valoresPermisos = entry.getValue();
+		Perfil perfil = perfilService.findById(rolId);
+	    if (perfil == null) {
+	        System.out.println("El perfil es nulo para el rolId: " + rolId);
+	        return new RedirectView("/lista-roles"); // o maneja el error como consideres
+	    }
 
-            // Crear un objeto RolMenu para cada permiso seleccionado
-            RolMenu rolMenu = new RolMenu();
-            rolMenu.setRoleId((long) 3);//rolId);
-            	//System.out.println(rolId);
-            rolMenu.setMenuId(menuId);
-            	System.out.println(menuId);
-            rolMenu.setEstado("V");
-            // Asignar los permisos
-		            for (String permiso : valoresPermisos) {
-		                switch (permiso) {
-		                    case "CREATE":
-		                        rolMenu.setAcreate(true);
-		                        break;
-		                    case "READ":
-		                        rolMenu.setAread(true);
-		                        break;
-		                    case "UPDATE":
-		                        rolMenu.setAupdate(true);
-		                        break;
-		                    case "DELETE":
-		                        rolMenu.setAdelete(true);
-		                        break;
+	    // Procesar los permisos del rol
+	    permisos.forEach((key, value) -> {
+	    	System.out.println("Clave procesada: " + key + ", Valor: " + value);
+	    	/////////////////////////////////////
+	    	String[] parts = key.split("\\[|\\]");
+	    	System.out.println("Parts: " + Arrays.toString(parts));
+	    	
+	    	if (parts.length > 1) {
+	    	    try {
+	    	        Long menuId = Long.parseLong(parts[1]);
+	    	        String permiso = parts[3];
+	    	        System.out.println("** PERMISO>>:   " + parts[3]);
+	    	        
+		            // Asignar los permisos correspondientes
+		            RolMenu rolMenu = new RolMenu();
+		            rolMenu.setRoleId(rolId);//.setRole(perfil);
+		            
+		            Menu menu = menuService.getMenu(menuId);
+		            rolMenu.setMenuId(menuId);//m.setMenu(menu);
+		         // Inicializa todos los permisos a false por defecto
+		            rolMenu.setAcreate(false);
+		            rolMenu.setAread(false);
+		            rolMenu.setAupdate(false);
+		            rolMenu.setAdelete(false);
+		            // Asignar los permisos a cada acción (CREATE, READ, UPDATE, DELETE)
+		         // Asignar los permisos a cada acción (CREATE, READ, UPDATE, DELETE)
+		            if ("CREATE".equals(permiso)) {
+		                rolMenu.setAcreate("on".equals(value));
+		                if ("on".equals(value)) {
+		                    //System.out.println("permiso create: " + value);
 		                }
 		            }
 
-            // Guardar los permisos en la base de datos
-            rolMenuService.save(rolMenu);
-        }
+		            if ("READ".equals(permiso)) {
+		                rolMenu.setAread("on".equals(value));
+		                if ("on".equals(value)) {
+		                   // System.out.println("permiso READ: " + value);
+		                }
+		            }
 
-        // Redirigir a la lista de roles después de guardar los permisos
-        return new RedirectView("/lista-roles");
-    
-	 } catch (Exception e) {
-	        // Log de la excepción
-	        e.printStackTrace();
-	        System.out.println(e);
-	        // Redirigir a una página de error personalizada
-	        //return new RedirectView("/error");
-	        return new RedirectView("/lista-roles");
+		            if ("UPDATE".equals(permiso)) {
+		                rolMenu.setAupdate("on".equals(value));
+		                if ("on".equals(value)) {
+		                    //System.out.println("permiso UPDATE: " + value);
+		                }
+		            }
+
+		            if ("DELETE".equals(permiso)) {
+		                rolMenu.setAdelete("on".equals(value));
+		                if ("on".equals(value)) {
+		                    //System.out.println("permiso DELETE: " + value);
+		                }
+		            }
+		            
+		            rolMenu.setEstado("V");
+		            // Guardar los permisos asignados al rol y menú
+		            rolMenuService.save(rolMenu);
+	    	    } catch (NumberFormatException e) {
+	    	        System.out.println("Error al parsear menuId: " + parts[1]);
+	    	    }
+	    	}
+///////////////////////
+	    });
+
+	    // Redirigir a la vista después de guardar los permisos
+	    return new RedirectView("/lista-roles");
+	    
+	    }catch(Exception e) {
+	    	System.out.println("el error al guardar permisos  "+e);
+	    	return new RedirectView("/lista-roles");
 	    }
-}
+	}
+
 }

@@ -33,6 +33,18 @@
             }, 4000);  // 4000 milisegundos = 4 segundos
         }
     </script>
+        <style>
+        /* Transición suave para desvanecimiento */
+        #notificationMessage {
+            opacity: 1; /* El mensaje aparece con opacidad completa */
+            transition: opacity 1s ease-in-out; /* Transición de opacidad */
+        }
+
+        /* Clase para ocultar el mensaje con desvanecimiento */
+        #notificationMessage.hidden {
+            opacity: 0; /* El mensaje se desvanece */
+        }
+    </style>
 </head>
 
 <body>

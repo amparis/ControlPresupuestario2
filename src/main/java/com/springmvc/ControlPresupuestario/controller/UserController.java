@@ -24,7 +24,7 @@ public class UserController {
         return new RedirectView("/lista-usuarios");
     }*/
     @PostMapping("")
-    public RedirectView postProject(@ModelAttribute UserAdm userAdm, RedirectAttributes redirectAttributes) {
+    public RedirectView postUserAdm(@ModelAttribute UserAdm userAdm, RedirectAttributes redirectAttributes) {
     	try {
             // Intentar guardar el usuario
     		userService.saveUser(userAdm);

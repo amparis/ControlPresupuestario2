@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="design/header :: head">
+    <title>Detalles del Beneficiario</title>
+    <style>
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+        .col {
+            flex: 0 0 50%;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-primary" id="page-top" onload="hideMessage()">
+    <div class="container" style="max-width: 800px;">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <div class="p-5">
+                    <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4">Detalles del Beneficiario</h1>
+                    </div>
+                    <div class="info-card">
+                        <div class="row">
+                            <div class="col">
+                                <div class="info-item">
+                                    <label>Tipo:</label>
+                                    <p th:text="${beneficiary.tipo}">Persona Natural</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="info-item">
+                                    <label class="form-label">Nombre Completo:</label>
+                                    <strong>
+                                        <p th:text="${beneficiary.nombreCompleto}">Juan Pérez</p>
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="info-item">
+                                    <label class="form-label">Documento:</label>
+                                    <strong>
+                                        <p th:text="${beneficiary.documento}">12345678</p>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="info-item">
+                                    <label class="form-label">Razón Social:</label>
+                                    <strong>
+                                        <p th:text="${beneficiary.razonSocial}">Razón Social Ejemplo</p>
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="info-item">
+                                    <label class="form-label">Email:</label>
+                                    <strong>
+                                        <p th:text="${beneficiary.email}">juan.perez@example.com</p>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="info-item">
+                                    <label class="form-label">Teléfono de Contacto:</label>
+                                    <strong>
+                                        <p th:text="${beneficiary.telefonoContacto}">987654321</p>
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="info-item">
+                                    <label class="form-label">País de Procedencia:</label>
+                                    <strong>
+                                        <p th:text="${beneficiary.paisProcedencia}">Argentina</p>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="info-item">
+                                    <label class="form-label">Fecha de Ingreso:</label>
+                                    <strong>
+                                        <p class="date" th:text="${beneficiary.fechaIngreso}">01 de enero de 2023</p>
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="info-item">
+                                    <label class="form-label">Observación:</label>
+                                    <strong>
+                                        <p th:text="${beneficiary.observacion}">Sin observaciones</p>
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="row">
+                            	<div class="col">
+                                	<div class="info-item">
+                                    <label class="form-label">PROYECTOS ASIGNADOS:</label>
+							            <strong>
+							                <ul>
+							                    <li th:each="project : ${projectsActivos}">
+							                        <p th:text="${project.nombre}"></p> <!-- Aquí 'nombre' es el atributo del proyecto -->
+							                    </li>
+							                </ul>
+							            </strong>
+                                	</div>
+                            	</div>
+                       		 </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a class="medium" href="/beneficiarios/lista-beneficiarios">Regresar!</a>
+        </div>
+    </div>
+    
+    <div th:replace="design/script :: scripts"></div>
+</body>
+</html>
+

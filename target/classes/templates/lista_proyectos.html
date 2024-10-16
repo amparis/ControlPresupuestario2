@@ -3,18 +3,7 @@
 
 <head th:replace="design/header :: head">
     <title>Lista Proyectos</title>
-        <style>
-        /* Transición suave para desvanecimiento */
-        #notificationMessage {
-            opacity: 1; /* El mensaje aparece con opacidad completa */
-            transition: opacity 1s ease-in-out; /* Transición de opacidad */
-        }
 
-        /* Clase para ocultar el mensaje con desvanecimiento */
-        #notificationMessage.hidden {
-            opacity: 0; /* El mensaje se desvanece */
-        }
-    </style>
 </head>
 
 <body id="page-top"  onload="hideMessage()">
@@ -56,8 +45,8 @@
                         <div class="card-body">
 				            <span th:each="menuRole : ${menuRoles}">
 								<div class="d-flex justify-content-end">
-								    <a th:href="@{/registro-proyecto}"
-								       th:if="${menuRole.menu.url == '/lista-proyectos' and menuRole.acreate}" 
+								    <a th:href="@{/proyectos/registro-proyecto}"
+								    								       th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.acreate}" 
 								       class="btn btn-outline-success">
 								       <i class="fas fa-plus"></i> + Nuevo Registro
 								    </a>
@@ -86,47 +75,39 @@
                                             <td th:text="${#dates.format(project.fechaFin, 'dd/MM/yy')}"></td>
                                             <td>
                                             <!-- Iterar sobre menuRoles para comprobar permiso de actualización -->
-				            <span th:each="menuRole : ${menuRoles}">
-				                <a th:href="@{/ver-proyecto/} + ${project.id}"
-				                   th:if="${menuRole.menu.url == '/lista-proyectos' and menuRole.aread}" 
-				                   class="btn btn-primary btn-circle  btn-sm">
-				                   <img src="/imagenes/ver.png" alt="ver detalle" width="22px" height="17px">
-				                   <i class="fas fa-exclamation-triangle"></i>
-				                </a>
-				            </span>
-				            <span th:each="menuRole : ${menuRoles}">
-				                <a th:href="@{/modificar-proyecto/} + ${project.id}"
-				                   th:if="${menuRole.menu.url == '/lista-proyectos' and menuRole.aupdate}" 
-				                   class="btn btn-warning btn-circle  btn-sm">
-				                   <img src="/imagenes/editar.png" alt="editar registro" width="20px" height="20px">
-				                   <i class="fas fa-exclamation-triangle"></i>
-				                </a>
-				            </span>
-				             <span th:each="menuRole : ${menuRoles}">
-				                 
-				                <a th:href="@{/eliminar-proyecto/} + ${project.id}"
-				                   th:if="${menuRole.menu.url == '/lista-proyectos' and menuRole.adelete}" 
-				                   class="btn btn-danger btn-circle btn-sm">
-				                   <img src="/imagenes/eliminar.png" alt="eliminar registro" width="20px" height="20px">
-				                   <i class="fas fa-exclamation-triangle"></i>
-				                </a>
-<!-- 
-<a th:href="#" 
-   th:if="${menuRole.menu.url == '/lista-proyectos' and menuRole.adelete}" 
-   class="btn btn-danger btn-circle"
-   th:onclick="'setDeleteUrl(' + ${project.id} + ')'"
-   data-bs-toggle="modal" data-bs-target="#deleteModal">
-   <img src="/imagenes/eliminar.png" alt="eliminar registro" width="20px" height="20px">
-   <i class="fas fa-exclamation-triangle"></i>
-</a> -->				            </span>
-				            <span th:each="menuRole : ${menuRoles}">
-				                <a th:href="@{/modificar-proyecto/} + ${project.id}"
-				                   th:if="${menuRole.menu.url == '/lista-proyectos' and menuRole.aupdate}" 
-				                   class="btn btn-warning btn-circle  btn-sm">
-				                   <img src="/imagenes/editar.png"  width="20px" height="20px">
-				                   Ejec
-				                </a>
-				            </span>
+								            <span th:each="menuRole : ${menuRoles}">
+								                <a th:href="@{/proyectos/ver-proyecto/} + ${project.id}"
+								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aread}" 
+								                   class="btn btn-primary btn-circle  btn-sm">
+								                   <img src="/imagenes/ver.png" alt="ver detalle" width="22px" height="17px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>
+								            <span th:each="menuRole : ${menuRoles}">
+								                <a th:href="@{/proyectos/modificar-proyecto/} + ${project.id}"
+								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
+								                   class="btn btn-warning btn-circle  btn-sm">
+								                   <img src="/imagenes/editar.png" alt="editar registro" width="20px" height="20px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>
+								             <span th:each="menuRole : ${menuRoles}">
+								                 
+								                <a th:href="@{/proyectos/eliminar-proyecto/} + ${project.id}"
+								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}" 
+								                   class="btn btn-danger btn-circle btn-sm">
+								                   <img src="/imagenes/eliminar.png" alt="eliminar registro" width="17px" height="19px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>
+								            <span th:each="menuRole : ${menuRoles}">
+								                <a th:href="@{/proyectos/ejecutar-proyecto/} + ${project.id}"
+								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
+								                   class="btn btn-success btn-circle  btn-sm">
+								                   <img src="/imagenes/money.png" alt="registro ejecucion" width="20px" height="20px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>
                                             </td>
                                         </tr>
 
@@ -197,7 +178,7 @@
 <div th:replace="design/script :: scripts"></div>
 <script>
     function setDeleteUrl(projectId) {
-        document.getElementById("confirmDeleteBtn").setAttribute("href", "/eliminar-proyecto/" + projectId);
+        document.getElementById("confirmDeleteBtn").setAttribute("href", "/proyectos/eliminar-proyecto/" + projectId);
     }
 </script>
 

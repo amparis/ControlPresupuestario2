@@ -36,6 +36,8 @@
 					                <label class="form-label">Fecha de Registro:</label>
 					                <strong><p class="date" th:text="${userAdm.dateCreation}">12 de marzo de 2023</p>
 					                </strong>
+					                <strong><p th:text="${userAdm.estado == 'V' ? 'ACTIVO' : 'INACTIVO'}">john.doe@example.com</p>
+					                </strong>
 					            </div>
 					            <div class="info-item">
 					                <label class="form-label">Rol Asignado:</label>

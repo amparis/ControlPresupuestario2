@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+</head>
+
+<body class="bg-gradient-primary" onload="hideMessage()">
+    <!-- Mensajes -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+    </div>
+
+    <div class="container" style="max-width: 900px;">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <div class="p-5">
+                    <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4" th:if="${project.id!=0}">Editar Proyecto</h1>
+                    </div>
+                    <!-- Pestañas -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#tab1">Datos Generales</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#tab2">Campos Críticos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#tab3">Asignación de Personal</a>
+                        </li>
+                    </ul>
+
+                    <form id="miFormulario" class="user" th:action="@{/proyectos/guardarEdit-proyecto}" th:method="post" th:object="${project}" onsubmit="return validateDates()">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <!-- Contenido de las pestañas -->
+                        <div class="tab-content">
+                            <!-- Tab 1: Datos Generales -->
+                            <div id="tab1" class="container tab-pane active"><br>
+                                <div class="form-group">
+                                    <label for="inputnombre" class="form-label">Nombre</label>
+                                    <input th:field="*{nombre}" type="text" class="form-control" id="inputnombre" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputdescripcion" class="form-label">Descripción</label>
+                                    <textarea th:field="*{descripcion}" class="form-control" id="inputdescripcion" rows="3" required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Tab 2: Campos Críticos -->
+				<!-- Tab 2: Campos Críticos -->
+				<div id="tab2" class="container tab-pane fade"><br>
+				    <div class="row">
+				        <div class="col">
+				            <div class="form-group">
+				                <label for="inputfechaInicial" class="form-label">Fecha Inicial</label>
+				                <input th:field="*{fechaInicial}" type="date" class="form-control" id="inputfechaInicial" required>
+				            </div>
+				        </div>
+				        <div class="col">
+				            <div class="form-group">
+				                <label for="inputfechaFin" class="form-label">Fecha de Finalización</label>
+				                <input th:field="*{fechaFin}" type="date" class="form-control" id="inputfechaFin" required>
+				            </div>
+				        </div>
+				    </div>
+				
+				    <div class="row">
+				        <div class="col">
+				            <div class="form-group">
+					            <label for="inputporcentajeRecurrente" class="form-label">Porcentaje(%) Recurrente</label>
+							     <input th:field="*{porcentajeRecurrente}" type="number"  step="0.01" class="form-control form-control-user"
+							            id="inputporcentajeRecurrente" placeholder="0.00"  min="0" required oninput="calculateMontos()" readOnly>
+				            </div>
+				        </div>
+				        <div class="col">
+				 
+				        </div>
+				    </div>
+				        <!-- Modificación del Monto -->
+				    <div class="row">
+				        <div class="col">
+				                <div class="form-group">
+				                <label for="inputValorModificacion" class="form-label">Valor a Modificar (USD)</label>
+				                <input type="number" class="form-control" id="inputValorModificacion" step="0.01" min="0">
+				                </div>
+				        </div>
+				        <div class="col">
+				        	<div class="form-group">
+					            <label class="form-label">Acción</label><br>
+					            <input type="radio" id="incrementar" name="accionMonto" value="incrementar" checked>
+					            <label for="incrementar">+ Incrementar</label>
+					            <input type="radio" id="disminuir" name="accionMonto" value="disminuir">
+					            <label for="disminuir">- Disminuir</label>
+				            </div>
+				        </div>
+				    </div>
+
+				    <!-- Cálculo de nuevos montos -->
+				    <div class="row">
+				    	<div class="col">
+				    	    <div class="form-group">
+				                <label for="inputmontoContrato" class="form-label">Monto Actual del Contrato (USD)</label>
+				                <input th:field="*{montoContrato}" type="number" class="form-control form-control-user" id="inputmontoContrato" step="0.01" min="0" readonly>
+				            </div>
+				    	</div>
+				        <div class="col">
+				            <div class="form-group">
+				                <label for="inputmontoContratoNew" class="form-label">Nuevo Monto del Contrato (USD)</label>
+				                <input type="number" class="form-control" id="inputmontoContratoNew" readonly>
+				            </div>
+				        </div>
+				    </div>
+				
+				    <div class="row">
+				        <div class="col">
+                                	<div class="form-group">
+										 <label for="inputmontoRecurrente" class="form-label">Monto Recurrente</label>
+		                                 <input th:field="*{montoRecurrente}" type="number" step="0.01" class="form-control form-control-user"
+		                                           id="inputmontoRecurrente" readonly >
+		                            </div>  
+		                                                            	<div class="form-group">
+		                                 <label for="inputmontoNoRecurrente" class="form-label">Monto No Recurrente</label>
+		                                 <input th:field="*{montoNoRecurrente}" type="number" step="0.01"  class="form-control form-control-user"
+		                                           id="inputmontoNoRecurrente" readonly >
+                                
+		                            </div>
+				        </div>
+				        <div class="col">
+				            <div class="form-group">
+				                <label for="inputmontoRecurrenteNew" class="form-label">Nuevo Monto Recurrente</label>
+				                <input type="number" class="form-control" id="inputmontoRecurrenteNew" readonly>
+				            </div>
+				            <div class="form-group">
+				                <label for="inputmontoNoRecurrenteNew" class="form-label">Nuevo Monto No Recurrente</label>
+				                <input type="number" class="form-control" id="inputmontoNoRecurrenteNew" readonly>
+				            </div>
+				        </div>
+				
+				    </div>
+				</div>
+
+
+                            <!-- Tab 3: Asignación de Personal -->
+                            <div id="tab3" class="container tab-pane fade"><br>
+                            	<div class="row">
+                            		<div class="col">
+                            			<div class="form-group">
+		                                    <label for="inputnombreSupervisor" class="form-label">Supervisor Asignado</label>
+                                            <!-- <input th:field="*{nombre}" type="text" class="form-control" id="inputnombre" required readOnly> -->
+                                            <input type="text" class="form-control form-control-user" 
+				                                   id="inputnombreCompletoSupervisor" 
+				                                   th:value="${selectedSupervisor}" 
+				                                   readOnly>
+		                                </div>
+                            		
+                            		</div>
+					        		<div class="col">
+		                                <!-- Checkbox para Asignar Supervisor -->
+		                                <div class="form-group">
+		                                    <input type="checkbox" id="assignSupervisor" onclick="toggleSupervisor()"> Asignar Nuevo Supervisor
+		                                    <br>
+		                                    <!-- 
+		                                    <select id="supervisor" name="supervisor" disabled>
+		                                        <option value="0" disabled selected>Seleccione Personal</option>
+		                                        <option th:each="supervisor : ${beneficiarySupervisor}" 
+		                                                th:value="${supervisor.id}" 
+		                                                th:text="${supervisor.nombreCompleto}">
+		                                        </option>
+		                                    </select>
+		                                    -->
+		                                    <select id="supervisor" name="supervisor" disabled>
+											    <option value="0" disabled selected>Seleccione Personal</option>
+											    <option th:each="supervisor : ${beneficiarySupervisor}" 
+											            th:if="${supervisor != null and supervisor.id != selectedSupervisorId}"
+											            th:value="${supervisor.id}" 
+											            th:selected="${supervisor.id == selectedSupervisorId}"  
+											            th:text="${supervisor.nombreCompleto}">
+											    </option>
+											</select>
+		                                </div>
+									</div>
+									
+								</div>
+								<div class="row">
+                            		<div class="col">
+                            			<div class="form-group">
+		                                    <label for="inputnombreSupervisor" class="form-label">Responsanble Asignado</label>
+                                            <!-- <input th:field="*{nombre}" type="text" class="form-control" id="inputnombre" required readOnly> -->
+		                                    <input type="text" class="form-control form-control-user" 
+				                                   id="inputnombreCompletoResponsable" 
+				                                   th:value="${selectedResponsable}" 
+				                                   readOnly>
+		                                </div>
+                            		
+                            		</div>
+					        		<div class="col">
+		                               <!-- Checkbox para Asignar Responsable -->
+		                                <div class="form-group">
+		                                    <input type="checkbox" id="assignResponsable" onclick="toggleResponsable()"> Asignar Nuevo Responsable
+		                                    <br>
+		                                    <!-- 
+		                                    <select id="responsable" name="responsable" disabled>
+		                                        <option value="0" disabled selected>Seleccione Personal</option>
+		                                        <option th:each="responsable : ${beneficiaryResponsable}"
+		                                                th:value="${responsable.id}"
+		                                                th:selected="${responsable.id == selectedResponsable}"
+		                                                
+		                                                th:text="${responsable.nombreCompleto}">
+		                                        </option>
+		                                    </select>
+		                                    -->
+		                                    <select id="responsable" name="responsable" disabled>
+		                                        <option value="0" disabled selected>Seleccione Personal</option>
+		                                        <option th:each="responsable : ${beneficiaryResponsable}"
+		                                                th:if="${responsable != null and responsable.id != selectedResponsableId}"
+		                                                th:value="${responsable.id}"
+		                                                th:selected="${responsable.id == selectedResponsableId}"
+		                                                
+		                                                th:text="${responsable.nombreCompleto}">
+		                                        </option>
+		                                    </select>
+		                                </div>
+									</div>
+									
+								</div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-user btn-block" onclick="validateForm()">GUARDAR PROYECTO</button>
+                        <div class="text-center">
+                            <a class="small" href="/proyectos/lista-proyectos">Regresar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="design/script :: scripts"></div>
+    <script>
+    function validateDates() {
+        var startDate = document.getElementById("inputfechaInicial").value;
+        var endDate = document.getElementById("inputfechaFin").value;
+
+        if (new Date(startDate) >= new Date(endDate)) {
+            alert("La fecha inicial debe ser menor a la fecha de finalización.");
+            return false;  // Evita que el formulario se envíe
+        }
+        return true;  // Permite el envío del formulario
+    }
+    
+    function calculateMontos() {
+        var montoContrato = parseFloat(document.getElementById('inputmontoContrato').value) || 0;
+        var valorModificacion = parseFloat(document.getElementById('inputValorModificacion').value) || 0;
+        var accionMonto = document.querySelector('input[name="accionMonto"]:checked').value;
+
+        // Calcular nuevo monto del contrato
+        var nuevoMontoContrato = accionMonto === 'incrementar' ? 
+            montoContrato + valorModificacion : 
+            montoContrato - valorModificacion;
+
+        if (nuevoMontoContrato < 0) {
+            alert("El monto del contrato no puede ser negativo.");
+            nuevoMontoContrato = 0;
+        }
+
+        // Actualizar campos de la interfaz
+        document.getElementById('inputmontoContratoNew').value = nuevoMontoContrato.toFixed(2);
+
+        // Calcular montos recurrente y no recurrente
+        var porcentajeRecurrente = parseFloat(document.getElementById('inputporcentajeRecurrente').value) || 0;
+        var montoRecurrenteNew = (nuevoMontoContrato * (porcentajeRecurrente / 100)).toFixed(2);
+        var montoNoRecurrenteNew = (nuevoMontoContrato * ((100 - porcentajeRecurrente) / 100)).toFixed(2);
+
+        document.getElementById('inputmontoRecurrenteNew').value = montoRecurrenteNew;
+        document.getElementById('inputmontoNoRecurrenteNew').value = montoNoRecurrenteNew;
+    }
+
+    // Llamar a la función cuando se ingrese un valor
+    document.getElementById('inputValorModificacion').addEventListener('input', calculateMontos);
+    document.querySelectorAll('input[name="accionMonto"]').forEach(function(radio) {
+        radio.addEventListener('change', calculateMontos);
+    });
+
+
+
+    // Function to add thousand separators
+    function formatNumberWithCommas(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+   
+
+    //Validando los combos de SUPERVISOR Y RESPONSABLE
+    function toggleSupervisor() {
+        const supervisorSelect = document.getElementById("supervisor");
+        const assignSupervisorCheck = document.getElementById("assignSupervisor");
+
+        // Habilitar o deshabilitar el combo de supervisor según el checkbox
+        supervisorSelect.disabled = !assignSupervisorCheck.checked;
+    }
+
+    function toggleResponsable() {
+        const responsableSelect = document.getElementById("responsable");
+        const assignResponsableCheck = document.getElementById("assignResponsable");
+        const assignSupervisorCheck = document.getElementById("assignSupervisor");
+
+        // Si se marca el checkbox de responsable, el de supervisor también debe estar marcado
+        if (assignResponsableCheck.checked) {
+            assignSupervisorCheck.checked = true;
+            toggleSupervisor(); // Asegura que el combo de supervisor se habilite
+        }
+        
+        // Habilitar o deshabilitar el combo de responsable según el checkbox
+        responsableSelect.disabled = !assignResponsableCheck.checked;
+    }
+    //Validamos la seleccion de Check
+    function validateForm() {
+    const assignSupervisorCheck = document.getElementById("assignSupervisor").checked;
+    const assignResponsableCheck = document.getElementById("assignResponsable").checked;
+    const supervisorSelect = document.getElementById("supervisor").value;
+    const responsableSelect = document.getElementById("responsable").value;
+
+		    // Validar que si está marcado "Asignar Responsable", "Asignar Supervisor" también esté marcado
+		    if (assignResponsableCheck && !assignSupervisorCheck) {
+		        alert("Debes asignar un supervisor si asignas un responsable.");
+		        return false;
+		    }
+		
+		    // Validar que si los checkboxes están marcados, los selects no estén vacíos
+		    if (assignSupervisorCheck && supervisorSelect === "0") {
+		        alert("Por favor, selecciona un supervisor.");
+		        return false;
+		    }
+		    if (assignResponsableCheck && responsableSelect === "0") {
+		        alert("Por favor, selecciona un responsable.");
+		        return false;
+		    }
+
+	    // Si pasa todas las validaciones, enviar el formulario
+	    return true;
+    }
+</script>
+    <script>
+        // Función para prevenir el envío del formulario con la tecla Enter
+        function disableEnterKey(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Previene la acción predeterminada (enviar el formulario)
+            }
+        }
+
+        // Añadir el listener al cargar el documento
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("miFormulario"); // Cambia "miFormulario" por el ID de tu formulario
+            form.addEventListener("keypress", disableEnterKey);
+        });
+    </script>
+</body>
+</html>

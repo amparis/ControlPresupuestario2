@@ -158,5 +158,57 @@ public class UserAdm {
 			this.perfil = perfil;
 		}
 
+		@ManyToOne(fetch = FetchType.EAGER, optional = true) // Permite que sea nulo
+		@JoinColumn(name = "us_ben_id", nullable = true)
+		private Beneficiary beneficiario;
+		/*
+		Relación opcional: Usamos optional = true para que el campo beneficiario pueda ser nulo.
+				@JoinColumn con nullable = true: Esto permite que la columna us_ben_id sea opcional en la base de datos.
+				Estrategia EAGER: Esta es una estrategia común en relaciones ManyToOne para cargar el beneficiario asociado junto con el usuario.
+		*/
+		/** @return the beneficiario
+		 */
+		public Beneficiary getBeneficiario() {
+			return beneficiario;
+		}
 
+		/**
+		 * @param beneficiario the beneficiario to set
+		 */
+		public void setBeneficiario(Beneficiary beneficiario) {
+			this.beneficiario = beneficiario;
+		}
+
+		public UserAdm orElseThrow(Object object) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+
+		/*public UserAdm orElseThrow() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public UserAdm orElseThrow(Object object) {
+			// TODO Auto-generated method stub
+			return null;
+		}*/
+		 @Column(name = "us_estado")
+		 private String estado;
+
+		/**
+		 * @return the estado
+		 */
+		public String getEstado() {
+			return estado;
+		}
+
+		/**
+		 * @param estado the estado to set
+		 */
+		public void setEstado(String estado) {
+			this.estado = estado;
+		}
+		
 }

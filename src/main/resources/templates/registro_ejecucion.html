@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+</head>
+
+<body class="bg-gradient-primary" onload="hideMessage()">
+    <!-- Mostrar el mensaje si está presente -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+    </div>
+<div class="container" style="max-width: 800px;">
+    <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div>
+                <div>
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${project.id==0}">Registrar Proyecto</h1>
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${project.id!=0}">Modificar Proyecto</h1>
+                        </div>
+                        <form class="user" th:action="@{/proyectos/guardar-proyecto}" th:method="post" th:object="${project}" onsubmit="return validateDates()">
+                        
+                            <input type="hidden" th:if="${project.id!=0}" th:field="*{id}" th:value="${project.id}">
+                            
+                            <div class="row">
+                            	<div class="col">
+                            		<div class="form-group">
+		                                <label for="inputnombre" class="form-label">Nombre</label>
+		                                <input th:field="*{nombre}" type="text" class="form-control form-control-user"
+		                                       id="inputnombre" placeholder="Nombre del Proyecto" required>
+	                                </div>
+                                </div>
+                                <div class="col">
+                                	<div class="form-group">
+                                		<label for="inputdescripcion" class="form-label">Descripcion</label>
+		                                <textarea th:field="*{descripcion}" class="form-control form-control-user"
+		                                       id="inputdescripcion" placeholder="Breve descripcion del proyecto"  rows="3" value="Mark" required></textarea>
+
+                                	</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                            	<div class="col">
+                            		<div class="form-group">
+			                              <label for="inputfechaInicial" class="form-label">Fecha Inicial</label>
+			                              <input th:field="*{fechaInicial}" type="date" class="form-control form-control-user"
+			                                           id="inputfechaInicial"  value="Mark" required>                                	
+	                                </div>                             	
+                                </div>
+                                <div class="col">
+                                	<div class="form-group">
+										 <label for="inputfechaFin" class="form-label">Fecha de Finalizacion</label>
+		                                 <input th:field="*{fechaFin}" type="date" class="form-control form-control-user"
+		                                           id="inputfechaFin"  value="Mark" required>
+
+		                            </div>      
+                            	</div>
+                            </div>
+							<hr>
+                            <!-- Agregamos % recurrente y los montos calculados automaticos -->
+                            <div class="row">
+                                <div class="col">
+                                	<div class="form-group">
+                                		<label for="inputmontoContrato" class="form-label">Monto en USD del Proyecto</label>
+		                                <input th:field="*{montoContrato}" type="number" step="0.01" class="form-control form-control-user"
+		                                       id="inputmontoContrato" placeholder="0.00"  min="1" oninput="calculateMontos()">
+		                                <small id="errorMonto" class="text-danger" style="display: none;">El monto no puede ser menor a 0</small>
+
+                                	</div>
+                                </div>
+                              
+                            	<div class="col">
+                            		<div class="form-group">
+		                                <label for="inputporcentajeRecurrente" class="form-label">Porcentaje(%) Recurrente</label>
+		                                <input th:field="*{porcentajeRecurrente}" type="number"  step="0.01" class="form-control form-control-user"
+		                                           id="inputporcentajeRecurrente" placeholder="0.00"  min="0" required oninput="calculateMontos()">
+		                                <small id="errorMonto" class="text-danger" style="display: none;" >El porcentaje no puede ser negativo</small>
+		                                
+                                	</div>                             	
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                	<div class="form-group">
+										 <label for="inputmontoRecurrente" class="form-label">Monto Recurrente</label>
+		                                 <input th:field="*{montoRecurrente}" type="number" step="0.01" class="form-control form-control-user"
+		                                           id="inputmontoRecurrente" readonly >
+		                            </div>                             	
+                                </div>
+                                <div class="col">
+                                	<div class="form-group">
+		                                 <label for="inputmontoNoRecurrente" class="form-label">Monto No Recurrente</label>
+		                                 <input th:field="*{montoNoRecurrente}" type="number" step="0.01"  class="form-control form-control-user"
+		                                           id="inputmontoNoRecurrente" readonly >
+                                
+		                            </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <!-- Agregamos Supervisor y Responsable del Proyecto -->
+                            <div class="row">
+                             <label class="form-label">Asignacion de Personal:</label>
+                             </div>
+                             <div class="row">
+                            	<div class="col">
+                            		<div class="form-group">
+                            		Supervisor del Proyecto
+
+							  		 <select id="supervisor" name="supervisor" onchange="validateSelection()">
+							                <option value="0" disabled selected th:if="${selectedSupervisor  == null || selectedSupervisor  == 0 }">Seleccione Personal</option> <!-- Opción por defecto si es null -->
+							                <option th:each="supervisor : ${beneficiarySupervisor}" 
+							                        th:value="${supervisor.id}" 
+							                        th:selected="${supervisor.id == selectedSupervisor}"  
+							                        th:text="${supervisor.nombreCompleto}">
+							                </option>
+							            </select>
+                                	</div>                             	
+                                </div>
+                                <div class="col">
+                                	<div class="form-group">
+                                	Responsable del Proyecto
+									 <select id="responsable" name="responsable" onchange="validateSelection()" required>
+						                <!-- <option value="0" disabled selected>Seleccione Personal</option> Opción por defecto -->
+                						<option value="0" disabled selected th:if="${selectedResponsable == null || selectedResponsable == 0}">Seleccione Personal</option> <!-- Opción por defecto si es null -->
+									    
+									    <option th:each="responsable : ${beneficiaryResponsable}"
+									            th:value="${responsable.id}"
+									            th:selected="${responsable.id == selectedResponsable}"
+									            th:text="${responsable.nombreCompleto}">
+									    </option>
+									</select>                   	
+		                            </div>
+                                </div>
+                            </div>
+                            
+ 							<!-- Mostrar mensaje de error si existe -->
+                            <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
+                                <p th:text="${error}"></p>
+                            </div>
+                             <button class="btn btn-primary btn-user btn-block">
+                                GUARDAR PROYECTO
+                             </button>
+							<div class="text-center">
+                                <a class="small" href="/proyectos/lista-proyectos">Regresar!</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="design/script :: scripts"></div>
+<script>
+    function calculateMontos() {
+        var montoContrato = parseFloat(document.getElementById('inputmontoContrato').value) || 0;
+        var porcentajeRecurrente = parseFloat(document.getElementById('inputporcentajeRecurrente').value) || 0;
+
+        var montoRecurrente = (montoContrato * (porcentajeRecurrente / 100)).toFixed(2);
+        var montoNoRecurrente = (montoContrato * ((100-porcentajeRecurrente)/100)).toFixed(2);
+
+        document.getElementById('inputmontoRecurrente').value = montoRecurrente;
+        document.getElementById('inputmontoNoRecurrente').value = montoNoRecurrente;
+    }
+
+    // Function to add thousand separators
+    function formatNumberWithCommas(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    
+
+</script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+

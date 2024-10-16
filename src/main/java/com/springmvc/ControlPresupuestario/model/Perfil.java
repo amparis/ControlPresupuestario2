@@ -45,8 +45,6 @@ public class Perfil {
     @Column(name = "rol_fecha_creacion")
     private Timestamp dateCreate;
     
-    @OneToMany(mappedBy = "perfil",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private List<Employee> employees = new ArrayList<>();
 
 	/**
 	 * @return the id
@@ -74,20 +72,6 @@ public class Perfil {
 	 */
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	/**
-	 * @return the employees
-	 */
-	public List<Employee> getEmployees() {
-		return employees;
-	}
-
-	/**
-	 * @param employees the employees to set
-	 */
-	public void setEmployees(List<Employee> employees) {
-		this.employees = employees;
 	}
 
 	/**

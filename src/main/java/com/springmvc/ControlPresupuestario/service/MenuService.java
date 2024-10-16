@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.springmvc.ControlPresupuestario.model.Menu;
+import com.springmvc.ControlPresupuestario.model.RolMenu;
 import com.springmvc.ControlPresupuestario.repository.MenuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +27,36 @@ public class MenuService {
 		
 		return this.menuRepository.findById(id).get();
 	}
+	
+	 public List<Menu> getMenusVigentes(){
+		 return this.menuRepository.findAllByEstado();
+	 }
+	  
+	   /*public List<Menu> getMenusVigentes() {
+	        List<Menu> allMenus = menuRepository.findAll(); // Obtener todos los menús
+	        List<Menu> parentMenus = new ArrayList<>(); // Lista de menús de nivel superior
+
+	        // Filtrar los menús vigentes (por ejemplo, estado = "V")
+	        for (Menu menu : allMenus) {
+	            if ("V".equals(menu.getEstado()) && menu.getSupMenu() == null) {
+	                parentMenus.add(menu); // Agregar menús sin superior a la lista de menús padre
+	            }
+	        }
+
+	        // Añadir submenús a los menús de nivel superior
+	        for (Menu parent : parentMenus) {
+	            List<Menu> subMenus = new ArrayList<>();
+	            for (Menu menu : allMenus) {
+	                if ("V".equals(menu.getEstado()) && menu.getSupMenu() != null && 
+	                    menu.getSupMenu().getId().equals(parent.getId())) {
+	                    subMenus.add(menu); // Agregar submenús a la lista
+	                }
+	            }
+	            parent.setSubMenus(subMenus); // Establecer submenús en el menú padre
+	        }
+
+	        return parentMenus; // Retornar solo los menús de nivel superior con sus submenús
+	    }*/
 /*
 	public List<Menu> getMenusJerarquicos() {
         List<Menu> allMenus = getMenus();
@@ -57,5 +90,10 @@ public class MenuService {
         }
         return menuRaiz;
     }*/
-	
+
+	/*public Optional<Menu> findById(Long menuId) {
+		// TODO Auto-generated method stub
+		return this.menuRepository.findById(menuId);
+	}
+	*/
 }

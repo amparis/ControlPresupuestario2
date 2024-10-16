@@ -3,8 +3,14 @@ package com.springmvc.ControlPresupuestario.service;
 import com.springmvc.ControlPresupuestario.model.Perfil;
 import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.repository.PerfilRepository;
+import com.springmvc.ControlPresupuestario.repository.RolMenuRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.springmvc.ControlPresupuestario.exception.CustomException;
+
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -15,6 +21,9 @@ public class PefilService {
 
     @Autowired
     PerfilRepository perfilRepository;
+    
+    @Autowired
+    RolMenuRepository rolMenuRepository;
 
 
     public List<Perfil> getRoles() {
@@ -48,8 +57,25 @@ public class PefilService {
 
 	}
 	
+	@Transactional
 	public void deleteRol(long id) {
-		this.perfilRepository.deleteById(id);
-	}
+		 try { // Primero, elimine las entradas de RolMenu por id de rol
+		//this.perfilRepository.deleteById(id);
+	    // Elimina las relaciones de rol en la tabla rol_menu
+		    rolMenuRepository.deleteByRoleId(id);   
+		// Elimina el rol de la tabla tbl_rol
+		    perfilRepository.deleteById(id); 
+		} catch (DataIntegrityViolationException e) { 
+			System.out.println(e);
+			// Manejar excepciones específicas relacionadas con problemas de integridad de la base de datos 
+			throw new CustomException("No se puede eliminar el rol porque aún se hace referencia a él en otras tablas", e); 
+			
+			} 
+		 catch (Exception e) { // Manejar excepciones generales 
+			 System.out.println(e);
+			 throw new CustomException("Se produjo un error al intentar eliminar el rol", e); 
+			 }
+		 }	
+
 
 }

@@ -4,8 +4,10 @@ import java.util.Optional;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.springmvc.ControlPresupuestario.model.RolMenu;
 import com.springmvc.ControlPresupuestario.model.RolMenuId;
@@ -21,6 +23,11 @@ public interface RolMenuRepository extends JpaRepository<RolMenu,RolMenuId>{
 	  
 	  public void deleteByRoleIdAndMenuId(Long roleId, Long menuId);
 	 
-	  public void deleteByRoleId(Long roleId);
+	  //public void deleteByRoleId(Long roleId);
+	  
+	  @Transactional
+	  @Modifying
+	  @Query("DELETE FROM RolMenu rm WHERE rm.id.roleId = :roleId")
+	  void deleteByRoleId(Long roleId);
 
 }
