@@ -1,4 +1,4 @@
-# Contabilidad básica empresarial
+# Control Presupuestario
 
 Proyecto desarrollado con spring boot, Spring Web, Spring Security, thymeleaf y base de datos postgree en nube, en el cual se refleja un CRUD en busca de organizar y controlar, de manera basica, los ingresos y egresos de una Empresa realizado por medio de los empleados autorizados.
 
@@ -57,7 +57,4 @@ El orden de prioridad es de la siguiente manera:
 
 ---
 
-## Contacto
 
-Si tienes dudas sobre este u otro proyecto, o quieres contactarme, puedes realizarlo por medio de
-mi mail john.chamorroc@gmail.com o mi [perfil](https://www.linkedin.com/in/john-edisson-chamorro-coral-76ab74228/) de LinkedIn
