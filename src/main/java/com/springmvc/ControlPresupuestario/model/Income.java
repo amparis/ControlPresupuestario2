@@ -16,6 +16,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 
 @ToString
@@ -30,18 +31,18 @@ public class Income {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ing_id")
-    private Long id;
+    private Integer id;
     
     @ManyToOne
-    @JoinColumn(name = "cuenta_id",  insertable = false, updatable = false)//referencedColumnName = "cuenta_id", //foreignKey = @ForeignKey(name = "fk_tbl_ingr_relations_tbl_cuen"))
+    @JoinColumn(name = "cuenta_id")//referencedColumnName = "cuenta_id", //foreignKey = @ForeignKey(name = "fk_tbl_ingr_relations_tbl_cuen"))
     private Account account;
 
     @ManyToOne
-    @JoinColumn(name = "proy_id", insertable = false, updatable = false)// referencedColumnName = "proy_id",  foreignKey = @ForeignKey(name = "fk_tbl_ingr_relations_tbl_proy"))
+    @JoinColumn(name = "proy_id")//permitirás que JPA maneje las claves foráneas automáticamente y se inserten correctamente en la base de datos
     private Project proyecto;
 
     @Column(name = "ing_fecha", nullable = false)
-    private Timestamp fecha;
+    private Date fecha;
 
     @Column(name = "ing_categoria", length = 50, nullable = false)
     private String categoria;
@@ -50,16 +51,13 @@ public class Income {
     private String concepto;
 
     @Column(name = "ing_monto", precision = 18, scale = 2, nullable = false)
-    private BigDecimal monto;
+    private double monto;
 
-    @Column(name = "ing_porcent_recu", precision = 4, scale = 2, nullable = false)
-    private BigDecimal porcentajeRecurrente;
+     @Column(name = "ing_monto_recurrente", precision = 18, scale = 2, nullable = false)
+    private double montoRecurrente;
 
-    @Column(name = "ing_montore_currente", precision = 18, scale = 2, nullable = false)
-    private BigDecimal montoRecurrente;
-
-    @Column(name = "ing_monto_proyecto", precision = 18, scale = 2, nullable = false)
-    private BigDecimal montoProyecto;
+    @Column(name = "ing_monto_no_recurrente", precision = 18, scale = 2, nullable = false)
+    private double montoNoRecurrente;
 
     @Column(name = "ing_estado", length = 10, nullable = false)
     private String estado;
@@ -67,17 +65,23 @@ public class Income {
     @Column(name = "ing_us_id", nullable = false)
     private Integer usuarioId;
 
+    @Column(name = "ing_fecha_registro", nullable = false)
+    private Timestamp fechaRegistro;
+
+    @Column(name = "ing_proy_id_prestamo")
+    private Long proyIdPrestamo;
+
 	/**
 	 * @return the id
 	 */
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -112,14 +116,14 @@ public class Income {
 	/**
 	 * @return the fecha
 	 */
-	public Timestamp getFecha() {
+	public Date getFecha() {
 		return fecha;
 	}
 
 	/**
 	 * @param fecha the fecha to set
 	 */
-	public void setFecha(Timestamp fecha) {
+	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
 
@@ -151,61 +155,7 @@ public class Income {
 		this.concepto = concepto;
 	}
 
-	/**
-	 * @return the monto
-	 */
-	public BigDecimal getMonto() {
-		return monto;
-	}
-
-	/**
-	 * @param monto the monto to set
-	 */
-	public void setMonto(BigDecimal monto) {
-		this.monto = monto;
-	}
-
-	/**
-	 * @return the porcentajeRecaudado
-	 */
-	public BigDecimal getPorcentajeRecurrente() {
-		return porcentajeRecurrente;
-	}
-
-	/**
-	 * @param porcentajeRecaudado the porcentajeRecaudado to set
-	 */
-	public void setPorcentajeRecurrente(BigDecimal porcentajeRecurrente) {
-		this.porcentajeRecurrente = porcentajeRecurrente;
-	}
-
-	/**
-	 * @return the montoRecaudadoCorriente
-	 */
-	public BigDecimal getMontoRecurrente() {
-		return montoRecurrente;
-	}
-
-	/**
-	 * @param montoRecaudadoCorriente the montoRecaudadoCorriente to set
-	 */
-	public void setMontoRecurrente(BigDecimal montoRecurrente) {
-		this.montoRecurrente = montoRecurrente;
-	}
-
-	/**
-	 * @return the montoProyecto
-	 */
-	public BigDecimal getMontoProyecto() {
-		return montoProyecto;
-	}
-
-	/**
-	 * @param montoProyecto the montoProyecto to set
-	 */
-	public void setMontoProyecto(BigDecimal montoProyecto) {
-		this.montoProyecto = montoProyecto;
-	}
+	
 
 	/**
 	 * @return the estado
@@ -233,6 +183,77 @@ public class Income {
 	 */
 	public void setUsuarioId(Integer usuarioId) {
 		this.usuarioId = usuarioId;
+	}
+
+	
+	/**
+	 * @return the fechaRegistro
+	 */
+	public Timestamp getFechaRegistro() {
+		return fechaRegistro;
+	}
+
+	/**
+	 * @param fechaRegistro the fechaRegistro to set
+	 */
+	public void setFechaRegistro(Timestamp fechaRegistro) {
+		this.fechaRegistro = fechaRegistro;
+	}
+
+	/**
+	 * @return the proyIdPrestamo
+	 */
+	public Long getProyIdPrestamo() {
+		return proyIdPrestamo;
+	}
+
+	/**
+	 * @param proyIdPrestamo the proyIdPrestamo to set
+	 */
+	public void setProyIdPrestamo(Long proyIdPrestamo) {
+		this.proyIdPrestamo = proyIdPrestamo;
+	}
+
+	/**
+	 * @return the monto
+	 */
+	public double getMonto() {
+		return monto;
+	}
+
+	/**
+	 * @param monto the monto to set
+	 */
+	public void setMonto(double monto) {
+		this.monto = monto;
+	}
+
+	/**
+	 * @return the montoRecurrente
+	 */
+	public double getMontoRecurrente() {
+		return montoRecurrente;
+	}
+
+	/**
+	 * @param montoRecurrente the montoRecurrente to set
+	 */
+	public void setMontoRecurrente(double montoRecurrente) {
+		this.montoRecurrente = montoRecurrente;
+	}
+
+	/**
+	 * @return the montoNoRecurrente
+	 */
+	public double getMontoNoRecurrente() {
+		return montoNoRecurrente;
+	}
+
+	/**
+	 * @param montoNoRecurrente the montoNoRecurrente to set
+	 */
+	public void setMontoNoRecurrente(double montoNoRecurrente) {
+		this.montoNoRecurrente = montoNoRecurrente;
 	}
 
     

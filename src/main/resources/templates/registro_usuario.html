@@ -2,7 +2,6 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head th:replace="design/header :: head">
-    <title>Administración de Usuarios</title>
 </head>
 
 <body class="bg-gradient-primary">
@@ -21,32 +20,32 @@
                 <div>
                     <div class="p-5">
                         <div class="text-center">
-                            <h1 class="h4 text-gray-900 mb-4" th:if="${userAdm.id==0}">Registrar Usuario</h1>
-                            <h1 class="h4 text-gray-900 mb-4" th:if="${userAdm.id!=0}">Modificar Usuario</h1>
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${userAdm.id==0}">Register User</h1>
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${userAdm.id!=0}">Edit User</h1>
                         </div>
                         <form class="user" th:action="@{/userAdm}" th:method="post" th:object="${userAdm}" onsubmit="return validatePassword()">
                             <input type="hidden" th:if="${userAdm.id!=0}" th:field="*{id}" th:value="${userAdm.id}">
                             <div class="form-group">
-                                <label for="inputusernamee" class="form-label">Nombre de Usuario</label>
+                                <label for="inputusernamee" class="form-label">Username</label>
                                 <input th:field="*{usernamee}" type="text" class="form-control form-control-user"
                                        id="inputusernamee"
-                                       placeholder="Usuario" required>
+                                       placeholder="Enter Username" required>
                             </div>
                             <div class="form-group">
-                                <label for="inputfullname" class="form-label">Nombre Completo</label>
+                                <label for="inputfullname" class="form-label">Full name</label>
                                 <input th:field="*{fullname}" type="text" class="form-control form-control-user"
                                        id="inputfullname"
-                                       placeholder="Nombre completo" required>
+                                       placeholder="Enter full name" required>
                             </div>
 
                             <div class="form-group">
                                 <label for="inputemail" class="form-label">Email</label>
                                 <input th:field="*{email}" type="email" class="form-control form-control-user"
                                        id="inputmail"
-                                       placeholder="Email" required>
+                                       placeholder="example@gmail.com" required>
                             </div>
                               <div class="form-group">
-                              Seleccione Rol:
+                              Select Role:
                                 <select class="form-control"
                                          th:field="*{perfil}">
                                     <option th:each="rol : ${roles}" th:value="${rol.id}"
@@ -69,10 +68,10 @@
                                 <p th:text="${error}"></p>
                             </div>
                             <button  type="submit" id="btnform-userAdm" class="btn btn-primary btn-user btn-block" >
-                                GUARDAR USUARIO
+                                SAVE USUARIO
                             </button>
                             <div class="text-center">
-                                <a class="small" href="/lista-usuarios">Regresar!</a>
+                                <a class="medium" href="/lista-usuarios">GO BACK!</a>
                             </div>
 
                         </form>

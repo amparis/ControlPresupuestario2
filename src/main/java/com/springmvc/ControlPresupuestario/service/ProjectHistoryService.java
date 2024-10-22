@@ -35,9 +35,9 @@ public class ProjectHistoryService {
        return this.projectHistoryRepository.findAll();  
    }
 	
-	public List<ProjectHistory> getProjectHistory(long ProyectId) {
+	public List<ProjectHistory> getProjectHistory(long proyectId) {
 		
-		return this.projectHistoryRepository.findByProjectId(ProyectId);
+		return this.projectHistoryRepository.findByProjectId(proyectId);
 	}
 	
     public ProjectHistory saveProjectHistory(ProjectHistory newProjectHistory) {
@@ -51,5 +51,6 @@ public class ProjectHistoryService {
 
         return this.projectHistoryRepository.save(newProjectHistory);
     }
+
 
 }

@@ -7,8 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+
 
 import java.sql.Date;
 
@@ -30,9 +29,12 @@ public class Beneficiary {
     @Column(name = "ben_tipo", length = 50)
     private String tipo;
 
-    @Column(name = "ben_nombre_completo", length = 100)
-    private String nombreCompleto;
+    @Column(name = "ben_nombres", length = 100)
+    private String nombres;
 
+    @Column(name = "ben_apellidos", length = 100)
+    private String apellidos;
+    
     @Column(name = "ben_doc", length = 50)
     private String documento;
 
@@ -61,28 +63,43 @@ public class Beneficiary {
     private Date fechaIngreso;
 
     // Getters y Setters
-    public Integer getId() {
-        return id;
-    }
+
 
     public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getTipo() {
+
+	public String getNombres() {
+		return nombres;
+	}
+
+
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
+	}
+
+
+	public String getApellidos() {
+		return apellidos;
+	}
+
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+
+
+	public Integer getId() {
+		return id;
+	}
+
+	public String getTipo() {
         return tipo;
     }
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
-    }
-
-    public String getNombreCompleto() {
-        return nombreCompleto;
-    }
-
-    public void setNombreCompleto(String nombreCompleto) {
-        this.nombreCompleto = nombreCompleto;
     }
 
     public String getDocumento() {
@@ -156,4 +173,5 @@ public class Beneficiary {
     public void setFechaIngreso(Date fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
+    
 }

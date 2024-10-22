@@ -21,4 +21,5 @@ public interface UserAdmRepository extends JpaRepository<UserAdm,Long>{
 	  @Query("SELECT rm FROM UserAdm rm  WHERE rm.beneficiario.id= :us_ben_id and rm.beneficiario.estado = 'V'")
 	  public Optional<UserAdm> findByBeneficiario(Integer us_ben_id);
 
+
 }

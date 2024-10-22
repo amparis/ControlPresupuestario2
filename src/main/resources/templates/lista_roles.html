@@ -32,7 +32,7 @@
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Roles registrados</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Registered Roles</h6>
                         </div>
                         <div class="card-body">
 				            <span th:each="menuRole : ${menuRoles}">
@@ -40,7 +40,7 @@
 				                <a th:href="@{/registro-rol}"
 				                   th:if="${menuRole.menu.url == '/lista-roles' and menuRole.acreate}" 
 				                   class="btn btn-outline-success ">
-				                   <i class="fas fa-plus">Nuevo Registro</i>
+				                   <i class="fas fa-plus">+ New Registration</i>
 				                </a>
 				                </div>
 				            </span>
@@ -48,16 +48,10 @@
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            <th>Nombre de Rol</th>
-                                            <th>Acciones</th>
+                                            <th>Role Name</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Nombre de Rol</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </tfoot>
                                     <tbody>
                                         <tr th:each="rol : ${roles}">
                                             <td th:text="${rol.name}"></td>

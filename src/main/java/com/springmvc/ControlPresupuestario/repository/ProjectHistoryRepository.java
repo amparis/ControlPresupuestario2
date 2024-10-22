@@ -10,6 +10,6 @@ import com.springmvc.ControlPresupuestario.model.RolMenu;
 
 public interface ProjectHistoryRepository extends JpaRepository<ProjectHistory,Long> {
 	
-	  @Query("SELECT ph FROM ProjectHistory ph  WHERE ph.project.id = :projectId order by ph.id")
+	  @Query("SELECT ph FROM ProjectHistory ph  WHERE ph.project.id = :projectId order by ph.id desc")
 	  public List<ProjectHistory> findByProjectId(Long projectId);	
 }

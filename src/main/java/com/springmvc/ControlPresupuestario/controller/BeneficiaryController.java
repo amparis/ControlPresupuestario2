@@ -2,6 +2,7 @@ package com.springmvc.ControlPresupuestario.controller;
 
 import com.springmvc.ControlPresupuestario.model.Beneficiary;
 import com.springmvc.ControlPresupuestario.service.BeneficiaryService;
+import com.springmvc.ControlPresupuestario.service.CountryService;
 import com.springmvc.ControlPresupuestario.service.IMyUserDetailsService;
 import com.springmvc.ControlPresupuestario.service.PefilService;
 import com.springmvc.ControlPresupuestario.service.RolMenuService;
@@ -28,13 +29,18 @@ public class BeneficiaryController {
     UserAdmService userService;
     @Autowired
     RolMenuService rolMenuService;
-    
+	@Autowired
+	private CountryService countryService;
+	
     // Listar Beneficiarios
     @GetMapping("/lista-beneficiarios")
     public String getBeneficiaries(Model model) {
         model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
         model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
         model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());//para jalar el MENU
+        
+        
+        
         model.addAttribute("beneficiaries", beneficiaryService.getAllBeneficiaries());
         
         return "lista_beneficiarios"; // Nombre de la vista Thymeleaf
@@ -55,6 +61,8 @@ public class BeneficiaryController {
     public String showRegisterForm(Model model) {
        
         model.addAttribute("beneficiary", new Beneficiary());
+	    model.addAttribute("paises", countryService.getAllCountries()); 
+
         return "registro_beneficiario"; // Nombre de la vista Thymeleaf
     }
 

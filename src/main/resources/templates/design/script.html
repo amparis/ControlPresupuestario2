@@ -27,7 +27,15 @@
     <script th:src="@{/js/demo/datatables-demo.js}"></script>
     <script th:src="@{/js/demo/dom.js}"></script>
         <!-- Otros elementos del head -->
-
+<script>
+function formatDate(input) {
+    let date = new Date(input.value);
+    let formattedDate = (('0' + (date.getMonth() + 1)).slice(-2)) + '/' + 
+                        (('0' + date.getDate()).slice(-2)) + '/' + 
+                        date.getFullYear();
+    input.value = formattedDate;
+}
+</script>
 </div>
 </body>
 

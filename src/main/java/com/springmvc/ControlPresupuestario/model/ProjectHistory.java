@@ -24,7 +24,7 @@ public class ProjectHistory {
     @Column(name = "mc_monto", nullable = false)
     private double amount;
 
-    @Column(name = "mc_observacion", nullable = false)
+    @Column(name = "mc_justificacion", nullable = false)
     private String observation;
 
     @Column(name = "mc_fecha_registro", nullable = false)
@@ -46,6 +46,9 @@ public class ProjectHistory {
     @Column(name = "mc_detalle", nullable = false)
     private String detail;
 
+    
+    @Column(name = "mc_correlativo")
+    private Integer correlativo;
     // Getters y Setters
 
     public Long getId() {

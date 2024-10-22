@@ -7,7 +7,9 @@
 body {
     background: #ecf0f3;
 }
-
+        body.bg-vista-edit-registro {
+            background: linear-gradient(to right, rgb(0, 157, 224), rgb(0, 100, 150));
+        }
 #body_fondo {
     background-image: url('/imagenes/fondo_inicio.png'); /* Ruta relativa desde el CSS */
     background-size: cover;  /* Hace que la imagen ocupe toda la pantalla */
@@ -43,7 +45,7 @@ body {
 
 h1 {
     font-size: 2rem;
-    color: #4e73df;
+    color: rgb(0,157, 224);
     font-weight: 700;
     margin-bottom: 1.5rem;
     text-align: center;
@@ -55,7 +57,10 @@ h2 {
     font-weight: 600;
     margin-bottom: 20px;
 }
-
+h6{
+   
+   color: rgb(0,157, 224);
+}
 /* User Info Card */
 .info-card {
     border: 1px solid #d1d3e2;
@@ -145,3 +150,14 @@ h2 {
         padding: 10px;
     }
 }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+        .col {
+            flex: 0 0 50%;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }

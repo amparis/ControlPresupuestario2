@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head th:replace="design/header :: head">
-    <title>Detalles del Beneficiario</title>
     <style>
         .row {
             display: flex;
@@ -16,27 +15,27 @@
     </style>
 </head>
 
-<body class="bg-gradient-primary" id="page-top" onload="hideMessage()">
+<body class="bg-vista-edit-registro" id="page-top" onload="hideMessage()">
     <div class="container" style="max-width: 800px;">
         <div class="card o-hidden border-0 shadow-lg my-5">
             <div class="card-body p-0">
                 <div class="p-5">
                     <div class="text-center">
-                        <h1 class="h4 text-gray-900 mb-4">Detalles del Beneficiario</h1>
+                        <h1 class="h4 text-gray-900 mb-4">Beneficiary Details</h1>
                     </div>
                     <div class="info-card">
                         <div class="row">
                             <div class="col">
                                 <div class="info-item">
-                                    <label>Tipo:</label>
-                                    <p th:text="${beneficiary.tipo}">Persona Natural</p>
+                                    <label>Beneficiary type:</label>
+                                    <p th:text="${beneficiary.tipo}">Staff</p>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="info-item">
-                                    <label class="form-label">Nombre Completo:</label>
+                                    <label class="form-label">Full Name:</label>
                                     <strong>
-                                        <p th:text="${beneficiary.nombreCompleto}">Juan Pérez</p>
+                                        <p th:text="${beneficiary.nombres +' '+ (beneficiary.apellidos != null ? beneficiary.apellidos : '') }">Juan Pérez</p>
                                     </strong>
                                 </div>
                             </div>
@@ -45,7 +44,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="info-item">
-                                    <label class="form-label">Documento:</label>
+                                    <label class="form-label">Identification Document:</label>
                                     <strong>
                                         <p th:text="${beneficiary.documento}">12345678</p>
                                     </strong>
@@ -53,9 +52,9 @@
                             </div>
                             <div class="col">
                                 <div class="info-item">
-                                    <label class="form-label">Razón Social:</label>
+                                    <label class="form-label">Company Name:</label>
                                     <strong>
-                                        <p th:text="${beneficiary.razonSocial}">Razón Social Ejemplo</p>
+                                        <p th:text="${beneficiary.razonSocial}">Company Name example</p>
                                     </strong>
                                 </div>
                             </div>
@@ -72,7 +71,7 @@
                             </div>
                             <div class="col">
                                 <div class="info-item">
-                                    <label class="form-label">Teléfono de Contacto:</label>
+                                    <label class="form-label">Contact phone:</label>
                                     <strong>
                                         <p th:text="${beneficiary.telefonoContacto}">987654321</p>
                                     </strong>
@@ -83,7 +82,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="info-item">
-                                    <label class="form-label">País de Procedencia:</label>
+                                    <label class="form-label">Country origin:</label>
                                     <strong>
                                         <p th:text="${beneficiary.paisProcedencia}">Argentina</p>
                                     </strong>
@@ -91,7 +90,7 @@
                             </div>
                             <div class="col">
                                 <div class="info-item">
-                                    <label class="form-label">Fecha de Ingreso:</label>
+                                    <label class="form-label">Star Date:</label>
                                     <strong>
                                         <p class="date" th:text="${beneficiary.fechaIngreso}">01 de enero de 2023</p>
                                     </strong>
@@ -102,7 +101,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="info-item">
-                                    <label class="form-label">Observación:</label>
+                                    <label class="form-label">Observation:</label>
                                     <strong>
                                         <p th:text="${beneficiary.observacion}">Sin observaciones</p>
                                     </strong>
@@ -112,7 +111,7 @@
                             <div class="row">
                             	<div class="col">
                                 	<div class="info-item">
-                                    <label class="form-label">PROYECTOS ASIGNADOS:</label>
+                                    <label class="form-label">ASSIGNED PROJECTS:</label>
 							            <strong>
 							                <ul>
 							                    <li th:each="project : ${projectsActivos}">
@@ -129,7 +128,7 @@
         </div>
 
         <div class="text-center">
-            <a class="medium" href="/beneficiarios/lista-beneficiarios">Regresar!</a>
+            <a class="medium" href="/beneficiarios/lista-beneficiarios">GO BACK!</a>
         </div>
     </div>
     

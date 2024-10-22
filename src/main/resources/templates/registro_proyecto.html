@@ -2,7 +2,33 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head th:replace="design/header :: head">
+    <!-- Tu CSS -->
+    <link rel="stylesheet" href="path/to/your/styles.css">
+    <!-- Flatpickr CSS -->
 
+<style>
+.fecha {
+  /* Ocultar el campo de fecha */
+  display: none;
+}
+
+/* Asignarle una apariencia a label */
+.etiqueta {
+  border: 1px solid silver;
+  border-radius: 4px;
+  padding: 0 10px;
+  height: 10px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+}
+
+.etiqueta:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+</style>
 </head>
 
 <body class="bg-gradient-primary" onload="hideMessage()">
@@ -15,31 +41,77 @@
 <div class="container" style="max-width: 800px;">
     <div class="card o-hidden border-0 shadow-lg my-5">
         <div class="card-body p-0">
+				  <div class="d-flex left-content-end">
+				      <a href="/proyectos/lista-proyectos" class="btn btn-outline-info">
+				         <i class="fas fa-plus"></i>GO BACK
+				      </a>
+				  </div>
             <!-- Nested Row within Card Body -->
             <div>
                 <div>
                     <div class="p-5">
                         <div class="text-center">
-                            <h1 class="h4 text-gray-900 mb-4" th:if="${project.id==0}">Registrar Proyecto</h1>
-                            <h1 class="h4 text-gray-900 mb-4" th:if="${project.id!=0}">Modificar Proyecto</h1>
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${project.id==0}">Project Register</h1>
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${project.id!=0}">Project Edit</h1>
+                           
+                            
                         </div>
                         <form id="miFormulario" class="user" th:action="@{/proyectos/guardar-proyecto}" th:method="post" th:object="${project}" onsubmit="return validateDates()">
                         
                             <input type="hidden" th:if="${project.id!=0}" th:field="*{id}" th:value="${project.id}">
+                            <div class="row">
+                            	<div class="col">
+                            		<div class="row">
+                            		<div class="col-8">
+                            			<div class="form-group">
+                                            <label for="inputpais" class="form-label">Country</label>
+								            <SELECT th:field = "*{pais}"  class="form-control form-control-user"  data-show-subtext="true" data-live-search="true">
+												<OPTION th:EACH= "paiss : ${paises}" 
+														th:VALUE = "${paiss.nombre}" th:TEXT = "${paiss.nombre}" >										 
+												</OPTION >		 
+											</SELECT>  
+										</div>
+									</div>
+									
+									<div class="col-4">
+										<div class="form-group">
+											 <label for="inputgestion" class="form-label">Year</label>
+											<select th:field="*{gestion}" class="form-control form-control-user" id="inputgestion" required>
+											    <option value="0" th:if="${project.gestion == 0}"> </option>
+											    <option value="2024" th:selected="${project.gestion == '2024'}">2024</option>
+											    <option value="2025" th:selected="${project.gestion == '2025'}">2025</option>
+											</select>	                                
+										</div>		                                
+									</div>
+									</div>
+                                </div>
+                                <div class="col">
+                                	<div class="form-group">
+                                		<label for="inputcliente" class="form-label">Customer</label>
+		                                <input th:field="*{cliente}" type="text" class="form-control form-control-user"
+		                                       id="inputcliente" placeholder="Customer name" required>
+
+                                	</div>
+                                </div>
+                            </div>
                             
                             <div class="row">
                             	<div class="col">
                             		<div class="form-group">
-		                                <label for="inputnombre" class="form-label">Nombre</label>
+                            			<label for="inputsigla" class="form-label">Acronym</label>
+		                                <input th:field="*{sigla}" type="text" class="form-control form-control-user"
+		                                       id="inputsigla" placeholder="Project Acronym" required>
+                            		
+		                                <label for="inputnombre" class="form-label">Name</label>
 		                                <input th:field="*{nombre}" type="text" class="form-control form-control-user"
-		                                       id="inputnombre" placeholder="Nombre del Proyecto" required>
+		                                       id="inputnombre" placeholder="Name of project" required>
 	                                </div>
                                 </div>
                                 <div class="col">
                                 	<div class="form-group">
-                                		<label for="inputdescripcion" class="form-label">Descripcion</label>
+                                		<label for="inputdescripcion" class="form-label">Description</label>
 		                                <textarea th:field="*{descripcion}" class="form-control form-control-user"
-		                                       id="inputdescripcion" placeholder="Breve descripcion del proyecto"  rows="3" value="Mark" required></textarea>
+		                                       id="inputdescripcion" placeholder="Brief description of the project"  rows="3"  required></textarea>
 
                                 	</div>
                                 </div>
@@ -47,16 +119,20 @@
                             <div class="row">
                             	<div class="col">
                             		<div class="form-group">
-			                              <label for="inputfechaInicial" class="form-label">Fecha Inicial</label>
-			                              <input th:field="*{fechaInicial}" type="date" class="form-control form-control-user"
-			                                           id="inputfechaInicial"  value="Mark" required>                                	
+			                              <label for="inputfechaInicial" class="form-label">Start Date</label>
+			                              <input th:field="*{fechaInicial}" 
+			                              		th:value="${#dates.format(fechaInicial, 'MM/dd/yyyy')}" 
+			                              		type="date"  class="form-control form-control-user"
+			                                    id="inputfechaInicial" placeholder="MM/DD/YYYY" required onchange="formatDate(this.value)" >                                	
+	                               <!-- Elemento para mostrar la fecha formateada -->
+								<p id="formattedDate"></p>
 	                                </div>                             	
                                 </div>
                                 <div class="col">
                                 	<div class="form-group">
-										 <label for="inputfechaFin" class="form-label">Fecha de Finalizacion</label>
+										 <label for="inputfechaFin" class="form-label">End Date</label>
 		                                 <input th:field="*{fechaFin}" type="date" class="form-control form-control-user"
-		                                           id="inputfechaFin"  value="Mark" required>
+		                                           id="inputfechaFin" onchange="formatDate(this.value)" required>
 
 		                            </div>      
                             	</div>
@@ -66,21 +142,23 @@
                             <div class="row">
                                 <div class="col">
                                 	<div class="form-group">
-                                		<label for="inputmontoContrato" class="form-label">Monto en USD del Proyecto</label>
-		                                <input th:field="*{montoContrato}" type="number" step="0.01" class="form-control form-control-user"
-		                                       id="inputmontoContrato" placeholder="0.00"  min="1" oninput="calculateMontos()">
-		                                <small id="errorMonto" class="text-danger" style="display: none;">El monto no puede ser menor a 0</small>
+                                		<label for="inputmontoContrato" class="form-label">Contract amount(USD)</label>
+		                                <input th:field="*{montoContrato}"
+		                                	   
+		                                	   type="number" step="0.01" class="form-control form-control-user"
+		                                       id="inputmontoContrato" placeholder="0.00"  min="1"  oninput="calculateMontos(); ">
+		                                <small id="errorMonto" class="text-danger" style="display: none;">The amount cannot be less than 0</small>
 
                                 	</div>
                                 </div>
                               
                             	<div class="col">
                             		<div class="form-group">
-		                                <label for="inputporcentajeRecurrente" class="form-label">Porcentaje(%) Recurrente</label>
+		                                <label for="inputporcentajeRecurrente" class="form-label">Recurring Percentage (%)</label>
 		                                <input th:field="*{porcentajeRecurrente}" type="number"  step="0.01" class="form-control form-control-user"
-		                                           id="inputporcentajeRecurrente" placeholder="0.00"  min="0" required oninput="calculateMontos()">
-		                                <small id="errorMonto" class="text-danger" style="display: none;" >El porcentaje no puede ser negativo</small>
-		                                
+		                                           id="inputporcentajeRecurrente" placeholder="0.00"  min="0" required oninput="calculateMontos();">
+		                                <small id="errorMonto" class="text-danger" style="display: none;" >The percentage cannot be negative</small>
+                     
                                 	</div>                             	
                                 </div>
 
@@ -88,16 +166,16 @@
                             <div class="row">
                                 <div class="col">
                                 	<div class="form-group">
-										 <label for="inputmontoRecurrente" class="form-label">Monto Recurrente</label>
-		                                 <input th:field="*{montoRecurrente}" type="number" step="0.01" class="form-control form-control-user"
+										 <label for="inputmontoRecurrente" class="form-label">Recurring Amount</label>
+		                                 <input th:field="*{montoRecurrente}" type="text" step="0.01" class="form-control form-control-user"
 		                                           id="inputmontoRecurrente" readonly >
 		                            </div>                             	
                                 </div>
                                 <div class="col">
                                 	<div class="form-group">
-		                                 <label for="inputmontoNoRecurrente" class="form-label">Monto No Recurrente</label>
-		                                 <input th:field="*{montoNoRecurrente}" type="number" step="0.01"  class="form-control form-control-user"
-		                                           id="inputmontoNoRecurrente" readonly >
+		                                 <label for="inputmontoNoRecurrente" class="form-label">Non-recurring amount</label>
+		                                 <input th:field="*{montoNoRecurrente}" type="text" step="0.01"  class="form-control form-control-user"
+		                                           id="inputmontoNoRecurrente" readonly  >
                                 
 		                            </div>
                                 </div>
@@ -105,20 +183,20 @@
                             <hr>
                             <!-- Agregamos Supervisor y Responsable del Proyecto -->
                             <div class="row">
-                             <label class="form-label">Asignacion de Personal:</label>
+                             <label class="form-label">Staff Assignment:</label>
                              </div>
 								<!-- Checkbox para Asignar Supervisor -->
 								<div class="row">
 								    <div class="col">
 								        <div class="form-group">
-								            <input type="checkbox" id="assignSupervisor" onclick="toggleSupervisor()"> Asignar Supervisor
+								            <input type="checkbox" id="assignSupervisor" onclick="toggleSupervisor()"> Assign Supervisor
 								            <br>
-								            <select id="supervisor" name="supervisor" disabled>
-								                <option value="0" disabled selected>Seleccione Personal</option>
+								            <select id="supervisor" name="supervisor" class="form-control form-control-user" disabled>
+								                <option value="0" disabled selected>Select staff</option>
 								                <option th:each="supervisor : ${beneficiarySupervisor}" 
 								                        th:value="${supervisor.id}" 
 								                        th:selected="${supervisor.id == selectedSupervisor}"  
-								                        th:text="${supervisor.nombreCompleto}">
+								                        th:text="${supervisor.nombres +' '+ (supervisor.apellidos != null ? supervisor.apellidos : '') }">
 								                </option>
 								            </select>
 								        </div>
@@ -127,14 +205,14 @@
 								    <!-- Checkbox para Asignar Responsable -->
 								    <div class="col">
 								        <div class="form-group">
-								            <input type="checkbox" id="assignResponsable" onclick="toggleResponsable()"> Asignar Responsable
+								            <input type="checkbox" id="assignResponsable" onclick="toggleResponsable()"> Assign Responsible
 								            <br>
-								            <select id="responsable" name="responsable" disabled>
-								                <option value="0" disabled selected>Seleccione Personal</option>
+								            <select id="responsable" name="responsable" class="form-control form-control-user"  disabled>
+								                <option value="0" disabled selected>Select staff</option>
 								                <option th:each="responsable : ${beneficiaryResponsable}"
 								                        th:value="${responsable.id}"
 								                        th:selected="${responsable.id == selectedResponsable}"
-								                        th:text="${responsable.nombreCompleto}">
+								                        th:text="${responsable.nombres +' '+ (responsable.apellidos != null ? responsable.apellidos : '') }">
 								                </option>
 								            </select>
 								        </div>
@@ -145,12 +223,11 @@
                             <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
                                 <p th:text="${error}"></p>
                             </div>
-                             <button class="btn btn-primary btn-user btn-block" onclick="validateForm()">
-                                GUARDAR PROYECTO
+                             <button class="btn btn-primary btn-user btn-block" 
+                             					onclick="prepareMonto('inputmontoRecurrente'); prepareMonto('inputmontoNoRecurrente');">
+                                SAVE PROJECT
                              </button>
-							<div class="text-center">
-                                <a class="small" href="/proyectos/lista-proyectos">Regresar!</a>
-                            </div>
+
                         </form>
 
                     </div>
@@ -162,7 +239,46 @@
 </div>
 
 <div th:replace="design/script :: scripts"></div>
+    <!-- Flatpickr JS 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr("#inputfechaInicial", {
+            dateFormat: "m/d/Y", // Formato MM/DD/YYYY
+            locale: "en" // Idioma inglés
+        });
+    </script>-->
+    <!-- Script para formatear la fecha -->
 <script>
+
+function formatDate(value) {
+    if (value) {
+       // const date = new Date(value); // Crea un objeto Date
+//        const options = { year: 'numeric', month: '2-digit', day: '2-digit' }; // Opciones para formatear
+
+        // Usa Intl.DateTimeFormat para formatear la fecha
+        //const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+        //document.getElementById('formattedDate').textContent = formattedDate; // Muestra la fecha formateada
+        // Reemplaza el valor en el input original con la fecha formateada
+      
+        // Crea un objeto Date a partir de la cadena
+        const dateParts = value.split('-'); // Separa el valor en año, mes y día
+        const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); // Crea un objeto Date (mes - 1)
+
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' }; // Opciones para formatear
+
+        // Usa Intl.DateTimeFormat para formatear la fecha
+        const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+        
+        // Reemplaza el valor en el input original con la fecha formateada
+        document.getElementById('inputfechaInicial').value = value; // Mantiene el formato YYYY-MM-DD
+        document.getElementById('inputfechaInicial').setAttribute('data-formatted', formattedDate); // Almacena el formato legible si es necesario
+    
+    }
+}
+
+</script>
+<script>
+
     function validateDates() {
         var startDate = document.getElementById("inputfechaInicial").value;
         var endDate = document.getElementById("inputfechaFin").value;
@@ -175,34 +291,20 @@
     }
     
     function calculateMontos() {
-        var montoContrato = parseFloat(document.getElementById('inputmontoContrato').value) || 0;
-        var porcentajeRecurrente = parseFloat(document.getElementById('inputporcentajeRecurrente').value) || 0;
+        const contractAmount = parseFloat(document.getElementById("inputmontoContrato").value) || 0;
+        const percentage = parseFloat(document.getElementById("inputporcentajeRecurrente").value) || 0;
 
-        var montoRecurrente = (montoContrato * (porcentajeRecurrente / 100)).toFixed(2);
-        var montoNoRecurrente = (montoContrato * ((100-porcentajeRecurrente)/100)).toFixed(2);
+        // Calcular montos
+        const montoRecurrente = (contractAmount * (percentage / 100));
+        const montoNoRecurrente = contractAmount - montoRecurrente;
 
-        document.getElementById('inputmontoRecurrente').value = montoRecurrente;
-        document.getElementById('inputmontoNoRecurrente').value = montoNoRecurrente;
+        const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const numeroFormateado = formateador.format(montoNoRecurrente);
+        document.getElementById("inputmontoRecurrente").value = formateador.format(montoRecurrente);
+        document.getElementById("inputmontoNoRecurrente").value = formateador.format(montoNoRecurrente); 
+
     }
 
-    // Function to add thousand separators
-    function formatNumberWithCommas(number) {
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-    
-    /*function validateSelection() {
-        const supervisorSelect = document.getElementById('supervisor');
-        const responsableSelect = document.getElementById('responsable');
-
-        const selectedSupervisor = supervisorSelect.value;
-        const selectedResponsable = responsableSelect.value;
-
-        if (selectedSupervisor && selectedResponsable && selectedSupervisor === selectedResponsable) {
-            alert("El Supervisor y el Responsable del Proyecto no pueden ser la misma persona.");
-            // Opcional: Resetear el campo responsable si son iguales
-            responsableSelect.value = ""; // O puedes deseleccionar la opción
-        }
-    }*/
     //Validando los combos de SUPERVISOR Y RESPONSABLE
     function toggleSupervisor() {
         const supervisorSelect = document.getElementById("supervisor");
@@ -226,7 +328,13 @@
         // Habilitar o deshabilitar el combo de responsable según el checkbox
         responsableSelect.disabled = !assignResponsableCheck.checked;
     }
-    //Validamos la seleccion de Check
+    
+ // Llama a esta función para actualizar el valor antes de enviar el formulario
+    function prepareMonto(elementId) {
+        const element = document.getElementById(elementId);
+        element.value = element.value.replace(/,/g, ''); // Elimina comas antes de enviar al servidor
+    }
+    //Validamos la seleccion de Check ***SOLO SI HAGO CHECK, si no quiero q valide nada
     function validateForm() {
     const assignSupervisorCheck = document.getElementById("assignSupervisor").checked;
     const assignResponsableCheck = document.getElementById("assignResponsable").checked;
@@ -267,6 +375,9 @@
             form.addEventListener("keypress", disableEnterKey);
         });
     </script>
+    
+        
+
 </body>
 
 </html>

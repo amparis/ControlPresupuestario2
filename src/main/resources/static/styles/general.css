@@ -282,6 +282,10 @@ label{
 h4{
    text-align: center;
 }
+h6{
+   text-align: center;
+   color: rgb(0,157, 224);
+}
 .contenedor-dropdown{
     display: flex;
     flex-direction: column;

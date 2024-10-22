@@ -2,7 +2,6 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head th:replace="design/header :: head">
-    <title>Lista Proyectos</title>
 
 </head>
 
@@ -35,20 +34,20 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Proyectos</h1>
+                    <h1 class="h3 mb-2 text-gray-800">Projects</h1>
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Proyectos registrados</h6>
+                            <h6>Registered projects</h6>
                         </div>
                         <div class="card-body">
 				            <span th:each="menuRole : ${menuRoles}">
 								<div class="d-flex justify-content-end">
 								    <a th:href="@{/proyectos/registro-proyecto}"
-								    								       th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.acreate}" 
+								       th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.acreate}" 
 								       class="btn btn-outline-success">
-								       <i class="fas fa-plus"></i> + Nuevo Registro
+								       <i class="fas fa-plus"></i> + New Registration
 								    </a>
 								</div>
 				            </span>
@@ -56,23 +55,29 @@
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            <th>Nombre</th>
-                                            <th>Descripcion</th>
-                                            <th>Monto</th>
-                                            <th>F.Inicial</th>
-                                            <th>F.Final</th>
-                                            <th>Acciones</th>
+                                        	<th>Country</th>
+                                        	<th>Acronym</th>
+                                        	<th>Customer</th>
+                                            <th>Name of project</th>
+                                            <th>Description</th>
+                                            <th>Contract amount</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr th:each="project : ${projects}">
+                                        <td th:text="${project.pais}"></td>
+                                        <td th:text="${project.sigla}"></td>
+                                        <td th:text="${project.cliente}"></td>
                                             <td th:text="${project.nombre}"></td>
                                             <td th:text="${project.descripcion}"></td>
                                             <!-- <td th:text="${project.montoContrato}"></td> -->
                                             <td th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}"></td>
                                             
-                                            <td  th:text="${#dates.format(project.fechaInicial, 'dd/MM/yy')}"></td>
-                                            <td th:text="${#dates.format(project.fechaFin, 'dd/MM/yy')}"></td>
+                                            <td  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy')}"></td>
+                                            <td th:text="${#dates.format(project.fechaFin, 'MM/dd/yy')}"></td>
                                             <td>
                                             <!-- Iterar sobre menuRoles para comprobar permiso de actualización -->
 								            <span th:each="menuRole : ${menuRoles}">
@@ -101,7 +106,7 @@
 								                </a>
 								            </span>
 								            <span th:each="menuRole : ${menuRoles}">
-								                <a th:href="@{/proyectos/ejecutar-proyecto/} + ${project.id}"
+								                <a th:href="@{/ejecucion/registro-ejecucion/} + ${project.id}"
 								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
 								                   class="btn btn-success btn-circle  btn-sm">
 								                   <img src="/imagenes/money.png" alt="registro ejecucion" width="20px" height="20px">

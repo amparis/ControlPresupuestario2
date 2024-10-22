@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.springmvc.ControlPresupuestario.model.Beneficiary;
+
 import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.model.UserAdm;
 
@@ -17,13 +18,13 @@ import org.springframework.stereotype.Repository;
 public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Integer >{
 	// Agregar métodos personalizados aquí si es necesario
 	// Ya puedo trabajar con las operaciones CRUD
-		boolean existsByNombreCompletoAndDocumento(String nombreCompleto, String documento);//Metodo para buscar por nombre, fecha inicla y fecha final
+		boolean existsByNombresAndApellidosAndDocumento(String nombres,String apellidos, String documento);//Metodo para buscar por nombre, fecha inicla y fecha final
 
 		Optional<Beneficiary> findById(Long beneficiaryId);
 
 	//@Query("SELECT u.beneficiario.id FROM UserAdmProject up JOIN FETCH UserAdm u WHERE up.project.id= :projectId and u.perfil.id= :roleId")
 	  //public Integer findByProjectIdAndRole(Long projectId, Long roleId);
-	  @Query("SELECT u.beneficiario.id FROM UserAdmProject up JOIN up.userAdm u WHERE up.project.id = :projectId AND u.perfil.id = :roleId")
+	  @Query("SELECT u.beneficiario.id FROM UserAdmProject up JOIN up.userAdm u WHERE up.project.id = :projectId AND u.perfil.id = :roleId and up.estado='V'")
 	  public Integer findByProjectIdAndRole(Long projectId, Long roleId);
 	  
 	  @Query("SELECT b FROM Beneficiary b  WHERE  b.estado = :estado")
@@ -37,4 +38,6 @@ public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Intege
 		       "JOIN up.userAdm u ON u.id = up.userAdm.id " +
 		       "WHERE u.beneficiario.id = :beneficiaryId")
 	  public List<Project> findAllProjectsByBeneficiaryId(Integer beneficiaryId);
+
+	  
 }

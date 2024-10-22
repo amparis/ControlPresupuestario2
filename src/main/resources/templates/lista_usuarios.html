@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head th:replace="design/header :: head">
-    <title>Lista Usuarios</title>
-
-</head>
+ </head>
 
 <body id="page-top"  onload="hideMessage()">
     <!-- Mostrar el mensaje si está presente -->
@@ -35,12 +33,12 @@
                 <div class="container-fluid">
 				
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Usuarios</h1>
+                    <h1 class="h3 mb-2 text-gray-800">Users</h1>
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Usuarios registrados</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Registered Users</h6>
                         </div>
                         <div class="card-body">
 				            <span th:each="menuRole : ${menuRoles}">
@@ -48,7 +46,7 @@
 				                <a th:href="@{/registro-usuario}"
 				                   th:if="${menuRole.menu.url == '/lista-usuarios' and menuRole.acreate}" 
 				                   class="btn btn-outline-success ">
-				                   <i class="fas fa-plus">+ Nuevo Registro</i>
+				                   <i class="fas fa-plus">+ New Registration</i>
 				                </a>
 				                </div>
 				            </span>
@@ -56,12 +54,12 @@
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            <th>Usuario</th>
-                                            <th>Nombre Completo</th>
+                                            <th>Username</th>
+                                            <th>Full Name</th>
                                             <th>Email</th>
-                                            <th>Rol</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
+                                            <th>Role</th>
+                                            <th>State</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -71,7 +69,7 @@
                                             <td th:text="${userAdm.email}"></td>
                                             <td th:text="${userAdm.perfil.name}"></td>
                                             <td>
-                                                <span th:text="${userAdm.estado == 'V' ? 'ACTIVO' : 'INACTIVO'}"
+                                                <span th:text="${userAdm.estado == 'V' ? 'ACTIVE' : 'INACTIVE'}"
          							 				th:classappend="${userAdm.estado == 'V' ? 'badge bg-success' : 'badge bg-danger'}"></span>
                                             </td>
                                             <td>
@@ -141,25 +139,6 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Listo para irse?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Selecciona "Logout" si desea cerrar la sesión.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="/login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
 <div th:replace="design/script :: scripts"></div>
 
 </body>

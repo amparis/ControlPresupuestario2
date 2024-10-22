@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head th:replace="design/header :: head">
-    <title>Administración de Roles</title>
+
 </head>
 
 <body class="bg-gradient-primary">
@@ -20,8 +20,8 @@
                 <div>
                     <div class="p-5">
                         <div class="text-center">
-                            <h1 class="h4 text-gray-900 mb-4" th:if="${perfil.id==0}">Registrar Rol</h1>
-                            <h1 class="h4 text-gray-900 mb-4" th:if="${perfil.id!=0}">Modificar Rol</h1>
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${perfil.id==0}">Register Role</h1>
+                            <h1 class="h4 text-gray-900 mb-4" th:if="${perfil.id!=0}">Edit Role</h1>
                         
                         </div>
                         <div th:if="${perfilGuardado == null}">
@@ -30,14 +30,14 @@
                             <div class="form-group">
                                 <input th:field="*{name}" type="text" class="form-control form-control-user"
                                        id="inputname"
-                                       placeholder="Nombre de Rol">
+                                       placeholder="Role Name">
                             </div>
                             
                             <button  id="btnform-rol" class="btn btn-primary btn-user btn-block" >
-                                GUARDAR ROL
+                                SAVE ROLE
                             </button>
                             <div class="text-center">
-                                <a class="small" href="/home">Regresar!</a>
+                                <a class="medium" href="/home">GO BACK!</a>
                             </div>
 
                         </form>
@@ -45,9 +45,9 @@
                         <!-- Mostrar información del rol guardado -->
                         <div class="text-center">
 	                        <div th:if="${perfilGuardado != null}">
-							<p  th:if="${perfil.id==0}">Rol guardado con éxito</p>
+							<p  th:if="${perfil.id==0}">Role saved successfully</p>
 							    <!-- <p>ID: <span th:text="${perfilGuardado.id}"></span></p>-->
-							    <p>Nombre de ROL: <span th:text="${perfilGuardado.name}"></span></p>
+							    <p>Role Name: <span th:text="${perfilGuardado.name}"></span></p>
 						<!-- Formulario para asignar permisos -->
 						
 							    <form class="user" th:action="@{/perfil/guardar-permisos}" th:method="post">
@@ -55,16 +55,16 @@
 							    <input type="hidden" th:value="${perfilGuardado.id}" name="rolId"/>
 							
 							    <div class="form-group">
-							        <label>Asigne los permisos:</label>
+							        <label>Assign Permissions:</label>
 							        <table class="table table-bordered">
 							            <thead>
 							                <tr>
 							                    <th></th>
-							                    <th>Menú</th>
-							                    <th>Crear</th>
-							                    <th>Leer</th>
-							                    <th>Editar</th>
-							                    <th>Eliminar</th>
+							                    <th>Menu</th>
+							                    <th>Create</th>
+							                    <th>Read</th>
+							                    <th>Edit</th>
+							                    <th>Delete</th>
 							                </tr>
 							            </thead>
 							            <tbody>
@@ -158,8 +158,7 @@
 	                                <p th:text="${error}"></p>
 	                            </div>
 								    <button id="btnform-rolMenu" class="btn btn-primary btn-user btn-block">
-								        GUARDAR PERMISOS
-								    </button>
+								        SAVE PERMISSIONS								    </button>
 								</form>
                 
                         	</div>

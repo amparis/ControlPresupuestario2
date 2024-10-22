@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head th:replace="design/header :: head">
-    <title>Usuarios</title>
-
 </head>
 
-<body class="bg-gradient-primary" id="page-top"  onload="hideMessage()">
+<body class="bg-vista-edit-registro" id="page-top"  onload="hideMessage()">
     <div class="container"  style="max-width: 600px;">
         <div class="card o-hidden border-0 shadow-lg my-5">
         <div class="card-body p-0">
@@ -14,16 +12,16 @@
                 <div>
                     <div class="p-5">
                         <div class="text-center">
-					        <h1 class="h4 text-gray-900 mb-4" >Detalles del Usuario</h1>
+					        <h1 class="h4 text-gray-900 mb-4" >User Details</h1>
 						</div>
 					        <div class="info-card">
 					            <div class="info-item" >
-					                <label >Nombre de Usuario:</label>
+					                <label >Username:</label>
 					               <p th:text="${userAdm.usernamee}">john_doe</p>
 					                
 					            </div>
 					            <div class="info-item">
-					                <label class="form-label">Nombre Completo:</label>
+					                <label class="form-label">Full name:</label>
 					                <strong><p th:text="${userAdm.fullname}">John Doe</p>
 					                </strong>
 					            </div>
@@ -33,20 +31,20 @@
 					                </strong>
 					            </div>
 					            <div class="info-item">
-					                <label class="form-label">Fecha de Registro:</label>
+					                <label class="form-label">Registration Date:</label>
 					                <strong><p class="date" th:text="${userAdm.dateCreation}">12 de marzo de 2023</p>
 					                </strong>
-					                <strong><p th:text="${userAdm.estado == 'V' ? 'ACTIVO' : 'INACTIVO'}">john.doe@example.com</p>
+					                <strong><p th:text="${userAdm.estado == 'V' ? 'ACTIVE' : 'INACTIVE'}">john.doe@example.com</p>
 					                </strong>
 					            </div>
 					            <div class="info-item">
-					                <label class="form-label">Rol Asignado:</label>
+					                <label class="form-label">Assigned Role:</label>
 					                <p th:text="${userAdm.perfil.name}">Administrador</p>
 					            </div>
                             </div>
                             <div class="info-card">
                             	 <div class="info-item">
-					                <label class="form-label">Permisos Asignados:</label>
+					                <label class="form-label">Assigned Permissions:</label>
 					            </div>
 					            <div class="py-2 collapse-inner rounded">
 								    <li th:each="menuRole : ${menuRoles2}" class="nav-item active">
@@ -79,7 +77,7 @@
 
         <!-- Roles del usuario -->
         <div class="text-center">
-            <a class="medium" href="/lista-usuarios">Regresar!</a>
+            <a class="medium" href="/lista-usuarios">GO BACK!</a>
         </div>
 
     </div>

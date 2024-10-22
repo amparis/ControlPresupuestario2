@@ -43,8 +43,8 @@ public class BeneficiaryService {
 	    
 	    // Verificar si ya existe un proyecto con el mismo nombre, fecha inicio y fecha fin
 	    
-		boolean exists = beneficiaryRepository.existsByNombreCompletoAndDocumento(
-				newBeneficiary.getNombreCompleto(), newBeneficiary.getDocumento());
+		boolean exists = beneficiaryRepository.existsByNombresAndApellidosAndDocumento(
+				newBeneficiary.getNombres(),newBeneficiary.getApellidos(), newBeneficiary.getDocumento());
 	    
 	    // Si es una actualización (id ya existe)
 	    if (newBeneficiary.getId() != null) {
@@ -53,27 +53,29 @@ public class BeneficiaryService {
 	            new IllegalArgumentException("Beneficiario no encontrado con ID: " + newBeneficiary.getId())
 	        );
 
-	        // Verificar si se han cambiado 'nombreCompleto' o 'documento'
-	        boolean nombreCambiado = !currentBeneficiary.getNombreCompleto().equalsIgnoreCase(newBeneficiary.getNombreCompleto());
+	        // Verificar si se han cambiado 'nombre' o 'apellido' o 'documento'
+	        boolean nombreCambiado = !currentBeneficiary.getNombres().equalsIgnoreCase(newBeneficiary.getNombres());
+	        boolean apellidoCambiado = !currentBeneficiary.getApellidos().equalsIgnoreCase(newBeneficiary.getApellidos());
 	        boolean documentoCambiado = !currentBeneficiary.getDocumento().equals(newBeneficiary.getDocumento());
 
 	        // Solo verificar duplicidad si alguno de estos dos campos ha cambiado
 	        if (nombreCambiado || documentoCambiado) {
 	            // Verificar si ya existe un beneficiario con el mismo nombre y documento
-	            if (beneficiaryRepository.existsByNombreCompletoAndDocumento(newBeneficiary.getNombreCompleto(), newBeneficiary.getDocumento())) {
+	            if (beneficiaryRepository.existsByNombresAndApellidosAndDocumento(newBeneficiary.getNombres(),newBeneficiary.getApellidos(), newBeneficiary.getDocumento())) {
 	                throw new IllegalArgumentException("Ya existe un beneficiario con el mismo nombre completo y documento.");
 	            }
 	        }
 	    } else {
 	        // Si es una creación de nuevo beneficiario, hacer la verificación normal
-	        if (beneficiaryRepository.existsByNombreCompletoAndDocumento(newBeneficiary.getNombreCompleto(), newBeneficiary.getDocumento())) {
+	        if (beneficiaryRepository.existsByNombresAndApellidosAndDocumento(newBeneficiary.getNombres(),newBeneficiary.getApellidos() ,newBeneficiary.getDocumento())) {
 	            throw new IllegalArgumentException("Ya existe un beneficiario con el mismo nombre completo y documento.");
 	        }
 	    	UserAdm loginUser = userService.getUser(userDetailsService.getUserDetailsService().getId());
 		    // Asignar el id del usuario logueado al campo us_id 
 		    newBeneficiary.setUsuarioId((int) loginUser.getId());
 		    newBeneficiary.setEstado("V");
-		    newBeneficiary.setNombreCompleto(newBeneficiary.getNombreCompleto().toUpperCase());
+		    newBeneficiary.setNombres(newBeneficiary.getNombres().toUpperCase());
+		    newBeneficiary.setApellidos(newBeneficiary.getApellidos().toUpperCase());
 	    }
         return beneficiaryRepository.save(newBeneficiary);
     }
