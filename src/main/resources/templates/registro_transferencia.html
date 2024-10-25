@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+</head>
+
+<body class="bg-sistemasIntegrales" onload="hideMessage()">
+    <!-- Mostrar el mensaje si está presente -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+    </div>
+<div class="container" style="max-width: 800px;">
+    <div class="card o-hidden border-0 shadow-lg my-2">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div>
+                <div>
+                    <div class="p-3">
+                        <div class="text-center">
+                       
+                            <h2 th:if="${income.id==0}">Transfer Register</h2>
+                            <h2 th:if="${income.id!=0}">Transfer Edit</h2>
+                        </div>
+                        <form id="miFormulario"  class="user" th:action="@{/incomes/guardar-transferencia}" th:method="post" th:object="${income}">
+                            <input type="hidden" th:if="${income.id!=0}" th:field="*{id}" th:value="${income.id}">
+                            <div class="form-group">
+                                <label for="inputproyecto" class="form-label">SELECTED PROJECT:</label>
+                                <input  type="text" class="form-control form-control-user"
+                                           id="inputproyecto" th:value="${project.nombre}"  readonly>
+                                <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
+                            </div>
+                            <div class="row">
+	                            <div class="col">
+                                		<label for="inputaccount" class="form-label">Origin Account:</label>
+                                		 <input type="hidden" th:value="${cuentaOrigen}" id="inputcuentaOrigen" name="inputcuentaOrigen">
+		                                <select class="form-control" disabled>
+		                                    <option th:each="cuenta : ${cuentas}" 
+		                  		                    th:if ="${cuenta!= null and cuenta.id == cuentaOrigen}"
+		                                    		th:value="${cuenta.id}"
+		                                            th:text="${cuenta.accountNumber +' ' +cuenta.nameBank}" ></option>
+		                                </select>
+		                        	    
+										<div class="row-header-montos">
+											<div class="col">
+												<strong>Contract Amount (USD)</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(totalAmountOrigin, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong> Recurring Amount (USD)&nbsp;&nbsp;
+												</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(totalRecurringAmountOrigin, 1, 'COMMA', 2, 'POINT')}">$20,000.00</p>
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<p  class="p-header" th:text="${#numbers.formatDecimal(totalNonRecurringAmountOrigin, 1, 'COMMA', 2, 'POINT')}">$80,000.00</p>
+											</div>								
+										</div>	
+									                       
+	                            </div>
+	                            <div class="col">
+		                            <div class="form-group">
+		                                <label for="inputaccount" class="form-label">Destiny Account</label>
+		                                <select class="form-control" th:field="*{account}" required>
+		                                	
+		                                    <option th:each="cuenta : ${cuentas}" 
+		                  		                    th:if ="${cuenta!= null and cuenta.id != cuentaOrigen}"
+		                                    		th:value="${cuenta.id}"
+		                                            th:text="${cuenta.accountNumber +' ' +cuenta.nameBank}" ></option>
+		                                </select>
+		                                
+										<div class="row-header-montos">
+											<div class="col">
+												<strong>Contract Amount (USD)</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(totalAmountDestiny, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong> Recurring Amount (USD)&nbsp;&nbsp;
+												</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(totalRecurringAmountDestiny, 1, 'COMMA', 2, 'POINT')}">$20,000.00</p>
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<p  class="p-header" th:text="${#numbers.formatDecimal(totalNonRecurringAmountDestiny, 1, 'COMMA', 2, 'POINT')}">$80,000.00</p>
+											</div>								
+										</div>	
+										 	                               
+		                             </div>	                            
+	                            </div>	                            
+                            </div>
+                            <div class="row">
+	                            <div class="col">                            
+		                            <div class="form-group row">
+		                                <div class="col-sm-6 mb-3 mb-sm-0">
+		                                <label for="inputfecha" class="form-label">Transfer Date</label>
+		                                <input th:field="*{fecha}" type="date" class="form-control form-control-user"
+		                                           id="inputfecha"  value="Mark" required>
+		                                </div>
+		                            </div>
+		                        </div>
+		                        <div class="col">
+		                           <div class="form-group">
+		                                <label for="inputdescripcion" class="form-label">Concept</label>
+		                                <input th:field="*{concepto}" type="text" class="form-control form-control-user"
+		                                       id="inputconcepto"
+		                                       placeholder="Concept of transfer"  required>
+		                            </div>
+		                        </div>
+		                    </div>
+                            <div class="row">
+	                            <div class="col">
+		                            <div class="form-group">
+		                                <label for="inputmonto" class="form-label">Transfer Amount</label>
+		                                <input th:field="*{monto}" type="number" step="0.01" class="form-control form-control-user"
+		                                       id="inputmonto"   placeholder="0.00"  min="1" oninput="calculateMontos()">
+		                                <small id="errorMonto" class="text-danger" style="display: none;">The amount cannot be less than 0</small>
+		                                
+		                                <input th:value="${project.porcentajeRecurrente}" type="hidden"  step="0.01" class="form-control form-control-user"
+				                               id="inputporcentajeRecurrente" >	
+				                    </div>                            
+	                            </div>
+	                            <div class="col">
+		                            <div class="form-group">
+				                        <label for="inputmonto" class="form-label">Task Amount</label>
+				                        <input  type="number" step="0.01" class="form-control form-control-user"
+		                                       id="inputmontoTask" name="inputmontoTask"    placeholder="0.00"  min="0">                                      
+		                            </div>	                            
+	                            </div>
+                            </div>
+<div class="row">
+    <div class="col">
+        <label class="form-label">Will the recurring % apply? &nbsp;&nbsp;
+            <span th:text="${#numbers.formatDecimal(project.porcentajeRecurrente, 1, 'COMMA', 2, 'POINT')}+ '%'">0.00%</span>
+        </label>
+        </br>
+        <!-- Radio buttons for Yes/No -->
+        <input type="radio" name="recurring" id="recurringYes" value="yes" onclick="toggleInputs(true)"> Yes
+        <input type="radio" name="recurring" id="recurringNo" value="no" onclick="toggleInputs(false)"> No
+    </div>
+
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="inputmontoRecurrenteSugerido" class="form-label">Recurring Amount</label>
+                    <input type="hidden" th:field="*{montoRecurrente}" id="inputmontoRecurrente" step="0.01">
+ 
+                    <!-- Input for 'SUGERIDO' -->
+                    <input type="text" step="0.01" class="form-control form-control-user"
+                           id="inputmontoRecurrenteSugerido"
+                           placeholder="0.00" min="0" style="display:none" readonly>	
+                    
+                    <!-- Input for 'AJUSTADO' -->
+                    <input type="number" step="0.01" class="form-control form-control-user"
+                           id="inputmontoRecurrenteAjustado"
+                           placeholder="0.00" min="0" style="display:none" oninput="updateNonRecurring()">	
+						<!-- Display error message if validation fails -->
+						<div id="error-message" style="color:red; display:none;">Recurring amount cannot be greater than total amount.</div>
+                           
+                </div>  	                            		
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="inputmontoNoRecurrenteSugerido" class="form-label">Non-Recurring Amount</label>
+                    <input type="hidden" th:field="*{montoNoRecurrente}" id="inputmontoNoRecurrente" step="0.01">
+                    
+                    <!-- Input for 'SUGERIDO' -->
+                    <input type="text" step="0.01" class="form-control form-control-user"
+                           id="inputmontoNoRecurrenteSugerido"
+                           placeholder="0.00" min="0" style="display:none" readonly> 
+                    
+                    <!-- Input for 'AJUSTADO' -->
+                    <input type="text" step="0.01" class="form-control form-control-user"
+                           id="inputmontoNoRecurrenteAjustado"
+                           placeholder="0.00" min="0" style="display:none" readonly> 				                                       				                                      
+                </div>		                            		
+            </div>
+        </div>
+    </div>
+</div>                            
+ 							<!-- Mostrar mensaje de error si existe -->
+                            <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
+                                <p th:text="${error}"></p>
+                            </div>
+                             <button class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" onclick="prepareMonto('inputmontoRecurrente'); prepareMonto('inputmontoNoRecurrente');">
+                                SAVE TRANSFER
+                             </button>
+							<div class="text-center">
+                                <a class="medium" href="/ejecucion/registro-ejecucion">GO BACK</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+            <!-- Footer -->
+            <footer th:replace="design/footerBar :: footerbar"></footer>
+            <!-- End of Footer -->
+<div th:replace="design/script :: scripts"></div>
+
+<script>
+function calculateMontos() {
+    const contractAmount = parseFloat(document.getElementById("inputmonto").value) || 0;
+    const percentage = parseFloat(document.getElementById("inputporcentajeRecurrente").value) || 0;
+
+    // Calcular montos
+    const montoRecurrente = (contractAmount * (percentage / 100));
+    const montoNoRecurrente = contractAmount - montoRecurrente;
+
+    const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const numeroFormateado = formateador.format(montoNoRecurrente);
+    document.getElementById("inputmontoRecurrenteSugerido").value = formateador.format(montoRecurrente);
+    document.getElementById("inputmontoNoRecurrenteSugerido").value = formateador.format(montoNoRecurrente); 
+
+}
+
+// Llama a esta función para actualizar el valor antes de enviar el formulario
+function prepareMonto(elementId) {
+    const element = document.getElementById(elementId);
+    element.value = element.value.replace(/,/g, ''); // Elimina comas antes de enviar al servidor
+}
+</script>
+<!-- JavaScript to toggle between 'SUGERIDO' and 'AJUSTADO' and update hidden fields -->
+<script>
+    // Function to toggle input fields between 'SUGERIDO' and 'AJUSTADO'
+    function toggleInputs(isRecurring) {
+        // Toggle Sugerido inputs (Yes selected)
+        document.getElementById('inputmontoRecurrenteSugerido').style.display = isRecurring ? 'block' : 'none';
+        document.getElementById('inputmontoNoRecurrenteSugerido').style.display = isRecurring ? 'block' : 'none';
+
+        // Toggle Ajustado inputs (No selected)
+        document.getElementById('inputmontoRecurrenteAjustado').style.display = isRecurring ? 'none' : 'block';
+        document.getElementById('inputmontoNoRecurrenteAjustado').style.display = isRecurring ? 'none' : 'block';
+
+        // Update hidden input values based on the selection
+        if (isRecurring) {
+            document.getElementById('inputmontoRecurrente').value = document.getElementById('inputmontoRecurrenteSugerido').value;
+            document.getElementById('inputmontoNoRecurrente').value = document.getElementById('inputmontoNoRecurrenteSugerido').value;
+        } else {
+        	//VALIDAR QUE EL MONTO RECURRENTE AJUSTADO NO SEA MAYOR AL MONTO TRANSFERENCIA, NI MENOR A 0
+        	//VALIDAR QUE SOLO ACEPTE NUMEROS, O VOLVERLO NUMERIC
+        	document.getElementById('inputmontoRecurrenteAjustado').value = document.getElementById('inputmonto').value;
+            document.getElementById('inputmontoRecurrente').value = document.getElementById('inputmontoRecurrenteAjustado').value;
+            document.getElementById('inputmontoNoRecurrente').value = document.getElementById('inputmontoNoRecurrenteAjustado').value;
+        }
+    }
+
+    // Function to update Non-Recurring Amount when Recurring Amount is adjusted
+    function updateNonRecurring() {
+        const montoRecurrenteAjustado = parseFloat(document.getElementById('inputmontoRecurrenteAjustado').value) || 0;
+        const montoTotal = parseFloat(document.getElementById('inputmonto').value) || 0;
+       
+        // Validate if the adjusted recurring amount exceeds the total amount
+        if (montoRecurrenteAjustado > montoTotal) {
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('inputmontoRecurrenteAjustado').style.border = '2px solid red';
+            return;  // Exit if validation fails
+        } else {
+            const montoNoRecurrenteAjustado = montoTotal - montoRecurrenteAjustado;
+            document.getElementById('inputmontoNoRecurrenteAjustado').value = montoNoRecurrenteAjustado.toFixed(2);
+
+            // Update hidden fields when 'AJUSTADO' is modified
+            document.getElementById('inputmontoRecurrente').value = montoRecurrenteAjustado.toFixed(2);
+            document.getElementById('inputmontoNoRecurrente').value = montoNoRecurrenteAjustado.toFixed(2);
+            
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('inputmontoRecurrenteAjustado').style.border = '';  // Remove red border if valid
+        }
+        
+
+    }
+</script>
+    <script>
+        // Función para prevenir el envío del formulario con la tecla Enter
+        function disableEnterKey(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Previene la acción predeterminada (enviar el formulario)
+            }
+        }
+
+        // Añadir el listener al cargar el documento
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("miFormulario"); // Cambia "miFormulario" por el ID de tu formulario
+            form.addEventListener("keypress", disableEnterKey);
+        });
+    </script>
+   
+</body>
+
+</html>
+
+
+
+
+
+
+
+

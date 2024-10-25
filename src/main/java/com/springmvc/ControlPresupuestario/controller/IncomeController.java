@@ -1,5 +1,7 @@
 package com.springmvc.ControlPresupuestario.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,7 +64,7 @@ public class IncomeController {
 
 
     @GetMapping("/registro-desembolso/{id}")
-    public String showRegisterFormIngreso( @PathVariable("id") long projectId, Model model) {
+    public String showRegisterFormDesembolso( @PathVariable("id") long projectId, Model model) {
         model.addAttribute("loginUser",
                 this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
         model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
@@ -76,17 +78,17 @@ public class IncomeController {
     }
     // Guardar
     @PostMapping("/guardar-desembolso")
-    public String saveIncome(@ModelAttribute Income income,
+    public String saveDesembolso(@ModelAttribute Income income,
             @RequestParam(required = false) Long id,
             @RequestParam(value = "inputproyectoId", required = false) long projectId,
-
+            @RequestParam(value = "inputmontoTask", required = false) Double montoTask,
             RedirectAttributes redirectAttributes) {
     	
     	System.out.println(" print   id  "+projectId);
         // Intentar guardar el proyecto si todas las validaciones pasaron
         try {
         	
-        	incomeService.saveIncome(income, projectId);
+        	incomeService.saveIncome(income, projectId, montoTask);
 
             redirectAttributes.addFlashAttribute("message", "desembolso guardado exitosamente.");
             redirectAttributes.addFlashAttribute("messageType", "success");
@@ -100,23 +102,101 @@ public class IncomeController {
     
 
 
-    @GetMapping("/eliminar-ingreso/{id}")
-    public String deleteIngreso(@PathVariable("id") Integer id, Model model,RedirectAttributes redirectAttributes) {
-
+    @GetMapping("/eliminar-ingreso/{id}/{projectId}")
+    public String deleteIngreso(@PathVariable("id") Integer id,
+    		@PathVariable("projectId") Long projectId,
+    		Model model,RedirectAttributes redirectAttributes) {
+    //Preguntar si el ingreso, fue afectado por un egreso, o sufrio algun movimiento	
+    	
    	 try {
 	        this.incomeService.deleteIncome(id);
-	
-	        model.addAttribute("incomes", this.incomeService.getIncomes());
+	        //model.addAttribute("incomes", this.incomeService.getIncomes());
 	        
 	     // Agregar el mensaje de éxito
 	        redirectAttributes.addFlashAttribute("message", "El ingreso fue eliminado exitosamente.");
 	        redirectAttributes.addFlashAttribute("messageType", "success");
 	
-	        return "redirect:/lista-ingresos";
+	        return "redirect:/ejecucion/registro-ejecucion/"+projectId;
  	 } catch (Exception e) {
  	        redirectAttributes.addFlashAttribute("message", "Error al eliminar el ingreso: " + e.getMessage());
  	        redirectAttributes.addFlashAttribute("messageType", "error");
- 	        return "redirect:/lista-ingresos";
+ 	       return "redirect:/ejecucion/registro-ejecucion/"+projectId;
  	    }
     }
+    
+    //METODOS DE TRANSFERENCIA
+    @GetMapping("/registro-transferencia/{id}")
+    public String showRegisterFormTransferencia( @PathVariable("id") long projectId, Model model) {
+        model.addAttribute("loginUser",
+                this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
+        model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
+        model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
+        model.addAttribute("project", projectService.getProject(projectId)); 
+        model.addAttribute("cuentas", accountService.getAccounts());
+        model.addAttribute("cuentaOrigen", incomeService.getAllAccountOriginByProjectId(projectId));
+        model.addAttribute("income", new Income());
+        
+	     // Supongamos que tienes una lista de 'incomesAccountOrigin' en tu controlador
+        List<Income> incomesAccountOrigin = incomeService.getAllSaldosByProjectIdAndAccount(projectId,incomeService.getAllAccountOriginByProjectId(projectId));
+
+        // Calcular sumas
+        double totalAmountOrigin = incomesAccountOrigin.stream().mapToDouble(Income::getMonto).sum();
+        double totalRecurringAmountOrigin = incomesAccountOrigin.stream().mapToDouble(Income::getMontoRecurrente).sum();
+        double totalNonRecurringAmountOrigin = incomesAccountOrigin.stream().mapToDouble(Income::getMontoNoRecurrente).sum();
+
+        // Añadir los totales al modelo, Cuenta Origin
+        model.addAttribute("totalAmountOrigin", totalAmountOrigin);
+        model.addAttribute("totalRecurringAmountOrigin", totalRecurringAmountOrigin);
+        model.addAttribute("totalNonRecurringAmountOrigin", totalNonRecurringAmountOrigin);
+        
+        //System.out.println("totalAmountOrigin " + totalAmountOrigin);
+        //System.out.println("totalRecurringAmountOrigin " + totalRecurringAmountOrigin);
+        //System.out.println("totalNonRecurringAmountOrigin " + totalNonRecurringAmountOrigin);
+        
+	     // Supongamos que tienes una lista de 'incomesAccountOrigin' en tu controlador
+        List<Income> incomesAccountDestiny = incomeService.getAllSaldosByProjectIdAndAccount(projectId,accountService.getAccountDestiny(incomeService.getAllAccountOriginByProjectId(projectId)));
+        // Si no hay registros 
+        if (incomesAccountDestiny == null || incomesAccountDestiny.isEmpty()) {
+            model.addAttribute("totalAmountDestiny", 0);
+            model.addAttribute("totalRecurringAmountDestiny", 0);
+            model.addAttribute("totalNonRecurringAmountDestiny", 0);
+        }
+        else {
+        // Calcular sumas
+        double totalAmountDestiny = incomesAccountDestiny.stream().mapToDouble(Income::getMonto).sum();
+        double totalRecurringAmountDestiny = incomesAccountDestiny.stream().mapToDouble(Income::getMontoRecurrente).sum();
+        double totalNonRecurringAmountDestiny = incomesAccountDestiny.stream().mapToDouble(Income::getMontoNoRecurrente).sum();
+
+        // Añadir los totales al modelo, Cuenta Origin
+        model.addAttribute("totalAmountDestiny", totalAmountDestiny);
+        model.addAttribute("totalRecurringAmountDestiny", totalRecurringAmountDestiny);
+        model.addAttribute("totalNonRecurringAmountDestiny", totalNonRecurringAmountDestiny);
+        }
+
+          return "registro_transferencia";
+    }
+    // Guardar
+    @PostMapping("/guardar-transferencia")
+    public String saveTransferencia(@ModelAttribute Income income,
+            @RequestParam(required = false) Long id,
+            @RequestParam(value = "inputproyectoId", required = false) long projectId,
+            @RequestParam(value = "inputmontoTask", required = false) Double montoTask,
+            @RequestParam(value = "inputcuentaOrigen", required = false) long inputcuentaOrigen,
+            RedirectAttributes redirectAttributes) {
+    	
+    	System.out.println(" print id transfer "+projectId);
+        // Intentar guardar el proyecto si todas las validaciones pasaron
+        try {
+        	
+        	incomeService.saveIncomeTransfer(income, projectId, montoTask, accountService.getAccount(inputcuentaOrigen));
+
+            redirectAttributes.addFlashAttribute("message", "Transfer saved success.");
+            redirectAttributes.addFlashAttribute("messageType", "success");
+            return "redirect:/ejecucion/registro-ejecucion/"+projectId;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "Error al guardar la transferencia: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/incomes/registro-transferencia/"+projectId;
+        }
+    }    
 }

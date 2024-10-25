@@ -1,11 +1,11 @@
 package com.springmvc.ControlPresupuestario.repository;
 
-import com.springmvc.ControlPresupuestario.model.Perfil;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.springmvc.ControlPresupuestario.model.ExpenditureClassification;
 
 @Repository
-public interface PerfilRepository extends JpaRepository<Perfil, Long> {
+public interface ExpenditureClassificationRepository extends JpaRepository<ExpenditureClassification, Long> {
 
 }

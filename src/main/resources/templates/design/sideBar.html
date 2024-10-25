@@ -9,10 +9,10 @@
 <div id="wrapper" th:fragment="sidebar">
 
     <!-- Sidebar -->
-<ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar"  style="background-color: #05144a;">
+<ul class="navbar-nav sidebar sidebar-dark accordion text-sistemasIntegralesNav custom-hover-sistemasIntegrales" id="accordionSidebar"  style="background-color: rgb(224,224,224);color:rgb(51,153,255);">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center text-sistemasIntegralesNav custom-hover-sistemasIntegrales" href="/">
         <div class="sidebar-brand-icon rotate-n-15">
             <span class="material-symbols-outlined">
                 calculate
@@ -26,7 +26,7 @@
 
     <!-- Nav Item - Dashboard -->
     <li class="nav-item active">
-        <a class="nav-link" href="/">
+        <a class="nav-link text-sistemasIntegralesNav" href="/">
             <span class="material-symbols-outlined">
                 home
             </span>
@@ -65,19 +65,19 @@
 </div>
 -->
 <div class="py-2 collapse-inner rounded">
-    <li th:each="menuRole : ${menuRoles2}" class="nav-item active">
-        <a class="nav-link collapsed" th:href="${menuRole.menu.url}" th:attr="target=${menuRole.menu.url == '/'} ? '_blank' : null">
+    <li th:each="menuRole : ${menuRoles2}" class="nav-item active text-sistemasIntegralesNav custom-hover-sistemasIntegrales">
+        <a class="nav-link collapsed text-sistemasIntegralesNav" th:href="${menuRole.menu.url}" th:attr="target=${menuRole.menu.url == '/'} ? '_blank' : null">
             <span class="material-symbols-outlined" th:text="${menuRole.menu.icono}"></span>
-            <span th:text="${menuRole.menu.nombre}"></span> 
+            <span th:text="${menuRole.menu.nombre}"  class="text-sistemasIntegralesNav custom-hover-sistemasIntegrales"></span> 
             
         </a>
         
         <!-- Acceso a submenús -->
         <ul th:if="${menuRole.menu.subMenus.size() > 0}">
-            <li th:each="subMenu : ${menuRole.menu.subMenus}" class="nav-item">
-                <a class="nav-link" th:href="${subMenu.url}">
+            <li th:each="subMenu : ${menuRole.menu.subMenus}" class="nav-item text-sistemasIntegralesNav custom-hover-sistemasIntegrales">
+                <a class="nav-link text-sistemasIntegralesNav" th:href="${subMenu.url}">
                     <span class="material-symbols-outlined" th:text="${subMenu.icono}"></span>
-                    <span th:text="${subMenu.nombre}"></span> 
+                    <span th:text="${subMenu.nombre}" class="text-sistemasIntegralesNav custom-hover-sistemasIntegrales"></span> 
                 </a>
             </li>
         </ul>

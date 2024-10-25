@@ -8,8 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.springmvc.ControlPresupuestario.model.Income;
+import com.springmvc.ControlPresupuestario.model.Account;
+import com.springmvc.ControlPresupuestario.model.Expense;
 import com.springmvc.ControlPresupuestario.model.Project;
+import com.springmvc.ControlPresupuestario.model.ProjectHistory;
 import com.springmvc.ControlPresupuestario.model.UserAdm;
+import com.springmvc.ControlPresupuestario.repository.ExpenseRepository;
 import com.springmvc.ControlPresupuestario.repository.IncomeRepository;
 
 @Service
@@ -17,6 +21,8 @@ public class IncomeService {
 
 	@Autowired
 	IncomeRepository incomeRepository;
+	@Autowired
+	ExpenseRepository expenseRepository;
 	@Autowired
 	AccountService accountService;
     @Autowired
@@ -46,12 +52,29 @@ public class IncomeService {
 		return this.incomeRepository.findById(id).get();
 	}
 	
+    public Long getAllAccountOriginByProjectId(long projectId){
+    	List<Income> incomes = incomeRepository.findFirstAccountOriginByProjectId(projectId);
+        return incomes.isEmpty() ? null : incomes.get(0).getAccount().getId();
+    	//return this.incomeRepository.findFirstAccountOriginByProjectId(projectId).getAccount().getId();//findAllAccountOriginByProjectId(projectId);
+    }
+    //public Income findFirstAccountOrigin(Long projectId) {
+        //List<Income> incomes = incomeRepository.findFirstAccountOriginByProjectId(projectId);
+        //return incomes.isEmpty() ? null : incomes.get(0).getAccount().getId();
+    //}
+
+    
+    
+    public  List<Income> getAllSaldosByProjectIdAndAccount(long projectId, long accountId){
+    	
+    	return this.incomeRepository.findAllSaldosByProjectIdAndAccount(projectId,accountId);
+    }
 	//public Income getIncomeById(Long id);
 	
-	public Income saveIncome(Income newIncome, long projectId) {
+	public Income saveIncome(Income newIncome, long projectId,Double montoTask ) {
 		long millis = System.currentTimeMillis();
 		   
 		Project proyecto = projectService.getProject(projectId);
+		newIncome.setProyecto(proyecto);
 		newIncome.setCategoria(newIncome.getCategoria().toUpperCase());
 		newIncome.setConcepto(newIncome.getConcepto().toUpperCase());
 		newIncome.setFechaRegistro(new Timestamp(millis));
@@ -60,8 +83,86 @@ public class IncomeService {
 	    UserAdm loginUser = userService.getUser(userDetailsService.getUserDetailsService().getId());
 	    newIncome.setUsuarioId((int) loginUser.getId());
 		
+	    if (montoTask>0) {
+	    //save TASK en Expense
+        Expense savedExpenseTask= new Expense();
+        savedExpenseTask.setProyecto(proyecto);
+        savedExpenseTask.setTipo("");
+        savedExpenseTask.setObjeto(newIncome.getConcepto().toUpperCase());
+        savedExpenseTask.setCargoItem("BANK CHARGE");
+        savedExpenseTask.setCantidad(1);
+        savedExpenseTask.setFechaInicio(newIncome.getFecha());
+        savedExpenseTask.setFechaFin(newIncome.getFecha());
+        savedExpenseTask.setTiempo(0);
+        savedExpenseTask.setCostoUnitario(montoTask);
+        savedExpenseTask.setMontoTotal(montoTask);
+        savedExpenseTask.setAguinaldo(0);
+        savedExpenseTask.setEstado("V");
+        savedExpenseTask.setUsuarioId((int) loginUser.getId());
+        expenseRepository.save(savedExpenseTask);
+	    }
 	    return incomeRepository.save(newIncome);
+    
 	}
+	
+	public Income saveIncomeTransfer(Income newIncome, long projectId, Double montoTask ,Account accountOrigin) {
+		long millis = System.currentTimeMillis();
+		  //SAVE DATA ACCOUNT DESTINY 
+		 UserAdm loginUser = userService.getUser(userDetailsService.getUserDetailsService().getId());
+		Project proyecto = projectService.getProject(projectId);
+		
+		newIncome.setProyecto(proyecto);
+		newIncome.setCategoria("DESEMBOLSO");
+		newIncome.setConcepto(newIncome.getConcepto().toUpperCase());
+		newIncome.setFechaRegistro(new Timestamp(millis));
+		newIncome.setEstado("V");
+		newIncome.setProyIdPrestamo(null);	   
+	    newIncome.setUsuarioId((int) loginUser.getId());
+	    incomeRepository.save(newIncome);
+	    
+	    //SAVE DATA ACCOUNT ORIGIN
+	   
+	    Income incomeOrigin = new Income();
+	    incomeOrigin.setProyecto(proyecto);
+	    incomeOrigin.setCategoria("TRANSFERENCIA");
+	    incomeOrigin.setConcepto(newIncome.getConcepto().toUpperCase());
+	    incomeOrigin.setFecha(newIncome.getFecha());
+	    incomeOrigin.setAccount(accountOrigin);
+	    incomeOrigin.setFechaRegistro(new Timestamp(millis));
+	    incomeOrigin.setEstado("V");
+	    incomeOrigin.setProyIdPrestamo(null);	   
+	    incomeOrigin.setUsuarioId((int) loginUser.getId());
+	    // Ajustar los montos de la cuenta origen con valores negativos
+	    incomeOrigin.setMonto(newIncome.getMonto() * -1);
+	    incomeOrigin.setMontoRecurrente(newIncome.getMontoRecurrente() * -1);
+	    incomeOrigin.setMontoNoRecurrente(newIncome.getMontoNoRecurrente() * -1);
+	    incomeRepository.save(incomeOrigin);
+	    
+		//SAVE amount task
+	    if (montoTask>0) {
+	    //save TASK en Expense
+        Expense savedExpenseTask= new Expense();
+        savedExpenseTask.setProyecto(proyecto);
+        savedExpenseTask.setTipo("");
+        savedExpenseTask.setObjeto(newIncome.getConcepto().toUpperCase());
+        savedExpenseTask.setCargoItem("BANK CHARGE");
+        savedExpenseTask.setCantidad(1);
+        savedExpenseTask.setFechaInicio(newIncome.getFecha());
+        savedExpenseTask.setFechaFin(newIncome.getFecha());
+        savedExpenseTask.setTiempo(0);
+        savedExpenseTask.setCostoUnitario(montoTask);
+        savedExpenseTask.setMontoTotal(montoTask);
+        savedExpenseTask.setAguinaldo(0);
+        savedExpenseTask.setEstado("V");
+        savedExpenseTask.setUsuarioId((int) loginUser.getId());
+        expenseRepository.save(savedExpenseTask);
+	    }
+	    
+	    return incomeRepository.save(incomeOrigin);
+    
+	}
+	
+
 	
 	public void updateIncome(long id, Income newIncome) {
 		
@@ -69,13 +170,11 @@ public class IncomeService {
 	
 	public void deleteIncome(Integer id) {
 		
-		this.incomeRepository.deleteById(id);
+		//this.incomeRepository.deleteById(id);
+		Income incomeDelete = incomeRepository.findById(id).get();
+		incomeDelete.setEstado("C");
+		this.incomeRepository.save(incomeDelete);
+		
 	}
-	////
-	/*
-    public List<Income> getIncomesByProjectId(Long id){
-    	
-    	return this.incomeRepository.findAllIncomesByProjectId(id);
-    }///
-	*/
+
 }

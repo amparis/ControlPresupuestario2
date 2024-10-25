@@ -4,29 +4,29 @@
 <head th:replace="design/header :: head">
 </head>
 
-<body class="bg-gradient-primary" onload="hideMessage()">
+<body class="bg-sistemasIntegrales" onload="hideMessage()">
     <!-- Mostrar el mensaje si está presente -->
     <div th:if="${message}" id="notificationMessage"
         th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
         style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
         <span th:text="${message}"></span>
     </div>
-<div class="container" style="max-width: 500px;">
-    <div class="card o-hidden border-0 shadow-lg my-5">
+<div class="container" style="max-width: 600px;">
+    <div class="card o-hidden border-0 shadow-lg my-2">
         <div class="card-body p-0">
             <!-- Nested Row within Card Body -->
             <div>
                 <div>
-                    <div class="p-5">
+                    <div class="p-3">
                         <div class="text-center">
                        
-                            <h1 class="h4 text-gray-900 mb-4" th:if="${income.id==0}">Disbursement Register</h1>
-                            <h1 class="h4 text-gray-900 mb-4" th:if="${income.id!=0}">Disbursement Edit</h1>
+                            <h2 th:if="${income.id==0}">Disbursement Register</h2>
+                            <h2  th:if="${income.id==0}">Disbursement Edit</h2>
                         </div>
                         <form id="miFormulario"  class="user" th:action="@{/incomes/guardar-desembolso}" th:method="post" th:object="${income}">
                             <input type="hidden" th:if="${income.id!=0}" th:field="*{id}" th:value="${income.id}">
                             <div class="form-group">
-                                <label for="inputproyecto" class="form-label">PROYECTO SELECCIONADO:</label>
+                                <label for="inputproyecto" class="form-label">SELECTED PROJECT:</label>
                                 <input  type="text" class="form-control form-control-user"
                                            id="inputproyecto" th:value="${project.nombre}"  readonly>
                                 <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
@@ -43,49 +43,73 @@
                                  <input type="hidden" class="form-control form-control-user" 
        									id="inputcategoria" name="categoria" value="Desembolso">
                              </div>
-                            <div class="form-group row">
-                                <div class="col-sm-6 mb-3 mb-sm-0">
-                                <label for="inputfecha" class="form-label">Disbursement Date</label>
-                                <input th:field="*{fecha}" type="date" class="form-control form-control-user"
-                                           id="inputfecha"  value="Mark" required>
-                                </div>
+                            <div class="row">
+	                        	<div class="col">                             
+		                            <div class="form-group row">
+		                                <div class="col-sm-6 mb-3 mb-sm-0">
+		                                <label for="inputfecha" class="form-label">Disbursement Date</label>
+		                                <input th:field="*{fecha}" type="date" class="form-control form-control-user"
+		                                           id="inputfecha"  value="Mark" required>
+		                                </div>
+		                            </div>
+		                        </div>
+		                        <div class="col">
+		                           <div class="form-group">
+		                                <label for="inputdescripcion" class="form-label">Concept</label>
+		                                <input th:field="*{concepto}" type="text" class="form-control form-control-user"
+		                                       id="inputconcepto"
+		                                       placeholder="Concept of income"  value="Mark" required>
+		                            </div>
+		                         </div>
+		                    </div>
+                            <div class="row">
+	                            <div class="col">
+		                            <div class="form-group">
+		                                <label for="inputmonto" class="form-label">Disbursement Amount</label>
+		                                <input th:field="*{monto}" type="number" step="0.01" class="form-control form-control-user"
+		                                       id="inputmonto"   placeholder="0.00"  min="1" oninput="calculateMontos()">
+		                                <small id="errorMonto" class="text-danger" style="display: none;">The amount cannot be less than 0</small>
+		                                
+		                                <input th:value="${project.porcentajeRecurrente}" type="hidden"  step="0.01" class="form-control form-control-user"
+				                               id="inputporcentajeRecurrente" >	
+				                    </div>                            
+	                            </div>
+	                            <div class="col">
+		                            <div class="form-group">
+				                        <label for="inputmonto" class="form-label">Task Amount</label>
+				                        <input  type="number" step="0.01" class="form-control form-control-user"
+		                                       id="inputmontoTask" name="inputmontoTask"    placeholder="0.00"  min="0">
+		                            </div>	                            
+	                            </div>
                             </div>
-                           <div class="form-group">
-                                <label for="inputdescripcion" class="form-label">Concepto</label>
-                                <input th:field="*{concepto}" type="text" class="form-control form-control-user"
-                                       id="inputconcepto"
-                                       placeholder="Concepto del ingreso"  value="Mark" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="inputmonto" class="form-label">Disbursement Amount</label>
-                                <input th:field="*{monto}" type="number" step="0.01" class="form-control form-control-user"
-                                       id="inputmonto"   placeholder="0.00"  min="1" oninput="calculateMontos()">
-                                <small id="errorMonto" class="text-danger" style="display: none;">The amount cannot be less than 0</small>
-                                
-                                <input th:value="${project.porcentajeRecurrente}" type="hidden"  step="0.01" class="form-control form-control-user"
-		                               id="inputporcentajeRecurrente" >
-                                </div>
-                            <div class="form-group">
-                                <label for="inputmontoRecurrente" class="form-label">Recurring Amount</label>
-                                <input th:field="*{montoRecurrente}" type="text" step="0.01" class="form-control form-control-user"
-                                       id="inputmontoRecurrente"
-                                       placeholder="0.00" min="0" readonly>
-                                
-                                <label for="inputmontoNoRecurrente" class="form-label">Non-Recurring Amount</label>
-                                <input th:field="*{montoNoRecurrente}" type="text" step="0.01" class="form-control form-control-user"
-                                       id="inputmontoNoRecurrente"
-                                       placeholder="0.00"  min="0" readonly>   
-                            </div>
- 
+                            <div class="row">
+	                            <div class="col">
+		                            <div class="form-group">
+		                                <label for="inputmontoRecurrente" class="form-label">Recurring Amount&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										<span th:text="${#numbers.formatDecimal(project.porcentajeRecurrente, 1, 'COMMA', 2, 'POINT')}+ '%'">0.00%</span></label>
+		                                <input th:field="*{montoRecurrente}" type="text" step="0.01" class="form-control form-control-user"
+		                                       id="inputmontoRecurrente"
+		                                       placeholder="0.00" min="0" readonly>	  
+		                            </div>                          
+	                            </div>
+	                            <div class="col">
+		                            <div class="form-group">
+		                                <label for="inputmontoNoRecurrente" class="form-label">Non-Recurring Amount</label>
+		                                <input th:field="*{montoNoRecurrente}" type="text" step="0.01" class="form-control form-control-user"
+		                                       id="inputmontoNoRecurrente"
+		                                       placeholder="0.00"  min="0" readonly>   
+	                            	</div>	                            
+	                            </div>
+	                        </div>	                            
  							<!-- Mostrar mensaje de error si existe -->
                             <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
                                 <p th:text="${error}"></p>
                             </div>
-                             <button class="btn btn-primary btn-user btn-block" onclick="prepareMonto('inputmontoRecurrente'); prepareMonto('inputmontoNoRecurrente');">
+                             <button class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" onclick="prepareMonto('inputmontoRecurrente'); prepareMonto('inputmontoNoRecurrente');">
                                 SAVE DISBURSEMENT
                              </button>
 							<div class="text-center">
-                                <a class="medium" href="/registro-ejecucion">GO BACK</a>
+                                <a class="medium" href="/ejecucion/registro-ejecucion">GO BACK</a>
                             </div>
                         </form>
 
@@ -96,7 +120,9 @@
     </div>
 
 </div>
-
+            <!-- Footer -->
+            <footer th:replace="design/footerBar :: footerbar"></footer>
+            <!-- End of Footer -->
 <div th:replace="design/script :: scripts"></div>
 
 <script>

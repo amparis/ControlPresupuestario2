@@ -13,11 +13,11 @@
     </div>
 
     <div class="container" style="max-width: 900px;">
-        <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card o-hidden border-0 shadow-lg my-2">
             <div class="card-body p-0">
-                <div class="p-5">
+                <div class="p-3">
                     <div class="text-center">
-                        <h1 class="h4 text-gray-900 mb-4" th:if="${project.id!=0}">Edit Project</h1>
+                        <h2 th:if="${project.id!=0}">Edit Project</h2>
                     </div>
                     <!-- Pestañas -->
                     <ul class="nav nav-tabs" role="tablist">
@@ -92,7 +92,7 @@
 		                                </div>
 		                            </div>
 		                        </div>
-                            <button type="submit" class="btn btn-primary">SAVE GENERAL DATA</button>
+                            <button type="submit" class="btn btn-primary" showOverlay();>SAVE GENERAL DATA</button>
                             </form>
                             </div>
 
@@ -191,7 +191,7 @@
 						 
 						        </div>
 						    </div>
-						<button type="submit" class="btn btn-primary">SAVE CRITICAL FIELDS</button>
+						<button type="submit" class="btn btn-primary" showOverlay();>SAVE CRITICAL FIELDS</button>
                         </form>
 						</div>
 	                        <!-- Tab 3: Asignación de Personal -->
@@ -257,7 +257,7 @@
 										</div>
 										
 									</div>
-	                        <button class="btn btn-primary btn-user btn-block" onclick="validateForm()">SAVE ASSGIN STAF</button>
+	                        <button class="btn btn-primary btn-user btn-block" onclick="validateForm();showOverlay();">SAVE ASSGIN STAF</button>
 	                        </form>
 	                        </div>
                         
@@ -271,7 +271,9 @@
             </div>
         </div>
     </div>
-
+            <!-- Footer -->
+            <footer th:replace="design/footerBar :: footerbar"></footer>
+            <!-- End of Footer -->
     <div th:replace="design/script :: scripts"></div>
     <script>
 function formatDate(input) {

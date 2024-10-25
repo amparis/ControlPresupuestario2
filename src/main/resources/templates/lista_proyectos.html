@@ -5,7 +5,7 @@
 
 </head>
 
-<body id="page-top"  onload="hideMessage()">
+<body id="page-top"  onload="hideMessage()" class="bg-sistemasIntegrales">
     <!-- Mostrar el mensaje si está presente -->
     <div th:if="${message}" id="notificationMessage"
         th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"

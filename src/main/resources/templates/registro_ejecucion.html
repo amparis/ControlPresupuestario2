@@ -4,81 +4,218 @@
 <head th:replace="design/header :: head">
 </head>
 
-<body class="bg-gradient-primary" onload="hideMessage()">
+<body class="bg-sistemasIntegrales" onload="hideMessage()">
     <!-- Mostrar el mensaje si está presente -->
     <div th:if="${message}" id="notificationMessage"
         th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
         style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
         <span th:text="${message}"></span>
     </div>
-<div class="container" style="width: 90%;">
-    <div class="card o-hidden border-0 shadow-lg my-5">
+<div class="container" style="width: 98%;">
+    <div class="card o-hidden border-0 shadow-lg my-2">
         <div class="card-body p-0">
             <!-- Nested Row within Card Body -->
             <div>
                 <div>
-                    <div class="p-5">
-                        <div class="text-center">
-                            <h4 class="h4 text-gray-900 mb-4" th:if="${project.id!=0}">
-                            <strong><p th:text="${project.nombre}">PROJECT IDB</p></strong>
-                              	<label class="form-label">Contract Amount:</label>
-                                <strong>
-                                <p th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
-                                </strong>
-                            </h4>
-                        </div>
-                        INCOMES
-                        </br>
-						<a class="small" th:href="@{/incomes/registro-desembolso/{id}(id=${project.id})}"> [DESEMBOLSO] </a>
-						-- -- 
-                        <a class="small" href="@{/income/registro-prestamo/{id}(id=${project.id})}">[PRESTAMO]</a>
-                           </br>
+                    <div class="p-3">
+	                    <div class="box box-primary">
+	 							<div class="box-header with-border">
+								<h6>PROJECT DETAILS</h6>
+								</div>
+							<div class="box-body">
+								<div class="row-header-max">
+									<div class="col-6">
+										<div class="row-header">
+											<div class="col-7">
+												<strong><i class="fa fa-book margin-r-5"></i> Project Name</strong>
+												<p class="p-header"  th:text="${project.nombre}">PROJECT IDB	</p>
+											</div>
+											<div class="col-5">
+												<strong>Country</strong>
+												<p  class="p-header"  th:text="${project.pais}">Chile</p>
+											
+											</div>
+										</div>
+										<div class="row-header">
+											<div class="col">
+												<strong>Dates</strong>
+												<p class="p-header"  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy') + ' - ' + #dates.format(project.fechaFin, 'MM/dd/yy')}"></p>
+
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row-header-montos">
+											<div class="col">
+												<strong><i class="fa fa-money margin-r-5"></i> Contract Amount (USD)</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Recurring Amount (USD)&nbsp;&nbsp;
+														<span th:text="${#numbers.formatDecimal(project.porcentajeRecurrente, 1, 'COMMA', 2, 'POINT')}+ '%'">0.00%</span>
+												
+												</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoRecurrente, 1, 'COMMA', 2, 'POINT')}">$20,000.00</p>
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<p  class="p-header" th:text="${#numbers.formatDecimal(project.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}">$80,000.00</p>
+											</div>								
+										</div>	
+									</div>
+								</div>
+								<hr>
+	
+							</div>
+							
+						</div>
+                        <h6>INCOMES </h6>
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTableIncomes" width="60%" cellspacing="0">
+                            <div class="row">
+                            	<div class="col-1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                            	<div class="col-9">
+                                <table class="table table-bordered" id="dataTableIncomes" width="80%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                        	<th>Categoria</th>
-                                        	<th>Concepto</th>
-                                        	<th>Fecha</th>
-                                        	<th>Monto</th>
+                                        	<th>Date</th>
+                                        	<th>Category</th>
+                                        	<th>Concept</th>
+                                        	<th>Amount</th>
+                                         	<th>Recurring Amount</th>
+                                         	<th>Non-recurring Amount</th>                                        	                                       	
+                                        	<th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                    
                                         <tr th:each="income : ${incomes}">
+										<td th:text="${#dates.format(income.fecha, 'MM/dd/yy')}"></td>                                        
                                         <td th:text="${income.categoria}"></td>
                                         <td th:text="${income.concepto}"></td>
-                                        <td th:text="${#dates.format(income.fecha, 'MM/dd/yy')}"></td>
-                    					<td th:text="${#numbers.formatDecimal(income.monto, 1, 'COMMA', 2, 'POINT')}"></td>
-                    					
+                                        
+<td class="td-montos" th:classappend="${income.monto < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(income.monto, 1, 'COMMA', 2, 'POINT')}"></td>
+<td class="td-montos" th:classappend="${income.montoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(income.montoRecurrente, 1, 'COMMA', 2, 'POINT')}"></td>
+<td class="td-montos" th:classappend="${income.montoNoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(income.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}"></td>
+                    					<td>
+                    					   <!-- Iterar sobre menuRoles para comprobar permisos -->
+                    					   <!-- 
+								            <span th:each="menuRole : ${menuRoles}">
+								                <a th:href="@{/incomes/modificar-ingreso/} + ${income.id}"
+								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
+								                   class="btn btn-warning btn-circle  btn-sm">
+								                   <img src="/imagenes/editar.png" alt="editar registro" width="20px" height="20px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>
+								             -->
+								             <span th:each="menuRole : ${menuRoles}">
+								                <a th:href="@{/incomes/eliminar-ingreso/} + ${income.id} + '/' + ${project.id}"
+								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}" 
+								                   class="btn btn-danger btn-circle btn-sm" onclick="showOverlay()">
+								                   <img src="/imagenes/eliminar.png" alt="eliminar registro" width="17px" height="19px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>								            
+                    					</td>
                                        </tr>
 
                                     </tbody>
-                                </table>
+										<tfoot>
+										    <tr>
+										        <td colspan="3" class="text-right"><strong>Total:</strong></td>
+										        <td class="td-montos" th:text="${#numbers.formatDecimal(totalAmount, 1, 'COMMA', 2, 'POINT')}"></td>
+										        <td class="td-montos" th:text="${#numbers.formatDecimal(totalRecurringAmount, 1, 'COMMA', 2, 'POINT')}"></td>
+										        <td class="td-montos" th:text="${#numbers.formatDecimal(totalNonRecurringAmount, 1, 'COMMA', 2, 'POINT')}"></td>
+										        <td></td>
+										    </tr>
+										</tfoot>
+
+                                </table>                            	
+                            	</div>
+                            	<div class="col-2">
+	                            	<div class="row">
+	                            		<div class="col">
+											<a th:href="@{/incomes/registro-desembolso/{id}(id=${project.id})}"
+									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales">
+									       DISBURSMENTS
+									    	</a>
+									    </div>
+	                            	</div>
+	                            	<div class="row">
+	                            		<div class="col">
+									    <a th:href="@{/incomes/registro-transferencia/{id}(id=${project.id})}"
+									       th:if="${totalAmount>5000}"
+									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales">
+									       TRANSFERS
+									    </a>
+									    </div>
+	                            	</div>
+	                            	<div class="row">
+	                            		<div class="col">
+									    <a th:href="@{/incomes/registro-prestamo/{id}(id=${project.id})}"
+									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales">
+									       PRESTAMO
+									    </a>	                            		
+	                            		</div>
+	                            	</div>
+	                            	<div class="row">
+	                            		<div class="col">
+									    <a th:href="@{/incomes/registro-prestamo/{id}(id=${project.id})}"
+									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales">
+									       DEVOLUCION
+									    </a>	                            		
+	                            		</div>
+	                            	</div>	                            	
+                            	</div>
                             </div>
-                            EXPENSES
+
+                            </div>
+                         <h6>EXPENSES</h6>
                                 <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                        	<th>header 1</th>
-                                        	<th>header 2</th>
-                                        	<th>header 3</th>
+                                        	<th>Type</th>
+                                        	<th>Beneficiary</th>
+                                        	<th>Object</th>
+                                        	<th>Cargo/Item</th>
+                                        	<th>Quantity</th>
+                                        	<th>Unit Cost</th>
+                                        	<th> </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <!-- 
                                         <tr th:each="expense : ${expenses}">
-                                        <td th:text="${expense.pais}"></td>
-                                        <td th:text="${expense.sigla}"></td>
-                                        <td th:text="${expense.cliente}"></td>
+                                        <td th:text="${expense.tipo}"></td>
+                                        <!-- <td th:text="${expense.beneficiario.nombres ?: ''}"></td>
+ --> <td>..</td>
+                                        <td th:text="${expense.objeto}"></td>
+                                        <td th:text="${expense.cargoItem}"></td>
+                                        <td th:text="${expense.cantidad}"></td>
+                                        <td th:text="${expense.costoUnitario}"></td>
+                    					<td>
+                    					   <!-- Iterar sobre menuRoles para comprobar permisos -->
+								            <span th:each="menuRole : ${menuRoles}">
+								                <a th:href="@{/expenses/modificar-egreso/} + ${expense.id}"
+								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
+								                   class="btn btn-warning btn-circle  btn-sm">
+								                   <img src="/imagenes/editar.png" alt="editar registro" width="20px" height="20px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>
+								             <span th:each="menuRole : ${menuRoles}">
+								                <a th:href="@{/expenses/eliminar-egreso/} + ${expense.id}"
+								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}" 
+								                   class="btn btn-danger btn-circle btn-sm" onsubmit="showOverlay()">
+								                   <img src="/imagenes/eliminar.png" alt="eliminar registro" width="17px" height="19px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>								            
+                    					</td>                                        
                                        </tr>
- 										-->
- 										<tr >
-                                        <td > 01</td>
-                                        <td >jkojo</td>
-                                        <td > cb dsb c</td>
-                                       </tr>
+
                                     </tbody>
                                 </table>
                             </div>
@@ -90,7 +227,9 @@
     </div>
 
 </div>
-
+            <!-- Footer -->
+            <footer th:replace="design/footerBar :: footerbar"></footer>
+            <!-- End of Footer -->
 <div th:replace="design/script :: scripts"></div>
 
 </body>

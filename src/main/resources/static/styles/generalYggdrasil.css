@@ -7,7 +7,10 @@
 body {
     background: #ecf0f3;
 }
-        body.bg-vista-edit-registro {
+.bg-sistemasIntegrales{
+	background: rgb(228, 228, 228);
+}
+ body.bg-vista-edit-registro {
             background: linear-gradient(to right, rgb(0, 157, 224), rgb(0, 100, 150));
         }
 #body_fondo {
@@ -53,7 +56,7 @@ h1 {
 
 h2 {
     font-size: 1.5rem;
-    color: #5a5c69;
+    color: rgb(0,157, 224);
     font-weight: 600;
     margin-bottom: 20px;
 }
@@ -151,13 +154,106 @@ h6{
     }
 }
 
-        .row {
+.row {
             display: flex;
             flex-wrap: wrap;
             margin: 0 -15px;
         }
-        .col {
+.col {
             flex: 0 0 50%;
             padding: 0 15px;
             box-sizing: border-box;
         }
+        
+/* Row with minimal padding */
+.row-header-max {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0; /* Eliminamos el margen negativo */
+    padding: 0; /* Mínimo padding */
+    font-size: 14px; /* Tamaño de letra pequeño */
+    border-radius: 1px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);     
+}
+/* Row with minimal padding */
+.row-header {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0; /* Eliminamos el margen negativo */
+    padding: 0; /* Mínimo padding */
+    font-size: 14px; /* Tamaño de letra pequeño */
+}
+/* Row with minimal padding */
+.row-header-montos {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0; /* Eliminamos el margen negativo */
+    padding: 0; /* Mínimo padding */
+    font-size: 14px; /* Tamaño de letra pequeño */
+    justify-content: center; /* Centra horizontalmente los elementos hijos */
+    text-align: center; /* Asegura que el texto dentro de las columnas esté centrado */
+   	border:rgba(0, 0, 0, 0.1) 1px solid;
+}   
+/* Column with minimal padding */
+.col-header {
+    flex: 0 0 50%; /* Ocupa el 50% de ancho */
+    padding: 0; /* Mínimo padding */
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+}
+
+/* Paragraph with 10px font size */
+.p-header {
+    margin: 0; /* Elimina el margen por defecto del párrafo */
+    padding: 0; /* Mínimo padding */
+}
+
+
+/* Para la superposición y el spinner*/        
+ #overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+}
+
+#spinner {
+    text-align: center;
+    color: white; /* Color del texto */
+}
+
+#spinner img {
+    width: 50px; /* Ajusta el tamaño del spinner */
+    height: 50px;
+}
+
+.td-montos{
+	text-align:right;
+}
+ /*BOTONES CON ESTILO DE SISTEMAS INTEGRALES*/ 
+ .text-sistemasIntegrales {
+    color: rgb(0,157, 224);
+}
+
+ .text-sistemasIntegralesBtn {
+    color: rgb(51,153, 255);
+}
+
+ .text-sistemasIntegralesNav {
+    color: rgb(64,64, 64);
+}
+.custom-hover-sistemasIntegrales:hover {
+    background-color: rgb(228, 228, 228) !important; /* Cambia el fondo al pasar el mouse */
+    color: rgb(0,157, 224)!important;
+}
+
+.text-negativo {
+    color: red;
+}
+
+       

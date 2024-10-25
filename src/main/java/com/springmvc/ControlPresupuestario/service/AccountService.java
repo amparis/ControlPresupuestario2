@@ -26,6 +26,10 @@ public class AccountService {
 		return this.accountRepository.findAll();
 	}
 	
+	public Long getAccountDestiny(long accountId){
+		
+		return this.accountRepository.findAllAccountDestiny(accountId);
+	}
 	public Account getAccount(long id) {
 		
 		return this.accountRepository.findById(id).get();
