@@ -197,74 +197,79 @@
                             </div>
                         	<!-- Tab 2: Expenses -->
 							<div id="tab2" class="container tab-pane fade">
-                                <div class="table-responsive">
-                            <span th:each="menuRole : ${menuRoles}">
-								<div class="d-flex justify-content-end">
-								    <a th:href="@{/expenses/registro-egreso/}+${project.id}"
-								       th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.acreate}" 
-								       class="btn btn-outline-success" onclick="showOverlay()">
-								       <i class="fas fa-plus"></i> + New Expense
-								    </a>
+	                            <div class="table-responsive">
+	                            	<div class="row">
+	                            		<div class="col-3"></div>
+			                            <div class="col-3">
+											<a th:href="@{/expenses/registro-egreso/}+${project.id}"
+											       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales btn-ancho"  onclick="showOverlay()" >
+											       NEW EXPENSE
+											</a>
+										</div>	 
+										<div class="col-3">
+											<a th:href="@{/gastos/lista-descargos/{id}(id=${project.id})}"
+												       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales"  onclick="showOverlay()" >
+												       EXPENSE DISCLAIMERS
+											</a>
+										</div>
+			                            <div class="col-3">
+											<a th:href="@{/incomes/registro-prestamo/{id}(id=${project.id})}"
+												       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales btn-ancho"  onclick="showOverlay()" >
+												       PAYMENT PLAN
+											</a>                         		
+			                            </div>											    
+	                            	</div>
+		                            <div class="row">
+		                              <div class="col-12">
+		                                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" data-search="false">
+		                                    <thead>
+		                                        <tr>
+		                                        	<th>Type</th>
+		                                        	<th>Beneficiary</th>
+		                                        	<th>Classification</th>
+		                                        	<th>Object</th>
+		                                        	<th>Cargo/Item</th>
+		                                        	<th>Quantity</th>
+		                                        	<th>Unit Cost</th>                                    	
+		                                        	<th> </th>
+		                                        </tr>
+		                                    </thead>
+		                                    <tbody>
+		                                        <tr th:each="expense : ${expenses}">
+			                                        <td th:text="${expense.tipo}"></td>
+			     									<td th:text="${expense.beneficiario != null ? expense.beneficiario.nombres + ' ' + (expense.beneficiario.apellidos != null ? expense.beneficiario.apellidos : '') : ''}"></td>
+			                                   		<td th:text="${expense.clasificacionEgreso != null ? expense.clasificacionEgreso.nombreClase : ''}"></td>
+			                                   		<td th:text="${expense.objeto}"></td>
+			                                        <td th:text="${expense.cargoItem}"></td>
+			                                        <td th:text="${expense.cantidad}"></td>
+			                                        <td th:text="${expense.costoUnitario}"></td>
+			                    					<td>
+			                    					   <!-- Iterar sobre menuRoles para comprobar permisos -->
+											            <span th:each="menuRole : ${menuRoles}">
+											                <a th:href="@{/expenses/modificar-egreso/} + ${expense.id}"
+											                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
+											                   class="btn btn-warning btn-circle  btn-sm">
+											                   <img src="/imagenes/editar.png" alt="editar registro" width="20px" height="20px">
+											                   <i class="fas fa-exclamation-triangle"></i>
+											                </a>
+											            </span>
+											             <span th:each="menuRole : ${menuRoles}">
+											                <a th:href="@{/expenses/eliminar-egreso/} + ${expense.id}"
+											                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}" 
+											                   class="btn btn-danger btn-circle btn-sm" onsubmit="showOverlay()">
+											                   <img src="/imagenes/eliminar.png" alt="eliminar registro" width="17px" height="19px">
+											                   <i class="fas fa-exclamation-triangle"></i>
+											                </a>
+											            </span>								            
+			                    					</td>                                        
+		                                       </tr>
+		                                    </tbody>
+		                                  </table>
+		                                </div>
+		                           	</div>
 								</div>
-				            </span>
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                        	<th>Type</th>
-                                        	<th>Beneficiary</th>
-                                        	<th>Object</th>
-                                        	<th>Cargo/Item</th>
-                                        	<th>Quantity</th>
-                                        	<th>Unit Cost</th>
-											<th></th>                                        	
-                                        	<th> </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="expense : ${expenses}">
-                                        <td th:text="${expense.tipo}"></td>
-     									<td th:text="${expense.beneficiario != null ? expense.beneficiario.nombres + ' ' + (expense.beneficiario.apellidos != null ? expense.beneficiario.apellidos : '') : ''}"></td>
-                                   		<td th:text="${expense.objeto}"></td>
-                                        <td th:text="${expense.cargoItem}"></td>
-                                        <td th:text="${expense.cantidad}"></td>
-                                        <td th:text="${expense.costoUnitario}"></td>
-                                        <td>
-										    <span th:if="${expense.descargo}">
-										        <a th:href="@{/gastos/lista-descargos/{id}(id=${expense.id})}">
-										            <img src="/imagenes/archivos.png" alt="Descargo" style="width: 20px; height: 20px;" />
-										        </a>
-										    </span>
-										    <span th:if="${!expense.descargo}"> </span>
-										</td>
-                                        
-                    					<td>
-                    					   <!-- Iterar sobre menuRoles para comprobar permisos -->
-								            <span th:each="menuRole : ${menuRoles}">
-								                <a th:href="@{/expenses/modificar-egreso/} + ${expense.id}"
-								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
-								                   class="btn btn-warning btn-circle  btn-sm">
-								                   <img src="/imagenes/editar.png" alt="editar registro" width="20px" height="20px">
-								                   <i class="fas fa-exclamation-triangle"></i>
-								                </a>
-								            </span>
-								             <span th:each="menuRole : ${menuRoles}">
-								                <a th:href="@{/expenses/eliminar-egreso/} + ${expense.id}"
-								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}" 
-								                   class="btn btn-danger btn-circle btn-sm" onsubmit="showOverlay()">
-								                   <img src="/imagenes/eliminar.png" alt="eliminar registro" width="17px" height="19px">
-								                   <i class="fas fa-exclamation-triangle"></i>
-								                </a>
-								            </span>								            
-                    					</td>                                        
-                                       </tr>
-
-                                    </tbody>
-                                </table>
-                           		</div>
-							
-							</div>
-                         
-						</div>
+						    </div>
+					   </div>
                     </div>
                 </div>
             </div>
@@ -276,6 +281,14 @@
             <footer th:replace="design/footerBar :: footerbar"></footer>
             <!-- End of Footer -->
 <div th:replace="design/script :: scripts"></div>
+<script >
+$(document).ready(function() {
+    $('#dataTable').DataTable({
+        "searching": false // Desactiva el cuadro de búsqueda
+    });
+});
+
+</script>
 
 </body>
 

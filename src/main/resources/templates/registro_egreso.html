@@ -54,27 +54,26 @@
 									<div class="col-6">
 										<div class="row-header-montos">
 											<div class="col">
-												<strong><i class="fa fa-money margin-r-5"></i> Contract Amount (USD)</strong>
+												<strong> Contract Amount (USD)</strong>
 												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
 											</div>
 										</div>	
 										<div class="row-header-montos">
 											<div class="col-6">
-												<strong><i class="fa fa-money margin-r-5"></i> Recurring Amount (USD)&nbsp;&nbsp;
+												<strong>Recurring Amount (USD)&nbsp;&nbsp;
 														<span th:text="${#numbers.formatDecimal(project.porcentajeRecurrente, 1, 'COMMA', 2, 'POINT')}+ '%'">0.00%</span>
 												
 												</strong>
 												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoRecurrente, 1, 'COMMA', 2, 'POINT')}">$20,000.00</p>
 											</div>
 											<div class="col-6">
-												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<strong>Non-Recurring Amount (USD)</strong>
 												<p  class="p-header" th:text="${#numbers.formatDecimal(project.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}">$80,000.00</p>
 											</div>								
 										</div>	
 									</div>
 								</div>
 								<hr>
-	
 							</div>
 							
 						</div>
@@ -85,9 +84,9 @@
                         </div>
                         <form id="miFormulario"  class="user" th:action="@{/expenses/guardar-egreso}" th:method="post" th:object="${expense}">
                             <input type="hidden" th:if="${expense.id!=0}"  th:field="*{id}" th:value="${expense.id}">
-                            <div class="form-group">
-                                <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
-                            </div>
+                           
+                            <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
+                            
                             <div class="row">
                             	<div class="col-6">
                             		<div class="row">
@@ -186,17 +185,17 @@
 
                             	</div>
                             	<div class="col-1">
-                            			  <div class="form-group">
-		                                 <input type="hidden" class="form-control form-control-user" 
-		       									id="inputIdBeneficiario" name="inputIdBeneficiario" placeholder="id beneficiario x">
-		                                 <input type="hidden" class="form-control form-control-user" 
-		       									id="inputBeneficiario" name="inputBeneficiario" placeholder="beneficiario x">	
-		                             
-                            	     <label for="btnAddBeneficiary" class="form-label"> &nbsp;&nbsp;</label>
-			                         <button type="button" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" 
-			                         	data-toggle="modal" data-target="#beneficiaryModal"  onclick="showOverlay()">
-			                               Add
-			                         </button>
+                            		<div class="form-group">
+			                             <input type="hidden" class="form-control form-control-user" 
+			       									id="inputIdBeneficiario" name="inputIdBeneficiario" placeholder="id beneficiario x">
+			                             <input type="hidden" class="form-control form-control-user" 
+			       									id="inputBeneficiario" name="inputBeneficiario" placeholder="beneficiario x">	
+			                             
+	                            	     <label for="btnAddBeneficiary" class="form-label"> &nbsp;&nbsp;</label>
+				                         <button type="button" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" 
+				                         	data-toggle="modal" data-target="#beneficiaryModal"  onclick="showOverlay()">
+				                               Add
+				                         </button>
 			                         </div>	                            	
                             	</div>                            	
                             </div>	
@@ -234,7 +233,7 @@
                             <div class="row">
                             	<div class="col">
 		                             <div class="row">
-									      	<div class="col-6">
+									    <div class="col-6">
 		                            		<div class="form-group">
 					                              <label for="inputfechaInicial" class="form-label">Start Date</label>
 					                              <input th:field="*{fechaInicio}" 
@@ -378,7 +377,6 @@
     </div>
 
 </div>
-
 <!-- Modal para registrar cargo/escala -->
 <div class="modal fade" id="cargoModal" tabindex="-1" role="dialog" aria-labelledby="cargoModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
@@ -518,6 +516,8 @@
     </div>
   </div>
 </div>
+
+
 <!-- Footer -->
    <footer th:replace="design/footerBar :: footerbar"></footer>
 <!-- End of Footer -->
@@ -663,7 +663,7 @@ function toggleFechaFin(selectElement) {
         const inputTiempo = document.getElementById('inputTiempo');
         const inputFechaFin = document.getElementById('inputfechaFin');
 
-        if (formaPago === 'single pay') {
+        if (formaPago === 'single payment') {
             inputTiempo.value = 1;  // Establecer tiempo a 1
             inputTiempo.disabled = true;
             inputFechaFin.disabled = true; // Desactivar fechaFin
@@ -674,30 +674,6 @@ function toggleFechaFin(selectElement) {
         }
     }
     
-    
-/*
-    function checkDates() {
-        const fechaInicioStr = document.getElementById('inputfechaInicio').value;
-        const fechaFinStr = document.getElementById('inputfechaFin').value;
-
-        if (fechaInicioStr && fechaFinStr) {
-            // Convertir las cadenas de fecha a objetos Date
-            const fechaInicio = new Date(fechaInicioStr);
-            const fechaFin = new Date(fechaFinStr);
-            alert(fechaInicio+"---"+fechaFin);
-            // Verificar si las fechas son válidas
-            if (isNaN(fechaInicio.getTime()) || isNaN(fechaFin.getTime())) {
-                alert("Please, enter date valid.");
-                return;
-            }
-
-            // Llamar a tu función para calcular inputTiempo
-            calculateInputTiempo(fechaInicio, fechaFin);
-        } else {
-            alert("Please, complete both dates.");
-        }
-    }
-    */
     function checkDates() {
         const fechaInicioStr = document.getElementById('inputfechaInicio').value;
         const fechaFinStr = document.getElementById('inputfechaFin').value;
@@ -710,7 +686,7 @@ function toggleFechaFin(selectElement) {
             // Crear fechas en UTC (los meses son 0-indexed)
             const fechaInicio = new Date(Date.UTC(yearInicio, monthInicio - 1, dayInicio));
             const fechaFin = new Date(Date.UTC(yearFin, monthFin - 1, dayFin));
-            alert(fechaInicio+"---"+fechaFin);
+            //alert(fechaInicio+"---"+fechaFin);
             // Verificar si las fechas son válidas
             if (isNaN(fechaInicio.getTime()) || isNaN(fechaFin.getTime())) {
                 alert("Por favor, ingresa fechas válidas.");
@@ -719,12 +695,17 @@ function toggleFechaFin(selectElement) {
 
             // Llamar a tu función para calcular inputTiempo
             calculateInputTiempo(fechaInicio, fechaFin);
+        } else if (fechaInicioStr && !fechaFinStr) {
+            alert("Fecha de fin es opcional, pero asegúrate de que la fecha de inicio esté correcta.");
         } else {
-            alert("Por favor, completa ambas fechas.");
+            alert("Por favor, completa la fecha de inicio.");
         }
     }
 
     function calculateInputTiempo(fechaInicial, fechaFinal) {
+        if (!fechaInicial || !fechaFinal) {
+            return; // No calcular si alguna fecha es nula o indefinida
+        }
         // Extraer día, mes y año de las fechas
         //alert(fechaInicial+'jo'+fechaFinal);
         const diaInicial = fechaInicial.getDate();
