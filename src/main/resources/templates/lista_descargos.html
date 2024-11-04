@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+</head>
+
+<body class="bg-sistemasIntegrales" onload="hideMessage()">
+    <!-- Mostrar el mensaje si está presente -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+    </div>
+<div class="container" style="width: 100%;">
+    <div class="card o-hidden border-0 shadow-lg my-2">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div>
+                <div>
+                    <div class="p-3">
+	                    <div class="box box-primary">
+	 							<div class="box-header with-border">
+								<h6>PROJECT DETAILS</h6>
+								</div>
+							<div class="box-body">
+								<div class="row-header-max">
+									<div class="col-6">
+										<div class="row-header">
+											<div class="col-7">
+												<strong><i class="fa fa-book margin-r-5"></i> Project Name</strong>
+												<p class="p-header"  th:text="${project.nombre}">PROJECT IDB	</p>
+											</div>
+											<div class="col-5">
+												<strong>Country</strong>
+												<p  class="p-header"  th:text="${project.pais}">Chile</p>
+											
+											</div>
+										</div>
+										<div class="row-header">
+											<div class="col">
+												<strong>Dates</strong>
+												<p class="p-header"  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy') + ' - ' + #dates.format(project.fechaFin, 'MM/dd/yy')}"></p>
+
+											</div>
+											<div class="col">
+												<strong>Financier</strong>
+												<p class="p-header"  th:text="${project.cliente}"></p>
+
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row-header-montos">
+											<div class="col">
+												<strong><i class="fa fa-money margin-r-5"></i> Contract Amount (USD)</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Recurring Amount (USD)&nbsp;&nbsp;
+														<span th:text="${#numbers.formatDecimal(project.porcentajeRecurrente, 1, 'COMMA', 2, 'POINT')}+ '%'">0.00%</span>
+												
+												</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoRecurrente, 1, 'COMMA', 2, 'POINT')}">$20,000.00</p>
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<p  class="p-header" th:text="${#numbers.formatDecimal(project.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}">$80,000.00</p>
+											</div>								
+										</div>	
+									</div>
+								</div>
+								<hr>
+	
+							</div>
+						</div>
+						<div class="box box-secondary">
+	 							<div class="box-header with-border">
+								<h6>Expense Selected Details</h6>
+								</div>
+							<div class="box-body">
+								<div class="row-header-max">
+									<div class="col-6">
+										<div class="row-header-montos-secondary">
+											<div class="col-7">
+												<strong>Beneficiary Name</strong>
+												<p class="p-header"  th:text="${expenseSelected.beneficiario.nombres + ' ' + (expenseSelected.beneficiario.apellidos != null ? expenseSelected.beneficiario.apellidos : '')}">Jhon Smith	</p>
+											</div>
+											<div class="col-5">
+												<strong>Identification document</strong>
+												<p  class="p-header"  th:text="${expenseSelected.beneficiario.documento}">123456</p>
+											
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row-header-montos-secondary">
+											<div class="col">
+												<strong>Type Expense</strong>
+												<span class="p-header"  th:text="${expenseSelected.tipo}">--</span>
+											</div>
+											<div class="col">
+												<strong>Object</strong>
+												<span class="p-header"  th:text="${expenseSelected.objeto}">--</span>
+											</div>											
+										</div>	
+										<div class="row-header-montos-secondary">
+											<div class="col-4">
+												<strong>Item</strong>
+												<span class="p-header"  th:text="${expenseSelected.cargoItem}">--</span>
+											</div>		
+											<div class="col-3">
+												<strong>Quantity</strong>
+												<span class="p-header"  th:text="${#numbers.formatDecimal(expenseSelected.cantidad, 1, 'COMMA', 2, 'POINT')}">0</span>
+											</div>		
+											<div class="col-5">
+												<strong>Unit Cost (USD)</strong>
+												<span  class="p-header" th:text="${#numbers.formatDecimal(expenseSelected.costoUnitario, 1, 'COMMA', 2, 'POINT')}">$00.00</span>
+											</div>								
+										</div>	
+									</div>
+								</div>
+								<hr>
+	
+							</div>
+						</div>
+						
+                   <!-- Page Heading -->
+                    <h1 class="h3 mb-2 text-gray-800">Expense Disclaimers</h1>
+
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6>Registered expense disclaimers</h6>
+                        </div>
+                        <div class="card-body">
+				            <span th:each="menuRole : ${menuRoles}">
+								<div class="d-flex justify-content-end">
+								    <a th:href="@{/gastos/registro-descargo/}+ ${expenseSelected.id}"
+								       th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.acreate}" 
+								       class="btn btn-outline-success">
+								       <i class="fas fa-plus"></i> + New Registration
+								    </a>
+								</div>
+				            </span>
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                        	<th>Description</th>
+                                        	<th>Quantity</th>
+                                        	<th>Cost Unit</th>
+                                            <th>Cost Total</th>
+                                            <th>total USD</th>
+                                            <th>Date</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="descargos : ${gastoDescargos}">
+                                        <td th:text="${descargos.descripcion}"></td>
+                                        <td th:text="${#numbers.formatDecimal(descargos.cantidad, 1, 'COMMA', 2, 'POINT')}">
+                                        <td th:text="${#numbers.formatDecimal(costoUnitario, 1, 'COMMA', 2, 'POINT')}">
+                                        <td th:text="${#numbers.formatDecimal(descargos.costoTotal, 1, 'COMMA', 2, 'POINT')}">
+                                        <td th:text="${#numbers.formatDecimal(descargos.totalUSD, 1, 'COMMA', 2, 'POINT')}">
+										<td th:text="${#dates.format(descargos.fecha, 'MM/dd/yy')}"></td>                                        
+											<td>
+                                            <!-- Iterar sobre menuRoles para comprobar permiso de actualización -->
+								             <span th:each="menuRole : ${menuRoles}">
+								                <a th:href="@{/proyectos/eliminar-proyecto/} + ${project.id}"
+								                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}" 
+								                   class="btn btn-danger btn-circle btn-sm">
+								                   <img src="/imagenes/eliminar.png" alt="eliminar registro" width="17px" height="19px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+            <!-- Footer -->
+            <footer th:replace="design/footerBar :: footerbar"></footer>
+            <!-- End of Footer -->
+<div th:replace="design/script :: scripts"></div>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+

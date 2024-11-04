@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body class="bg-sistemasIntegrales" onload="hideMessage()">
+    <!-- Mostrar el mensaje si está presente -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+    </div>
+<div class="container" style="width: 80%;">
+    <div class="card o-hidden border-0 shadow-lg my-2">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div>
+                <div>
+                    <div class="p-3">
+                    	<div class="box box-primary">
+	 						<div class="box-header with-border">
+							<h6>PROJECT DETAILS</h6>
+							</div>
+							<div class="box-body">
+								<div class="row-header-max">
+									<div class="col-6">
+										<div class="row-header">
+											<div class="col-7">
+												<strong><i class="fa fa-book margin-r-5"></i> Project Name</strong>
+												<p class="p-header"  th:text="${project.nombre}">PROJECT IDB	</p>
+											</div>
+											<div class="col-5">
+												<strong>Country</strong>
+												<p  class="p-header"  th:text="${project.pais}">Chile</p>
+											
+											</div>
+										</div>
+										<div class="row-header">
+											<div class="col">
+												<strong>Dates</strong>
+												<p class="p-header"  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy') + ' - ' + #dates.format(project.fechaFin, 'MM/dd/yy')}"></p>
+
+											</div>
+											<div class="col">
+												<strong>Financier</strong>
+												<p class="p-header"  th:text="${project.cliente}"></p>
+
+											</div>											
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row-header-montos">
+											<div class="col">
+												<strong><i class="fa fa-money margin-r-5"></i> Contract Amount (USD)</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Recurring Amount (USD)&nbsp;&nbsp;
+														<span th:text="${#numbers.formatDecimal(project.porcentajeRecurrente, 1, 'COMMA', 2, 'POINT')}+ '%'">0.00%</span>
+												
+												</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoRecurrente, 1, 'COMMA', 2, 'POINT')}">$20,000.00</p>
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<p  class="p-header" th:text="${#numbers.formatDecimal(project.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}">$80,000.00</p>
+											</div>								
+										</div>	
+									</div>
+								</div>
+								<hr>
+	
+							</div>
+
+						</div>
+						<div class="box box-secondary">
+	 							<div class="box-header with-border">
+								<h6>Expense Selected Details</h6>
+								</div>
+							<div class="box-body">
+								<div class="row-header-max">
+									<div class="col-6">
+										<div class="row-header-montos-secondary">
+											<div class="col-7">
+												<strong>Beneficiary Name</strong>
+												<p class="p-header"  th:text="${expenseSelected.beneficiario.nombres + ' ' + (expenseSelected.beneficiario.apellidos != null ? expenseSelected.beneficiario.apellidos : '')}">Jhon Smith	</p>
+											</div>
+											<div class="col-5">
+												<strong>Identification document</strong>
+												<p  class="p-header"  th:text="${expenseSelected.beneficiario.documento}">123456</p>
+											
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row-header-montos-secondary">
+											<div class="col">
+												<strong>Type Expense</strong>
+												<span class="p-header"  th:text="${expenseSelected.tipo}">--</span>
+											</div>
+											<div class="col">
+												<strong>Object</strong>
+												<span class="p-header"  th:text="${expenseSelected.objeto}">--</span>
+											</div>											
+										</div>	
+										<div class="row-header-montos-secondary">
+											<div class="col-4">
+												<strong>Item</strong>
+												<span class="p-header"  th:text="${expenseSelected.cargoItem}">--</span>
+											</div>		
+											<div class="col-3">
+												<strong>Quantity</strong>
+												<span class="p-header"  th:text="${#numbers.formatDecimal(expenseSelected.cantidad, 1, 'COMMA', 2, 'POINT')}">0</span>
+											</div>		
+											<div class="col-5">
+												<strong>Unit Cost (USD)</strong>
+												<span  class="p-header" th:text="${#numbers.formatDecimal(expenseSelected.costoUnitario, 1, 'COMMA', 2, 'POINT')}">$00.00</span>
+											</div>								
+										</div>	
+									</div>
+								</div>
+								<hr>
+	
+							</div>
+						</div>
+                        <div class="text-center">
+                       
+                            <h2 th:if="${expenseDisclaimer.id == null}">Expense Disclaimer Register</h2>
+                            <h2 th:if="${expenseDisclaimer.id != null and expenseDisclaimer.id != 0}">Expense Disclaimer Edit</h2>
+                        </div>
+                        <form id="miFormulario"  class="user" th:action="@{/gastos/guardar-descargo}" th:method="post" th:object="${expenseDisclaimer}">
+                            <input type="hidden" th:if="${expenseDisclaimer.id!=0}"  th:field="*{id}" th:value="${expenseDisclaimer.id}">
+                            <div class="form-group">
+                                <input type="hidden" th:value="${expenseSelected.id}" id="inputexpenseId" name="inputexpenseId">
+                            </div>
+                            <div class="row">
+                            			<div class="col-4">
+				                            <div class="form-group">
+				                                <label for="inputaccount" class="form-label">Project Phases</label>
+													<select  class="form-control form-control-user" id="inputtipo" required disabled >
+													    <option value="" th:if="${expenseDisclaimer.id == null}">Select phase</option>
+													    <option th:each="faseproyecto : ${fasesProyecto}" th:value="${faseproyecto.id}"
+													    		th:text="${faseproyecto.fase.nombre+ ' - (' + #numbers.formatDecimal(faseproyecto.presupuesto, 1, 'COMMA', 2, 'POINT')+' USD)'}" 
+                    											th:selected="${faseproyecto.fase.id == expenseSelected.proyectoFase.fase.id}"></option>
+													
+													</select>
+				                             </div>                               			
+                            			</div>
+                            			<div class="col-4">
+				                            <div class="form-group">
+				                                <label for="inputtipo" class="form-label">Expense Category</label>
+													<select th:field="*{categoriaGastos}" class="form-control form-control-user" id="inputtipo" required>
+													    <option value="" th:if="${expenseDisclaimer.id == null}">Select phase</option>
+													    <option th:each="category : ${expenseCategories}" th:value="${category.id}"
+													    		th:text="${category.categoria}" ></option>
+													</select>
+				                             </div>                               			
+                            			</div>
+		                            	<div class="col-4">
+				                            <div class="form-group">
+				                                <label for="inputClassification" class="form-label">Classification of Expense</label>
+													<select th:field="*{unidadMedida}" class="form-control form-control-user" id="inputtipo" required>
+														 <option value="" th:if="${expenseDisclaimer.id == null}">Select phase</option>
+														 <option th:each="unit : ${unitOfMeasurements}" th:value="${unit.id}"
+															     th:text="${unit.descripcionUnidad}" ></option>
+															    
+													</select>
+				                             </div>                            	
+		                            	</div>                              			
+                              </div>
+                            <div class="row">
+                            	<div class="col">
+		                             <div class="form-group">
+		                             	 <label for="inputDescripcion" id="inputDescripcion" class="form-label">Description</label>
+		                                 <input th:field="*{descripcion}" type="text" class="form-control form-control-user" 
+		       									id="inputDescripcion" name="inputDescripcion" placeholder="Enter description of expense">
+		                             </div>
+                            	</div>
+                          	
+                            </div>		
+                            		<div class="row">
+                            			<div class="col-4">
+					                        <div class="form-group">
+											 <label for="inputCantidad" class="form-label">Quantity</label>                            			
+		                       				<input th:field="*{cantidad}" type="number"  class="form-control form-control-user" 
+		       								id="inputCantidad" name="inputCantidad" step="0.01" oninput="calculateTotalCosto()">
+		       								</div>                            			
+                            			</div>
+                            			<div class="col-4">
+					                        <div class="form-group">
+											 <label for="inputCantidadPagos" class="form-label">Quantity of pays</label>                            			
+		                       				<input th:field="*{cantidadPagos}" type="number"  class="form-control form-control-user" 
+		       								id="inputCantidadPagos" name="inputCantidadPagos" step="0.01" oninput="calculateTotalCosto()">
+		       								</div>                            			
+                            			</div>                            			
+                            			<div class="col-4">
+					                        <div class="form-group">
+											 <label for="inputPrecioUnitario" id="expensePrecioUnitarioMonto" class="form-label">Unit Cost </label>                            			
+		                       				<input th:field="*{costoUnitario}"  type="number" class="form-control form-control-user" 
+		       								id="inputPrecioUnitario" name="inputPrecioUnitario" step="0.01"  oninput="calculateTotalCosto()" >                             			
+											</div>
+                            			</div>
+                            		</div>
+
+
+                            		<div class="row">
+                            		    <div class="col-4">
+					                        <div class="form-group">
+											 <label for="inputCostoTotal" id="expenseCostoTotal" class="form-label">Total Cost </label>                            			
+		                       				<input th:field="*{costoTotal}"  type="number" class="form-control form-control-user" 
+		       								id="inputCostoTotal" name="inputCostoTotal" step="0.01" disabled >                             			
+											</div>
+                            			</div>
+                            			<div class="col-4">
+			                               <div class="form-group">
+												<label for="inputfecha" class="form-label">Date Transfer</label>
+					                            <input th:field="*{fecha}" type="date" class="form-control form-control-user"
+					                                           id="inputfecha" onchange="formatDate(this.value)" required>
+					                       </div>                             			
+                            			</div>
+                            		 <div class="col-4">
+		                             <div class="form-group">
+		                             	 <label for="inputObservacion" id="expenseObjetoPuesto" class="form-label">Observation</label>
+		                                 <input th:field="*{observacion}" type="text" class="form-control form-control-user" 
+		       									id="inputObservacion" name="inputObservacion" placeholder="Enter observacion if necesary">
+		                             </div>
+                            		 </div>
+
+                            		</div>
+
+  							<!-- Mostrar mensaje de error si existe -->
+                            <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
+                                <p th:text="${error}"></p>
+                            </div>
+                             <button class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" onclick="prepareMonto('inputmontoRecurrente'); prepareMonto('inputmontoNoRecurrente'); showOverlay(); ">
+                                SAVE EXPENSE
+                             </button>
+							<div class="text-center">
+ 								<a class="medium" th:href="@{/ejecucion/registro-ejecucion/{id}(id=${project.id})}">GO BACK</a>
+                           </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Footer -->
+   <footer th:replace="design/footerBar :: footerbar"></footer>
+<!-- End of Footer -->
+<div th:replace="design/script :: scripts"></div>
+<script>
+
+// Llama a esta función para actualizar el valor antes de enviar el formulario
+function prepareMonto(elementId) {
+    const element = document.getElementById(elementId);
+    element.value = element.value.replace(/,/g, ''); // Elimina comas antes de enviar al servidor
+}
+</script>
+    <script>
+        // Función para prevenir el envío del formulario con la tecla Enter
+        function disableEnterKey(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Previene la acción predeterminada (enviar el formulario)
+            }
+        }
+
+        // Añadir el listener al cargar el documento
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("miFormulario"); // Cambia "miFormulario" por el ID de tu formulario
+            form.addEventListener("keypress", disableEnterKey);
+        });
+    </script>
+
+<script>
+function openModal() {
+    // Limpiar el campo ID para crear un nuevo registro
+    document.getElementById("inputId").value = 0;
+    
+    // Limpiar otros campos del formulario si es necesario
+    document.getElementById("inputdocumento").value = "";
+    // Limpiar otros campos del formulario...
+
+    // Mostrar el modal
+    $('#myModal').modal('show');
+}
+
+</script> 
+<script type='text/javascript'>
+$(function(){
+    $(document).bind("contextmenu",function(e){
+        return false;
+    });
+});
+</script>
+<script>
+function calculateTotalCosto() {
+    const cantidad = parseFloat(document.getElementById("inputCantidad").value) || 0;
+    const cantidadPagos = parseFloat(document.getElementById("inputCantidadPagos").value) || 0;
+    const precioUnitario = parseFloat(document.getElementById("inputPrecioUnitario").value) || 0;
+
+        // Calcular montos
+        const montoTotalPagar = (cantidad + cantidadPagos+precioUnitario);
+
+        const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        //const numeroFormateado = formateador.format(montoTotalPagar);
+        document.getElementById("inputCostoTotal").value = formateador.format(montoTotalPagar);
+}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+

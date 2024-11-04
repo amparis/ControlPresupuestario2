@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+
+</head>
+<body class="bg-gradient-primary" onload="hideMessage()">
+<form id="miFormulario" class="user" th:action="@{/pp/guardar-pp}" th:method="post">
+<input type="number" id="sumPayment" step="0.01" min="0.00" class="form-control form-control-user" value="0" >
+ 
+						<!-- Tab 4: Program payment -->
+						<div id="tab4" class="container">
+					        <!-- Input para agregar un nuevo pago -->
+					        <div class="input-group mb-3">
+					            <input type="text" id="paymentInput" class="form-control form-control-user" placeholder="##.## % (Payment)">
+					            &nbsp;&nbsp;
+					            <input type="number" id="amountInput" step="0.01" min="0.00" class="form-control form-control-user" placeholder="Amount">
+					            <button class="btn btn-outline-primary" type="button" onclick="addPayment()">Add Payment</button>
+					        </div>
+					
+					        <!-- Lista donde se mostrarán los pagos agregados -->
+					        <ul id="paymentList" class="list-group form-control-user">
+					            <!-- Aquí se agregarán los elementos dinámicamente -->
+					        </ul>
+					    <!-- Campo oculto para enviar la lista de pagos concatenados -->
+					    <input type="hidden" name="paymentList" id="paymentListInput">
+					
+						</div>
+                              <button class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" type="submit">
+                                SAVE 
+                             </button>
+                             
+                             	  <div class="table-responsive">
+	                            	<label class="form-label">Project Phases:</label>
+	                            	
+	                            		<select id="fases" name="fases" class="form-control form-control-user"  >
+								                <option value="0" disabled selected>Select phase</option>
+								                <option th:each="phase : ${phases}"
+								                		th:value="${phase.nombre}"
+								                        th:text="${phase.nombre}">
+								                </option>
+								         </select>
+							    &nbsp;&nbsp;
+							    <input type="number" id="amountPhaseInput" step="0.01" min="0.00" class="form-control form-control-user" placeholder="0.00">
+							    <button id="btnPhase" class="btn btn-outline-primary" type="button" onclick="addPhase()">Add Phase</button>
+                         		
+			                         <!-- Lista donde se mostrarán los pagos agregados -->
+								        <ul id="phaseList" class="list-group form-control-user">
+								            <!-- Aquí se agregarán los elementos dinámicamente -->
+								        </ul>
+								    <!-- Campo oculto para enviar la lista de pagos concatenados -->
+								    <input type="hidden" name="phaseList" id="phaseListInput">
+	                          </div>
+</form>
+	
+			
+
+            <!-- Footer -->
+            <footer th:replace="design/footerBar :: footerbar"></footer>
+            <!-- End of Footer -->
+    <div th:replace="design/script :: scripts"></div>
+
+<script>
+function addPayment() {
+    // Obtener el valor del detalle del pago y el monto
+    var paymentDetail = document.getElementById("paymentInput").value;
+    const amount = parseFloat(document.getElementById("amountInput").value) || 0;
+    // Verificar que ambos campos no estén vacíos y que el monto no exceda el límite
+    const currentSum = parseFloat(document.getElementById("sumPayment").value) || 0;
+    // Si ambos campos no están vacíos
+    if (paymentDetail.trim() !== "" && !isNaN(amount)) {
+        
+    	if (currentSum + amount > 50000) {
+            alert("El total del contrato no puede exceder monto Contrato de 50,000.");
+            return;
+        }
+        // Concatenar descripción y monto con '->'
+        var paymentString = paymentDetail + "->" + amount;
+
+        // Añadir el nuevo pago a la lista visualmente
+        var li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+        li.textContent = paymentString;
+
+        // Crear un botón para eliminar el pago
+        var deleteButton = document.createElement("button");
+        deleteButton.className = "btn btn-sm btn-danger";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function() {
+            var deletedAmount = parseFloat(li.textContent.split("->")[1].trim());
+            li.remove(); // Eliminar el elemento de la lista
+            updateSumPayment(-deletedAmount); // Restar el monto eliminado
+            updatePaymentList(); // Actualizar el campo hidden
+        };
+
+        // Añadir el botón de eliminar al elemento de la lista
+        li.appendChild(deleteButton);
+
+        // Añadir el elemento a la lista visual
+        document.getElementById("paymentList").appendChild(li);
+        // Actualizar la suma del monto total del contrato
+        updateSumPayment(amount);
+        // Actualizar el campo hidden con la nueva lista de pagos concatenados
+        updatePaymentList();
+
+        // Limpiar los campos de entrada después de agregar el pago
+        document.getElementById("paymentInput").value = "";
+        document.getElementById("amountInput").value = "";
+    }
+}
+
+function updatePaymentList() {
+    // Obtener todos los elementos de la lista de pagos
+    var paymentItems = document.querySelectorAll("#paymentList li");    
+    // Crear una lista temporal para almacenar los valores concatenados
+    var paymentArray = [];
+    paymentItems.forEach(function(item) {
+        paymentArray.push(item.textContent.replace("Delete", "").trim()); // Quitar el texto del botón "Delete"
+    });
+    // Actualizar el valor del campo hidden con los pagos concatenados
+    document.getElementById("paymentListInput").value = paymentArray.join(";"); // Usar ";" para separar cada pago
+}
+
+function updateSumPayment(amount) {
+    // Obtener el monto total actual
+    const currentSum = parseFloat(document.getElementById("sumPayment").value) || 0;
+
+    // Sumar o restar el monto proporcionado
+    const newSum = currentSum + amount;
+	alert("suma "+newSum);
+    // Actualizar el valor del campo "CONTRATO" (sumPayment)
+    document.getElementById("sumPayment").value = newSum.toFixed(2);
+}
+
+function addPhase() {
+    const selectElement = document.getElementById("fases");
+    const selectedPhaseName = selectElement.value;
+    const amountValue = parseFloat(document.getElementById("amountPhaseInput").value) || 0;
+
+    if (selectedPhaseName && amountValue > 0) {
+        var phaseString = selectedPhaseName + "-> Amount = " + amountValue;
+        var li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+        li.textContent = phaseString;
+
+        var deleteButton = document.createElement("button");
+        deleteButton.className = "btn btn-sm btn-danger";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function() {
+            li.remove();
+            updateHiddenField();
+            addPhaseToSelect(selectedPhaseName); // Reagregar la fase al select
+        };
+
+        li.appendChild(deleteButton);
+        document.getElementById("phaseList").appendChild(li);
+        updateHiddenField();
+        removePhaseFromSelect(selectedPhaseName); // Eliminar la fase del select
+        document.getElementById("amountPhaseInput").value = '';
+        selectElement.selectedIndex = 0;
+    } else {
+        alert("Please select a phase and enter a valid amount.");
+    }
+}
+
+function updateHiddenField() {
+    var phasesItems = document.querySelectorAll("#phaseList li");
+    var phaseArray = [];
+
+    phasesItems.forEach(function(item) {
+        phaseArray.push(item.textContent.replace("Delete", "").trim());
+    });
+
+    document.getElementById("phaseListInput").value = phaseArray.join(";");
+}
+
+function removePhaseFromSelect(phaseName) {
+    const selectElement = document.getElementById("fases");
+    const options = selectElement.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value === phaseName) {
+            options[i].style.display = 'none'; // Oculta la opción
+            break;
+        }
+    }
+}
+
+function addPhaseToSelect(phaseName) {
+    const selectElement = document.getElementById("fases");
+    const options = selectElement.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value === phaseName) {
+            options[i].style.display = ''; // Muestra la opción
+            break;
+        }
+    }
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+

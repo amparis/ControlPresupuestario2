@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+</head>
+
+<body class="bg-sistemasIntegrales" onload="hideMessage()">
+    <!-- Mostrar el mensaje si está presente -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+    </div>
+<div class="container" style="max-width: 80%;">
+    <div class="card o-hidden border-0 shadow-lg my-2">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div>
+                <div>
+                    <div class="p-3">
+                     	<div class="box box-primary">
+	 						<div class="box-header with-border">
+							<h6>PROJECT DETAILS</h6>
+							</div>
+							<div class="box-body">
+								<div class="row-header-max">
+									<div class="col-6">
+										<div class="row-header">
+											<div class="col-7">
+												<strong><i class="fa fa-book margin-r-5"></i> Project Name</strong>
+												<p class="p-header"  th:text="${project.nombre}">PROJECT IDB	</p>
+											</div>
+											<div class="col-5">
+												<strong>Country</strong>
+												<p  class="p-header"  th:text="${project.pais}">Chile</p>
+											
+											</div>
+										</div>
+										<div class="row-header">
+											<div class="col">
+												<strong>Dates</strong>
+												<p class="p-header"  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy') + ' - ' + #dates.format(project.fechaFin, 'MM/dd/yy')}"></p>
+
+											</div>
+											<div class="col">
+												<strong>Financier</strong>
+												<p class="p-header"  th:text="${project.cliente}"></p>
+
+											</div>											
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row-header-montos">
+											<div class="col">
+												<strong><i class="fa fa-money margin-r-5"></i> Contract Amount (USD)</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Recurring Amount (USD)&nbsp;&nbsp;
+														<span th:text="${#numbers.formatDecimal(project.porcentajeRecurrente, 1, 'COMMA', 2, 'POINT')}+ '%'">0.00%</span>
+												
+												</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoRecurrente, 1, 'COMMA', 2, 'POINT')}">$20,000.00</p>
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<p  class="p-header" th:text="${#numbers.formatDecimal(project.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}">$80,000.00</p>
+											</div>								
+										</div>	
+									</div>
+								</div>
+								<hr>
+	
+							</div>
+							
+						</div>
+                        <div class="text-center">
+                            <h2 th:if="${income.id == null}">Repayment Register</h2>
+                            <h2 th:if="${income.id != null and income.id != 0}">Repayment Edit</h2>
+                        </div>
+                        <form id="miFormulario"  class="user" th:action="@{/incomes/guardar-prestamo}" th:method="post" th:object="${income}">
+                            <input type="hidden" th:if="${income.id!=0}" th:field="*{id}" th:value="${income.id}">
+                               <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
+									
+                   
+                            <div class="row">
+	                            <div class="col">
+                                		<label for="inputaccount" class="form-label">LOANS RECEIVED:</label>
+ 			                                <table class="table table-bordered " id="dataTableLoans" width="95%" cellspacing="0">
+			                                    <thead>
+			                                        <tr>
+			                                        	<th class="row-details">Date</th>
+			                                        	<th class="row-details">Concept</th>
+			                                        	<th class="row-details">Amount</th>
+			                                         	<th class="row-details">Recurring Amount</th>
+			                                         	<th class="row-details">Non-recurring Amount</th>                                        	                                       	
+			                                        	<th>  </th>
+			                                        </tr>
+			                                    </thead>
+			                                    <tbody>
+			                                        <tr th:each="loanReceived : ${loansReceived}">
+													<td class="row-details" th:text="${#dates.format(loanReceived.fecha, 'MM/dd/yy')}"></td>                                        
+			                                        <td class="row-details" th:text="${loanReceived.concepto}"></td>
+													<td class="td-montos row-details " th:classappend="${loanReceived.monto < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(loanReceived.monto *(-1), 1, 'COMMA', 2, 'POINT')}"></td>
+													<td class="td-montos row-details" th:classappend="${loanReceived.montoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(loanReceived.montoRecurrente *(-1), 1, 'COMMA', 2, 'POINT')}"></td>
+													<td class="td-montos row-details" th:classappend="${loanReceived.montoNoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(loanReceived.montoNoRecurrente *(-1), 1, 'COMMA', 2, 'POINT')}"></td>
+			                    					<td class="row-details" >
+													<button type="button" class="btn btn-info" 
+												        th:id="'btn-' + ${loanReceived.id}"
+												        th:data-id="${loanReceived.proyecto.id}"
+												        th:data-project="${loanReceived.proyecto.nombre}"
+												        th:data-cuenta="${loanReceived.account.id}"
+												        th:data-cuentaNombre="${loanReceived.account.nameBank}"
+												        th:data-concepto="|${loanReceived.concepto}|"
+												        th:data-monto="|${loanReceived.monto}|"
+												        onclick="selectLoanRow(this)">
+												    Choose
+													</button>
+			                    					</td>
+			                    			<td><!-- <input type="checkbox"  th:id="'menuCheckbox-' + ${loanReceived.id}" th:onclick="|togglePermissions(${loanReceived.id},${loanReceived.monto})|"/> -->										               
+										    </td>
+			                                       </tr>
+			                                    </tbody>
+			                                </table>   
+	                            </div>
+                            </div>
+                            <div class="row">
+	                            <div class="col">
+                                		
+                                		<input type="hidden" id="inputcuentaOrigen" name="inputcuentaOrigen" value="1">
+									    <select id="cuentaSelect" class="form-control" name="cuentaSelect" required onchange="updateTotalAmount(); calculateMontos();">
+									        <option value="0" disabled selected>Select account</option>
+									        <option th:each="cuenta : ${saldosCuenta}" 
+											        th:value="${cuenta[0]}"
+											        th:data-total="${cuenta[3]}" 
+											        th:data-recurring="${cuenta[4]}" 
+											        th:data-non-recurring="${cuenta[5]}"
+											        th:text="${cuenta[2] + ' - ' + cuenta[1] + ' - Total: ' + #numbers.formatDecimal(cuenta[3], 1, 'COMMA', 2, 'POINT')}">
+									        </option>
+									    </select>
+		                        	    
+										<div class="row-header-montos">
+											<div class="col">
+												<strong>Contract Amount (USD)</strong>
+										        <p class="p-header" id="totalAmount">$##.##</p>
+										        <input type="hidden" id="inputTotalAmountOrigin" name="inputTotalAmountOrigin">
+				
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong> Recurring Amount (USD)&nbsp;&nbsp;
+												</strong>
+												<p class="p-header"  id="totalRecurringAmountOrigin" >$##.##</p>
+												<input type="hidden" id="inputTotalRecurringAmountOrigin" name="inputTotalRecurringAmountOrigin">
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<p  class="p-header"  id="totalNonRecurringAmountOrigin">$##.##</p>
+												 <input type="hidden"  id="inputTotalNonRecurringAmountOrigin" name="inputTotalNonRecurringAmountOrigin">
+											</div>								
+										</div>	
+									                                                    	
+                            	</div>
+	                            <div class="col">
+	                            		<div class="row-header-montos">
+											<div class="col">
+												<p class="p-header" id="inputLoanSelected">---</p>
+											
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col">
+	                             			    <input type="hidden" id="inputproyectoAcreedor" name="inputproyectoAcreedor" value="0">   
+	                            			    <input type="hidden" id="inputcuentaAcreedor" name="inputcuentaOrigen" value="0"> 
+				                                <input type="hidden" id="inputMontoPrestadoSeleccionado" name="inputMontoPrestadoSeleccionado" value="0">  
+												<strong>Creditor Project</strong>
+												<p class="p-header" id="nombreProyectoAcreedor">---</p>	
+											</div>
+										</div>
+	                            		<div class="row-header-montos">
+											<div class="col">
+												<strong>Account and amount repayment</strong>
+												<p  class="p-header" id="cuentaMontoAcreedor">----</p>
+											</div>								
+										</div>	
+	                            </div>
+                            </div>
+                            <div class="row">
+	                            <div class="col">                            
+		                            <div class="form-group row">
+		                                <div class="col-sm-6 mb-3 mb-sm-0">
+		                                <label for="inputfecha" class="form-label">Repayment Date</label>
+		                                <input th:field="*{fecha}" type="date" class="form-control form-control-user"
+		                                           id="inputfecha"  value="Mark" required>
+		                                </div>
+		                            </div>
+		                        </div>	  
+		                        <div class="col">
+		                           <div class="form-group">
+		                                <label for="inputdescripcion" class="form-label">Concept</label>
+		                                <input th:field="*{concepto}" type="text" class="form-control form-control-user"
+		                                       id="inputconcepto"
+		                                       placeholder="Concept of repayment"  required>
+		                            </div>
+		                        </div>
+		                    </div>
+                            <div class="row">
+	                            <div class="col">
+		                            <div class="form-group">
+		                                <label for="inputmonto" class="form-label">Repayment Amount</label>
+		                                <input th:field="*{monto}" type="number" step="0.01" class="form-control form-control-user"
+		                                       id="inputmonto"   placeholder="0.00"  min="0" oninput="updateNonRecurring()" onchange="calculateMontos()">
+		                                       
+		                                <small id="errorMonto" class="text-danger" style="display: none;">The amount cannot be less than 0</small>
+		                                						<!-- Display error message if validation fails -->
+										<div id="error-message" style="color:red; display:none;">Repayment amount cannot be greater than total Non-recurring amount or loan amount.</div>
+						                                
+								        </div>                            
+	                            </div>
+	                            <div class="col">
+	                            </div>
+                          
+                            </div>
+                            <div class="row">
+	                            <div class="col">
+		                            <div class="form-group">
+				                        <label for="inputsaldo" class="form-label">The balance of the amount <strong>remains </strong>of project</label>
+		                                 <!-- Input for 'AJUSTADO APLICANDO EL PRESTAMO' -->
+					                    
+		                            </div>	      
+		                				<div class="row-header-montos">
+											<div class="col-3">
+											</div>
+											<div class="col-6 ">
+												<strong>Contract Amount (USD) remain</strong>
+												<input type="text" step="0.01" class="form-control form-control-user td-montos" id="inputmontoSaldo" placeholder="0.00" min="0" readonly>
+											</div>		
+											<div class="col-3">
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong> Recurring Amount (USD)& remain;
+												</strong>
+												<input type="text" step="0.01" class="form-control form-control-user td-montos" id="inputmontoRecurrenteSaldo" placeholder="0.00" min="0"readonly> 
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD) remain</strong>
+												 <input type="text" step="0.01" class="form-control form-control-user td-montos" id="inputmontoNoRecurrenteSaldo" placeholder="0.00" min="0"  readonly> 
+											</div>								
+										</div>		                            
+		                                                  
+	                            </div>
+                            
+	                            <div class="col">
+	                            </div>
+	                        </div>                          
+				 							<!-- Mostrar mensaje de error si existe -->
+                            <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
+                                <p th:text="${error}"></p>
+                            </div>
+                             <button id="saveLoanBtn"  class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" onclick="showOverlay()" disabled>
+                                SAVE REPAYMENT
+                             </button>
+							<div class="text-center">
+                                <a class="medium" th:href="@{/ejecucion/registro-ejecucion/{id}(id=${project.id})}">GO BACK</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+            <!-- Footer -->
+            <footer th:replace="design/footerBar :: footerbar"></footer>
+            <!-- End of Footer -->
+<div th:replace="design/script :: scripts"></div>
+<script>
+function selectLoanRow(button) {
+    // El botón es el elemento desde el que se disparó el evento
+    var button = event.target;
+    // Recuperar los valores desde los atributos data-*
+    var id = button.getAttribute('data-id');
+    var idPy = button.getAttribute('data-project');
+    var concepto = button.getAttribute('data-concepto');
+    var monto = (-1)*button.getAttribute('data-monto');
+    var cuentaId = button.getAttribute('data-cuenta'); 
+    var cuentaNombre = button.getAttribute('data-cuentaNombre');
+    // var row = elementId.closest('tr');
+    //row.style.backgroundColor = 'rgb(228,228,228)';
+    // Actualizar el input con el monto seleccionado
+    document.getElementById('inputMontoPrestadoSeleccionado').value = monto;
+    document.getElementById('inputproyectoAcreedor').value = id;
+    document.getElementById('inputcuentaAcreedor').value = cuentaId;
+    // Actualizar el label con el concepto y monto seleccionados
+        // Actualizar el contenido del <p> con el nuevo total
+    document.getElementById("nombreProyectoAcreedor").innerHTML = idPy;
+    document.getElementById("cuentaMontoAcreedor").innerHTML = cuentaNombre +' amount selected  ('+parseFloat(monto).toLocaleString('en-US', {
+        minimumFractionDigits: 2,maximumFractionDigits: 2})+')';
+    document.getElementById('inputLoanSelected').innerHTML = concepto ;
+}
+
+function togglePermissions(loanId, monto) {
+    const menuCheckbox = document.getElementById(`menuCheckbox-${loanId}`);
+    const isChecked = menuCheckbox.checked;
+
+    if (isChecked) {
+       // var row = button.closest('tr');
+        //row.style.backgroundColor = 'rgb(228,228,228)';
+        
+    	document.getElementById('inputproyectoAcreedor').value = loanId;
+    	document.getElementById('inputMontoPrestadoSeleccionado').value = monto;
+    	//document.getElementById('inputLoanSelected').innerText = "USTED SELECCIONO EL ' "+concepto +"' PARA LA DEVOLUCION DE:"+ monto;
+
+    } else {
+    	document.getElementById('inputproyectoAcreedor').value = 0;
+    	document.getElementById('inputMontoPrestadoSeleccionado').value = 0;  
+    	//document.getElementById('inputLoanSelected').value = "";
+    }
+}
+</script>
+<script>
+function updateTotalAmount() {
+    // Obtener el elemento <select> y la opción seleccionada
+    var selectElement = document.getElementById("cuentaSelect");
+    var selectedOption = selectElement.options[selectElement.selectedIndex];
+
+    // Obtener los valores de los atributos 'data-*' de la opción seleccionada
+    const cuentaOrigin = parseFloat(document.getElementById("cuentaSelect").value) || 0;
+    var totalAmount = selectedOption.getAttribute("data-total");
+    var recurringAmount = selectedOption.getAttribute("data-recurring");
+    var nonRecurringAmount = selectedOption.getAttribute("data-non-recurring");
+
+    // Actualizar el contenido del <p> con el nuevo total
+    document.getElementById("totalAmount").innerHTML = parseFloat(totalAmount).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+    // Actualizar el contenido del <p> con el nuevo total
+    document.getElementById("totalRecurringAmountOrigin").innerHTML = parseFloat(totalAmount).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+    // Actualizar el contenido del <p> con el nuevo total
+    document.getElementById("totalNonRecurringAmountOrigin").innerHTML = parseFloat(totalAmount).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+    document.getElementById("inputcuentaOrigen").value = cuentaOrigin; 
+    // Actualizar el valor del campo hidden
+    document.getElementById("inputTotalAmountOrigin").value = totalAmount;
+    // Actualizar el valor del campo hidden
+    document.getElementById("inputTotalRecurringAmountOrigin").value = totalAmount;
+    // Actualizar el valor del campo hidden
+    document.getElementById("inputTotalNonRecurringAmountOrigin").value = totalAmount;
+}
+
+</script>
+<script>
+function calculateMontos() {
+    const montoDevolucion = parseFloat(document.getElementById('inputmonto').value) || 0;
+    const TotalAmount = parseFloat(document.getElementById("inputTotalAmountOrigin").value) || 0;
+    const TotalAmountRecurring = parseFloat(document.getElementById("inputTotalRecurringAmountOrigin").value) || 0;
+    const TotalAmountNonRecurring = parseFloat(document.getElementById("inputTotalNonRecurringAmountOrigin").value) || 0;
+
+        const montoNoRecurrenteSaldo = TotalAmountNonRecurring - montoDevolucion;
+        const montoSaldo = TotalAmount - montoDevolucion;
+        const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        document.getElementById('inputmontoNoRecurrenteSaldo').value = formateador.format(montoNoRecurrenteSaldo);
+
+        document.getElementById('inputmontoSaldo').value = formateador.format(montoSaldo);
+        document.getElementById('inputmontoRecurrenteSaldo').value =  formateador.format(TotalAmountRecurring);
+        
+}
+function updateNonRecurring() {
+    const montoDevolucion = parseFloat(document.getElementById('inputmonto').value) || 0;
+    const TotalAmountNonRecurring = parseFloat(document.getElementById("inputTotalNonRecurringAmountOrigin").value) || 0;
+    const montoPrestado= parseFloat(document.getElementById("inputMontoPrestadoSeleccionado").value) || 0;
+    
+    //const montoLimite=0;
+    if(TotalAmountNonRecurring > montoPrestado){
+    	//const montoLimite = montoPrestado;
+    	
+        // Validate if the adjusted recurring amount exceeds the total amount
+        if (montoDevolucion > montoPrestado ){
+        	
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('inputmonto').style.border = '2px solid red';
+            document.getElementById('saveLoanBtn').disabled = true;
+            return;  // Exit if validation fails
+        	
+        }	else {
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('inputmonto').style.border = '';  // Remove red border if valid
+            document.getElementById('saveLoanBtn').disabled = false;
+        }
+    }
+    else{
+        if (montoDevolucion > TotalAmountNonRecurring ){
+        	
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('inputmonto').style.border = '2px solid red';
+            document.getElementById('saveLoanBtn').disabled = true;
+            return;  // Exit if validation fails
+        	
+        }	else {
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('inputmonto').style.border = '';  // Remove red border if valid
+            document.getElementById('saveLoanBtn').disabled = false;
+        }
+    }
+
+
+}
+// Llama a esta función para actualizar el valor antes de enviar el formulario
+function prepareMonto(elementId) {
+    const element = document.getElementById(elementId);
+    element.value = element.value.replace(/,/g, ''); // Elimina comas antes de enviar al servidor
+}
+/*
+function selectLoanRow2(loanId, amount) {
+    // Cambiar el color de la fila seleccionada
+   // var row = elementId.closest('tr');
+    //row.style.backgroundColor = 'rgb(228,228,228)';
+ var concepto = button.getAttribute('data-concepto');
+    // Establecer el valor del monto seleccionado en el input
+    document.getElementById('inputIdPrestadoSeleccionado').value = loanId;
+    document.getElementById('inputMontoPrestadoSeleccionado').value = amount;
+	//document.getElementById('inputLoanSelected').innerText  = "USTED SELECCIONO EL ' "+concepto +"' PARA LA DEVOLUCION DE:"+ mmonto;
+	document.getElementById('inputLoanSelected').value  = "USTED SELECCIONO EL < "+concepto +"> PARA LA DEVOLUCION DE:"; //+ amount;
+
+}*/
+</script>
+
+
+<script>
+        // Función para prevenir el envío del formulario con la tecla Enter
+        function disableEnterKey(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Previene la acción predeterminada (enviar el formulario)
+            }
+        }
+
+        // Añadir el listener al cargar el documento
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("miFormulario"); // Cambia "miFormulario" por el ID de tu formulario
+            form.addEventListener("keypress", disableEnterKey);
+        });
+</script>
+   
+</body>
+
+</html>
+
+
+
+
+
+
+
+
