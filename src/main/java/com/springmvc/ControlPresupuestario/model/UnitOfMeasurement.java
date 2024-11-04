@@ -37,4 +37,69 @@ public class UnitOfMeasurement {
     
     @Column(name = "uni_estado", length = 100)
     private String estado;
+
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+	/**
+	 * @return the descripcionUnidad
+	 */
+	public String getDescripcionUnidad() {
+		return descripcionUnidad;
+	}
+
+
+	/**
+	 * @param descripcionUnidad the descripcionUnidad to set
+	 */
+	public void setDescripcionUnidad(String descripcionUnidad) {
+		this.descripcionUnidad = descripcionUnidad;
+	}
+
+
+	/**
+	 * @return the abrevitura
+	 */
+	public String getAbrevitura() {
+		return abrevitura;
+	}
+
+
+	/**
+	 * @param abrevitura the abrevitura to set
+	 */
+	public void setAbrevitura(String abrevitura) {
+		this.abrevitura = abrevitura;
+	}
+
+
+	/**
+	 * @return the estado
+	 */
+	public String getEstado() {
+		return estado;
+	}
+
+
+	/**
+	 * @param estado the estado to set
+	 */
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+    
 }

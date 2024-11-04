@@ -193,7 +193,18 @@ h6{
     justify-content: center; /* Centra horizontalmente los elementos hijos */
     text-align: center; /* Asegura que el texto dentro de las columnas esté centrado */
    	border:rgba(0, 0, 0, 0.1) 1px solid;
-}   
+}  
+/* Row with minimal padding */
+.row-header-montos-secondary {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0; /* Eliminamos el margen negativo */
+    padding: 0; /* Mínimo padding */
+    font-size: 14px; /* Tamaño de letra pequeño */
+    justify-content: left; /* Centra horizontalmente los elementos hijos */
+    text-align: center; /* Asegura que el texto dentro de las columnas esté centrado */
+   	border:rgba(0, 0, 0, 0.1) 1px solid;
+} 
 /* Column with minimal padding */
 .col-header {
     flex: 0 0 50%; /* Ocupa el 50% de ancho */
@@ -255,5 +266,28 @@ h6{
 .text-negativo {
     color: red;
 }
+/* Table for details*/
+table-details {
+  table-layout: fixed;
+  width: 95%;
+  border-collapse: collapse;
+  border: 3px solid purple;
+  font-size: 14px;
+}
 
+.td-details{
+	text-align:right;
+	
+}
+
+/* Row with minimal padding */
+.row-details {
+	margin: 0;
+    padding: 0; /* Mínimo padding */
+    font-size: 14px; /* Tamaño de letra pequeño */
+}
+.btn-ancho{
+	width:147px;
+	font-size:13px !important;
+}
        

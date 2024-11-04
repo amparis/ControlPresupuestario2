@@ -11,9 +11,9 @@ import com.springmvc.ControlPresupuestario.model.Expense;
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense,Long>  {
 
-	  @Query("SELECT e FROM Expense e WHERE e.proyecto.id = :projectId")
+	  @Query("SELECT e FROM Expense e WHERE e.proyectoFase.proyecto.id = :projectId")
 	  public List<Expense> findAllExpensesByProjectId(Long projectId);
 	  
-	  @Query("SELECT e FROM Expense e WHERE e.proyecto.id = :projectId and estado='V'")
+	  @Query("SELECT e FROM Expense e WHERE e.proyectoFase.proyecto.id = :projectId and estado='V'")
 	  public List<Expense> findAllExpensesVigentesByProjectId(Long projectId);
 }

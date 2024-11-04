@@ -11,7 +11,7 @@
         style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
         <span th:text="${message}"></span>
     </div>
-<div class="container" style="width: 98%;">
+<div class="container" style="width: 100%;">
     <div class="card o-hidden border-0 shadow-lg my-2">
         <div class="card-body p-0">
             <!-- Nested Row within Card Body -->
@@ -40,6 +40,11 @@
 											<div class="col">
 												<strong>Dates</strong>
 												<p class="p-header"  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy') + ' - ' + #dates.format(project.fechaFin, 'MM/dd/yy')}"></p>
+
+											</div>
+											<div class="col">
+												<strong>Financier</strong>
+												<p class="p-header"  th:text="${project.cliente}"></p>
 
 											</div>
 										</div>
@@ -71,10 +76,26 @@
 							</div>
 							
 						</div>
-                        <h6>INCOMES </h6>
+						<!-- Pestañas -->
+	                    <ul class="nav nav-tabs" role="tablist">
+	                        <li class="nav-item">
+	                            <a class="nav-link active" data-toggle="tab" href="#tab1">Incomes</a>
+	                        </li>
+	                        <li class="nav-item">
+	                            <a class="nav-link" data-toggle="tab" href="#tab2">Expenses</a>
+	                        </li>
+	                        <!-- <li class="nav-item">
+	                            <a class="nav-link" data-toggle="tab" href="#tab4">Payment Plan</a>
+	                        </li> -->
+	                    </ul>
+	                    <!-- Contenido de las pestañas -->
+                        <div class="tab-content">
+                             <!-- Tab 1: Incomes -->
+                            <div id="tab1" class="container tab-pane active">
+                       
                             <div class="table-responsive">
                             <div class="row">
-                            	<div class="col-1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                            	<div class="col-1">&nbsp;&nbsp;&nbsp;</div>
                             	<div class="col-9">
                                 <table class="table table-bordered" id="dataTableIncomes" width="80%" cellspacing="0">
                                     <thead>
@@ -85,7 +106,7 @@
                                         	<th>Amount</th>
                                          	<th>Recurring Amount</th>
                                          	<th>Non-recurring Amount</th>                                        	                                       	
-                                        	<th></th>
+                                        	<th> </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -95,9 +116,9 @@
                                         <td th:text="${income.categoria}"></td>
                                         <td th:text="${income.concepto}"></td>
                                         
-<td class="td-montos" th:classappend="${income.monto < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(income.monto, 1, 'COMMA', 2, 'POINT')}"></td>
-<td class="td-montos" th:classappend="${income.montoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(income.montoRecurrente, 1, 'COMMA', 2, 'POINT')}"></td>
-<td class="td-montos" th:classappend="${income.montoNoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(income.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}"></td>
+										<td class="td-montos" th:classappend="${income.monto < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(income.monto, 1, 'COMMA', 2, 'POINT')}"></td>
+										<td class="td-montos" th:classappend="${income.montoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(income.montoRecurrente, 1, 'COMMA', 2, 'POINT')}"></td>
+										<td class="td-montos" th:classappend="${income.montoNoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(income.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}"></td>
                     					<td>
                     					   <!-- Iterar sobre menuRoles para comprobar permisos -->
                     					   <!-- 
@@ -138,42 +159,54 @@
 	                            	<div class="row">
 	                            		<div class="col">
 											<a th:href="@{/incomes/registro-desembolso/{id}(id=${project.id})}"
-									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales">
-									       DISBURSMENTS
-									    	</a>
+									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales btn-ancho"  onclick="showOverlay()" >
+									       DISBURSEMENTS
+									    	</a>	<br>
 									    </div>
 	                            	</div>
 	                            	<div class="row">
 	                            		<div class="col">
 									    <a th:href="@{/incomes/registro-transferencia/{id}(id=${project.id})}"
 									       th:if="${totalAmount>5000}"
-									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales">
+									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales btn-ancho"  onclick="showOverlay()" >
 									       TRANSFERS
-									    </a>
+									    </a>	<br>
 									    </div>
 	                            	</div>
 	                            	<div class="row">
 	                            		<div class="col">
 									    <a th:href="@{/incomes/registro-prestamo/{id}(id=${project.id})}"
-									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales">
-									       PRESTAMO
-									    </a>	                            		
+									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales btn-ancho"  onclick="showOverlay()" >
+									       LOANS
+									    </a>	<br>                            		
 	                            		</div>
 	                            	</div>
 	                            	<div class="row">
 	                            		<div class="col">
-									    <a th:href="@{/incomes/registro-prestamo/{id}(id=${project.id})}"
-									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales">
-									       DEVOLUCION
-									    </a>	                            		
+									    <a th:href="@{/incomes/registro-devolucion/{id}(id=${project.id})}"
+									       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales btn-ancho"  onclick="showOverlay()" >
+									       REPAYMENT
+									    </a>	<br>                            		
 	                            		</div>
 	                            	</div>	                            	
                             	</div>
                             </div>
 
                             </div>
-                         <h6>EXPENSES</h6>
+                             
+                            </div>
+                        	<!-- Tab 2: Expenses -->
+							<div id="tab2" class="container tab-pane fade">
                                 <div class="table-responsive">
+                            <span th:each="menuRole : ${menuRoles}">
+								<div class="d-flex justify-content-end">
+								    <a th:href="@{/expenses/registro-egreso/}+${project.id}"
+								       th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.acreate}" 
+								       class="btn btn-outline-success" onclick="showOverlay()">
+								       <i class="fas fa-plus"></i> + New Expense
+								    </a>
+								</div>
+				            </span>
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
@@ -183,18 +216,27 @@
                                         	<th>Cargo/Item</th>
                                         	<th>Quantity</th>
                                         	<th>Unit Cost</th>
+											<th></th>                                        	
                                         	<th> </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr th:each="expense : ${expenses}">
                                         <td th:text="${expense.tipo}"></td>
-                                        <!-- <td th:text="${expense.beneficiario.nombres ?: ''}"></td>
- --> <td>..</td>
-                                        <td th:text="${expense.objeto}"></td>
+     									<td th:text="${expense.beneficiario != null ? expense.beneficiario.nombres + ' ' + (expense.beneficiario.apellidos != null ? expense.beneficiario.apellidos : '') : ''}"></td>
+                                   		<td th:text="${expense.objeto}"></td>
                                         <td th:text="${expense.cargoItem}"></td>
                                         <td th:text="${expense.cantidad}"></td>
                                         <td th:text="${expense.costoUnitario}"></td>
+                                        <td>
+										    <span th:if="${expense.descargo}">
+										        <a th:href="@{/gastos/lista-descargos/{id}(id=${expense.id})}">
+										            <img src="/imagenes/archivos.png" alt="Descargo" style="width: 20px; height: 20px;" />
+										        </a>
+										    </span>
+										    <span th:if="${!expense.descargo}"> </span>
+										</td>
+                                        
                     					<td>
                     					   <!-- Iterar sobre menuRoles para comprobar permisos -->
 								            <span th:each="menuRole : ${menuRoles}">
@@ -218,8 +260,11 @@
 
                                     </tbody>
                                 </table>
-                            </div>
-
+                           		</div>
+							
+							</div>
+                         
+						</div>
                     </div>
                 </div>
             </div>

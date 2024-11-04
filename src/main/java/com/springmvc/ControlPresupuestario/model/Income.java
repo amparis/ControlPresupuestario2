@@ -38,8 +38,12 @@ public class Income {
     private Account account;
 
     @ManyToOne
-    @JoinColumn(name = "proy_id")//permitirás que JPA maneje las claves foráneas automáticamente y se inserten correctamente en la base de datos
+    @JoinColumn(name = "proy_id")
     private Project proyecto;
+    
+    @ManyToOne
+    @JoinColumn(name = "pp_id")
+    private PaymentPlan planPago;
 
     @Column(name = "ing_fecha", nullable = false)
     private Date fecha;
@@ -254,6 +258,20 @@ public class Income {
 	 */
 	public void setMontoNoRecurrente(double montoNoRecurrente) {
 		this.montoNoRecurrente = montoNoRecurrente;
+	}
+
+	/**
+	 * @return the planPago
+	 */
+	public PaymentPlan getPlanPago() {
+		return planPago;
+	}
+
+	/**
+	 * @param planPago the planPago to set
+	 */
+	public void setPlanPago(PaymentPlan planPago) {
+		this.planPago = planPago;
 	}
 
     

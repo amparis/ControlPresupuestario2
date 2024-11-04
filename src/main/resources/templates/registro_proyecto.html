@@ -54,11 +54,30 @@
                         <div class="text-center">
                             <h2 th:if="${project.id==0}">Project Register</h2>
                             <h2 th:if="${project.id!=0}">Project Edit</h2>
-                           
-                            
                         </div>
-                        <form id="miFormulario" class="user" th:action="@{/proyectos/guardar-proyecto}" th:method="post" th:object="${project}" onsubmit="return validateDates()">
+                    <!-- Pestañas -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#tab1">General Data</a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#tab2">Supervisor/Responsible</a>
+                        </li> -->
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#tab3">Phases</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#tab4">Payment Plan</a>
+                        </li>
+                    </ul>
+                         <form id="miFormulario" class="user" th:action="@{/proyectos/guardar-proyecto}" th:method="post" th:object="${project}" onsubmit="return validateDates()">
+                    
+                        <!-- Contenido de las pestañas -->
+                        <div class="tab-content">
                         
+                            <!-- Tab 1: Datos Generales -->
+                            <div id="tab1" class="container tab-pane active">
+                         
                             <input type="hidden" th:if="${project.id!=0}" th:field="*{id}" th:value="${project.id}">
                             <div class="row">
                             	<div class="col">
@@ -119,24 +138,29 @@
                             </div>
                             <div class="row">
                             	<div class="col">
-                            		<div class="form-group">
-			                              <label for="inputfechaInicial" class="form-label">Start Date</label>
-			                              <input th:field="*{fechaInicial}" 
-			                              		th:value="${#dates.format(fechaInicial, 'MM/dd/yyyy')}" 
-			                              		type="date"  class="form-control form-control-user"
-			                                    id="inputfechaInicial" placeholder="MM/DD/YYYY" required onchange="formatDate(this.value)" >                                	
-	                               <!-- Elemento para mostrar la fecha formateada -->
-								<p id="formattedDate"></p>
-	                                </div>                             	
+                            		<div class="row">
+                            			<div class="col-6">
+		                            		<div class="form-group">
+					                              <label for="inputfechaInicial" class="form-label">Start Date</label>
+					                              <input th:field="*{fechaInicial}" 
+					                              		th:value="${#dates.format(fechaInicial, 'MM/dd/yyyy')}" 
+					                              		type="date"  class="form-control form-control-user"
+					                                    id="inputfechaInicial" placeholder="MM/DD/YYYY" required onchange="formatDate(this.value)" >                                	
+			                               <!-- Elemento para mostrar la fecha formateada -->
+												<p id="formattedDate"></p>
+			                                </div> 
+                            			</div>
+                            			<div class="col-6">
+			                                	<div class="form-group">
+													 <label for="inputfechaFin" class="form-label">End Date</label>
+					                                 <input th:field="*{fechaFin}" type="date" class="form-control form-control-user"
+					                                           id="inputfechaFin" onchange="formatDate(this.value)" required>
+					                            </div>      
+                            			</div>
+                            		</div>
                                 </div>
-                                <div class="col">
-                                	<div class="form-group">
-										 <label for="inputfechaFin" class="form-label">End Date</label>
-		                                 <input th:field="*{fechaFin}" type="date" class="form-control form-control-user"
-		                                           id="inputfechaFin" onchange="formatDate(this.value)" required>
-
-		                            </div>      
-                            	</div>
+ 								<div class="col">
+ 								</div>
                             </div>
 							<hr>
                             <!-- Agregamos % recurrente y los montos calculados automaticos -->
@@ -219,19 +243,92 @@
 								        </div>
 								    </div>
 								</div>
-                            
+
  							<!-- Mostrar mensaje de error si existe -->
                             <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
                                 <p th:text="${error}"></p>
                             </div>
-                             <button class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales"
-                             					onclick="prepareMonto('inputmontoRecurrente'); prepareMonto('inputmontoNoRecurrente'); showOverlay();">
+
+						</div>
+						<!-- Tab 2: Supervisor/Responsible Assignment-->
+						<div id="tab2" class="container tab-pane fade">
+						</div>
+						<!-- Tab 3: Phases Project -->
+						<div id="tab3" class="container tab-pane fade">
+						 <label class="form-label">Project Phases:</label>
+	                        <div class="row">
+		                        <div class="col-5">
+		                           
+			                            <select id="fases" name="fases" class="form-control form-control-user"  >
+									         <option value="0" disabled selected>Select phase</option>
+									         <option th:each="phase : ${phases}"
+									                		th:value="${phase.nombre}"
+									                        th:text="${phase.nombre}">
+									        </option>
+									     </select>	                        
+		                        </div>
+		                        <div class="col-3">
+									 <input type="number" id="amountPhaseInput" step="0.01" min="0.00" class="form-control form-control-user" placeholder="0.00">
+		                        
+		                        </div>
+		                        <div class="col-4">
+									<button id="btnPhase" class="btn btn-outline-primary" type="button" onclick="addPhase()">Add Phase</button>
+		                        </div>
+	                        </div>	
+	                        <div class="row">
+	                        	<div class="col-2"></div>
+		                        <div class="col-8">
+				                         <!-- Lista donde se mostrarán los pagos agregados -->
+									        <ul id="phaseList" class="list-group form-control-user">
+									            <!-- Aquí se agregarán los elementos dinámicamente -->
+									        </ul>
+									    <!-- Campo oculto para enviar la lista de pagos concatenados -->
+									    <input type="hidden" name="phaseList" id="phaseListInput">	                        
+		                        </div>
+		                        <div class="col-2"></div>
+	                        </div>	
+						</div>
+						<!-- Tab 4: Program payment -->
+						<div id="tab4" class="container tab-pane fade">
+					        <!-- Input para agregar un nuevo pago -->
+					       	                        <div class="row">
+		                        <div class="col-5">
+		                            
+ 									<input type="text" id="paymentInput" class="form-control form-control-user" placeholder="##.## % (Payment)">                       
+		                        </div>
+		                        <div class="col-3">
+									 <input type="number" id="amountInput" step="0.01" min="0.00" class="form-control form-control-user" placeholder="0.00">
+		                        
+		                        </div>
+		                        <div class="col-4">
+									<button class="btn btn-outline-primary" type="button" onclick="addPayment()">Add Payment</button>
+		                        </div>
+	                        </div>	
+	                        <div class="row">
+	                        	<div class="col-2"></div>
+		                        <div class="col-8">
+							        <!-- Lista donde se mostrarán los pagos agregados -->
+							        <ul id="paymentList" class="list-group form-control-user">
+							            <!-- Aquí se agregarán los elementos dinámicamente -->
+							        </ul>
+									    <!-- Campo oculto para enviar la lista de pagos concatenados -->
+								    <input type="hidden" name="paymentList" id="paymentListInput">                       
+		                        </div>
+		                        <div class="col-2">
+		                        	Total:
+		                        	<input type="number" id="sumPayment" step="0.01" min="0.00" class="form-control form-control-user" value="0" width="100px" readonly>
+		                        </div>
+	                        </div>							
+					
+						</div>
+                
+                    </div>
+                    	 <button class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales"
+                             		   onclick="prepareMonto('inputmontoRecurrente'); prepareMonto('inputmontoNoRecurrente'); showOverlay();">
                                 SAVE PROJECT
                              </button>
 
-                        </form>
-
-                    </div>
+                        </form>   
                 </div>
             </div>
         </div>
@@ -242,27 +339,11 @@
             <footer th:replace="design/footerBar :: footerbar"></footer>
             <!-- End of Footer -->
 <div th:replace="design/script :: scripts"></div>
-    <!-- Flatpickr JS 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-        flatpickr("#inputfechaInicial", {
-            dateFormat: "m/d/Y", // Formato MM/DD/YYYY
-            locale: "en" // Idioma inglés
-        });
-    </script>-->
-    <!-- Script para formatear la fecha -->
+
 <script>
 
 function formatDate(value) {
     if (value) {
-       // const date = new Date(value); // Crea un objeto Date
-//        const options = { year: 'numeric', month: '2-digit', day: '2-digit' }; // Opciones para formatear
-
-        // Usa Intl.DateTimeFormat para formatear la fecha
-        //const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
-        //document.getElementById('formattedDate').textContent = formattedDate; // Muestra la fecha formateada
-        // Reemplaza el valor en el input original con la fecha formateada
-      
         // Crea un objeto Date a partir de la cadena
         const dateParts = value.split('-'); // Separa el valor en año, mes y día
         const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); // Crea un objeto Date (mes - 1)
@@ -274,7 +355,7 @@ function formatDate(value) {
         
         // Reemplaza el valor en el input original con la fecha formateada
         document.getElementById('inputfechaInicial').value = value; // Mantiene el formato YYYY-MM-DD
-        document.getElementById('inputfechaInicial').setAttribute('data-formatted', formattedDate); // Almacena el formato legible si es necesario
+        document.getElementById('inputfechaFin').setAttribute('data-formatted', formattedDate); // Almacena el formato legible si es necesario
     
     }
 }
@@ -359,12 +440,26 @@ function formatDate(value) {
 		        alert("Por favor, selecciona un responsable.");
 		        return false;
 		    }
+		    
+		    var paymentItems = document.querySelectorAll("#paymentList li");
+
+		    if (paymentItems.length === 0) {
+		        alert("Debe agregar al menos una programacion de pago.");
+		        return false; // Evitar que el formulario se envíe
+		    }
+		    
+		    var paymentItems = document.querySelectorAll("#phaseList li");
+
+		    if (paymentItems.length === 0) {
+		        alert("Debe agregar al menos una fase para el proyecto.");
+		        return false; // Evitar que el formulario se envíe
+		    }
 
 	    // Si pasa todas las validaciones, enviar el formulario
 	    return true;
     }
 </script>
-    <script>
+   <script>
         // Función para prevenir el envío del formulario con la tecla Enter
         function disableEnterKey(event) {
             if (event.key === "Enter") {
@@ -378,6 +473,145 @@ function formatDate(value) {
             form.addEventListener("keypress", disableEnterKey);
         });
     </script>
+ 
+<script>
+function addPayment() {
+    // Obtener el valor del detalle del pago y el monto
+    var paymentDetail = document.getElementById("paymentInput").value;
+    const amount = parseFloat(document.getElementById("amountInput").value) || 0;
+    // Verificar que ambos campos no estén vacíos y que el monto no exceda el límite
+    const currentSum = parseFloat(document.getElementById("sumPayment").value) || 0;
+    const montoContratoLimite = parseFloat(document.getElementById("inputmontoContrato").value) || 0;
+    
+    // Si ambos campos no están vacíos
+    if (paymentDetail.trim() !== "" && !isNaN(amount)) {
+        
+    	if (currentSum + amount > montoContratoLimite) {
+            alert("El total del contrato no puede exceder monto Contrato de "+ montoContratoLimite);
+            return;
+        }
+        // Concatenar descripción y monto con '->'
+        var paymentString = paymentDetail + "->" + amount;
+
+        // Añadir el nuevo pago a la lista visualmente
+        var li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+        li.textContent = paymentString;
+
+        // Crear un botón para eliminar el pago
+        var deleteButton = document.createElement("button");
+        deleteButton.className = "btn btn-sm btn-danger";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function() {
+            var deletedAmount = parseFloat(li.textContent.split("->")[1].trim());
+            li.remove(); // Eliminar el elemento de la lista
+            updateSumPayment(-deletedAmount); // Restar el monto eliminado
+            updatePaymentList(); // Actualizar el campo hidden
+        };
+
+        // Añadir el botón de eliminar al elemento de la lista
+        li.appendChild(deleteButton);
+
+        // Añadir el elemento a la lista visual
+        document.getElementById("paymentList").appendChild(li);
+        // Actualizar la suma del monto total del contrato
+        updateSumPayment(amount);
+        // Actualizar el campo hidden con la nueva lista de pagos concatenados
+        updatePaymentList();
+
+        // Limpiar los campos de entrada después de agregar el pago
+        document.getElementById("paymentInput").value = "";
+        document.getElementById("amountInput").value = "";
+    }
+}
+
+function updatePaymentList() {
+    // Obtener todos los elementos de la lista de pagos
+    var paymentItems = document.querySelectorAll("#paymentList li");    
+    // Crear una lista temporal para almacenar los valores concatenados
+    var paymentArray = [];
+    paymentItems.forEach(function(item) {
+        paymentArray.push(item.textContent.replace("Delete", "").trim()); // Quitar el texto del botón "Delete"
+    });
+    // Actualizar el valor del campo hidden con los pagos concatenados
+    document.getElementById("paymentListInput").value = paymentArray.join(";"); // Usar ";" para separar cada pago
+}
+
+function updateSumPayment(amount) {
+    // Obtener el monto total actual
+    const currentSum = parseFloat(document.getElementById("sumPayment").value) || 0;
+
+    // Sumar o restar el monto proporcionado
+    const newSum = currentSum + amount;
+    // Actualizar el valor del campo "CONTRATO" (sumPayment)
+    document.getElementById("sumPayment").value = newSum.toFixed(2);
+}
+
+function addPhase() {
+    const selectElement = document.getElementById("fases");
+    const selectedPhaseName = selectElement.value;
+    const amountValue = parseFloat(document.getElementById("amountPhaseInput").value) || 0;
+
+    if (selectedPhaseName && amountValue > 0) {
+        var phaseString = selectedPhaseName + "-> Amount = " + amountValue;
+        var li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+        li.textContent = phaseString;
+
+        var deleteButton = document.createElement("button");
+        deleteButton.className = "btn btn-sm btn-danger";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function() {
+            li.remove();
+            updateHiddenField();
+            addPhaseToSelect(selectedPhaseName); // Reagregar la fase al select
+        };
+
+        li.appendChild(deleteButton);
+        document.getElementById("phaseList").appendChild(li);
+        updateHiddenField();
+        removePhaseFromSelect(selectedPhaseName); // Eliminar la fase del select
+        document.getElementById("amountPhaseInput").value = '';
+        selectElement.selectedIndex = 0;
+    } else {
+        alert("Please select a phase and enter a valid amount.");
+    }
+}
+
+function updateHiddenField() {
+    var phasesItems = document.querySelectorAll("#phaseList li");
+    var phaseArray = [];
+
+    phasesItems.forEach(function(item) {
+        phaseArray.push(item.textContent.replace("Delete", "").trim());
+    });
+
+    document.getElementById("phaseListInput").value = phaseArray.join(";");
+}
+
+function removePhaseFromSelect(phaseName) {
+    const selectElement = document.getElementById("fases");
+    const options = selectElement.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value === phaseName) {
+            options[i].style.display = 'none'; // Oculta la opción
+            break;
+        }
+    }
+}
+
+function addPhaseToSelect(phaseName) {
+    const selectElement = document.getElementById("fases");
+    const options = selectElement.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value === phaseName) {
+            options[i].style.display = ''; // Muestra la opción
+            break;
+        }
+    }
+}
+
+</script>
     
         
 

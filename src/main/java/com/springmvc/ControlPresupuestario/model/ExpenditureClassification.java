@@ -33,7 +33,7 @@ public class ExpenditureClassification {
     @Column(name = "clase_descripcion", length = 250)
     private String descripcionClase;
     
-    @Column(name = "clase_forma_pago", length = 10)
+    @Column(name = "clase_forma_pago", length = 50)
     private String formaPago;
 
 	/**

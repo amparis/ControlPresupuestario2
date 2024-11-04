@@ -45,9 +45,13 @@ public class BeneficiaryService {
 	    
 		boolean exists = beneficiaryRepository.existsByNombresAndApellidosAndDocumento(
 				newBeneficiary.getNombres(),newBeneficiary.getApellidos(), newBeneficiary.getDocumento());
-	    
+	    System.out.println("id ben>> "+newBeneficiary.getId());
 	    // Si es una actualización (id ya existe)
-	    if (newBeneficiary.getId() != null) {
+	    if (newBeneficiary.getId() != null && newBeneficiary.getId() != 0) {
+
+		    System.out.println("EDIT BEN ");
+		    System.out.println(newBeneficiary.getNombres());
+
 	        // Cargar el beneficiario actual desde la base de datos
 	        Beneficiary currentBeneficiary = beneficiaryRepository.findById(newBeneficiary.getId()).orElseThrow(() -> 
 	            new IllegalArgumentException("Beneficiario no encontrado con ID: " + newBeneficiary.getId())
@@ -66,16 +70,20 @@ public class BeneficiaryService {
 	            }
 	        }
 	    } else {
+		    System.out.println("NUEVO BEN ");
+		    System.out.println(newBeneficiary.getNombres());
 	        // Si es una creación de nuevo beneficiario, hacer la verificación normal
 	        if (beneficiaryRepository.existsByNombresAndApellidosAndDocumento(newBeneficiary.getNombres(),newBeneficiary.getApellidos() ,newBeneficiary.getDocumento())) {
 	            throw new IllegalArgumentException("Ya existe un beneficiario con el mismo nombre completo y documento.");
 	        }
+	        
 	    	UserAdm loginUser = userService.getUser(userDetailsService.getUserDetailsService().getId());
-		    // Asignar el id del usuario logueado al campo us_id 
 		    newBeneficiary.setUsuarioId((int) loginUser.getId());
 		    newBeneficiary.setEstado("V");
 		    newBeneficiary.setNombres(newBeneficiary.getNombres().toUpperCase());
 		    newBeneficiary.setApellidos(newBeneficiary.getApellidos().toUpperCase());
+	        
+
 	    }
         return beneficiaryRepository.save(newBeneficiary);
     }

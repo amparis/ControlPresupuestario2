@@ -15,7 +15,7 @@ public class CountryService {
 	private CountryRepository countryRepository;
 	
     public List<Country> getAllCountries() {
-        return countryRepository.findAll();
+        return countryRepository.findAllAndSortByNombre();
     }	
     
     public Country getCountryById(Long id) {

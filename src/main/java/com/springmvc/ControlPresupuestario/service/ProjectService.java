@@ -1,11 +1,14 @@
 package com.springmvc.ControlPresupuestario.service;
 
 import com.springmvc.ControlPresupuestario.model.Beneficiary;
+import com.springmvc.ControlPresupuestario.model.PaymentPlan;
 import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.model.ProjectHistory;
+import com.springmvc.ControlPresupuestario.model.ProjectPhase;
 import com.springmvc.ControlPresupuestario.model.UserAdm;
 import com.springmvc.ControlPresupuestario.model.UserAdmProject;
 import com.springmvc.ControlPresupuestario.repository.BeneficiaryRepository;
+import com.springmvc.ControlPresupuestario.repository.PaymentPlanRepository;
 import com.springmvc.ControlPresupuestario.repository.PerfilRepository;
 import com.springmvc.ControlPresupuestario.repository.ProjectRepository;
 import com.springmvc.ControlPresupuestario.repository.UserAdmProjectRepository;
@@ -14,6 +17,7 @@ import com.springmvc.ControlPresupuestario.repository.UserAdmRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
@@ -35,18 +39,23 @@ public class ProjectService {
     UserAdmRepository userRepository;
     @Autowired
     BeneficiaryRepository beneficiaryRepository;
-    
+	@Autowired
+    private PaymentPlanRepository paymentPlanRepository;
+	@Autowired
+	ProjectPhaseService projectPhaseService;
+	@Autowired
+	PhaseService phaseService;
     @Autowired
     IMyUserDetailsService userDetailsService;
     
     @Autowired
     ProjectHistoryService projectHistoryService;
+    //@Autowired
+   // PaymentPlanService paymentPlanService;
 	
 	public List<Project> getProjects(){
-		
 		//return this.projectRepository.findAll();//deberia listar solo los vigentes
         return this.projectRepository.findByEstado("V");  // Listar solo proyectos con estado 'v'
-
 	}
 	
 	public Project getProject(long id) {
@@ -55,9 +64,12 @@ public class ProjectService {
 	}
 	
 	//public Project getProjectById(Long id);
-	
-	public Project saveProject(Project newProject, 
-			Integer beneficiaryIdSupervisor,Integer beneficiaryIdResponsable,Long projectId) {
+ 	public Project saveProject(Project newProject, 
+			Integer beneficiaryIdSupervisor,Integer beneficiaryIdResponsable,
+			Long projectId, 
+			List<String>  paymentPlan,
+			List<String>  phasesList
+			) {
 	    if (projectId == null) {
 			// Verificar si ya existe un proyecto con el mismo nombre, fecha inicio y fecha fin    
 			boolean exists = projectRepository.existsByNombreAndFechaInicialAndFechaFin(
@@ -105,9 +117,71 @@ public class ProjectService {
 	            Long userIdResponsable = getOrCreateUserForBeneficiary(beneficiaryIdResponsable, rolResponsable);
 	            linkUserToProject(savedProject, userIdResponsable);
 	        }
-		    
+	        // Procesar el paymentPlan
+	 	   for (String payment : paymentPlan) {
+		        // Dividir cada elemento del paymentPlan por ';' para obtener cada pago
+		        String[] payments = payment.split(";"); // Dividir por punto y coma
+
+		        for (String singlePayment : payments) {
+		            // Dividir cada elemento en descripción y monto usando '->'
+		            String[] parts = singlePayment.split("->", 2); // Limitar a dos partes
+		            if (parts.length == 2) {
+		                String descripcion = parts[0].trim();  // Parte antes de '->'
+		                String amountStr = parts[1].trim();    // Parte después de '->'
+		                double amount;
+		                try {
+		                    amount = Double.parseDouble(amountStr); // Convertir a double
+		                } catch (NumberFormatException e) {
+		                    throw new IllegalArgumentException("El monto no es un número válido: " + amountStr, e);
+		                }
+
+		                // Crear un nuevo objeto PaymentPlan
+		                PaymentPlan savedPaymentPlan = new PaymentPlan();
+		                savedPaymentPlan.setProyecto(savedProject); // Cambia 1L por el ID real del proyecto
+		                savedPaymentPlan.setDescripcion(descripcion); // Guardar la descripción
+		                savedPaymentPlan.setMonto(amount); // Guardar el monto
+		                savedPaymentPlan.setMontoPagado(0);
+		                savedPaymentPlan.setEstado("PENDING");
+		                // Guardar el PaymentPlan
+		                paymentPlanRepository.save(savedPaymentPlan);
+		            } else {
+		                throw new IllegalArgumentException("Formato de plan de pago incorrecto: " + singlePayment);
+		            }
+		        }
+		    }
+	 	   //Procesar phase by project
+		   for (String phase : phasesList) {
+		        // Dividir cada elemento del paymentPlan por ';' para obtener cada pago
+		        String[] phases = phase.split(";"); // Dividir por punto y coma
+
+		        for (String singlePhase : phases) {
+		            // Dividir cada elemento en descripción y monto usando '->'
+		            String[] parts = singlePhase.split("-> Amount = ", 2); // Limitar a dos partes
+		            if (parts.length == 2) {
+		                String descripcion = parts[0].trim();  // Parte antes de '-> Amount = '
+		                String amountStr = parts[1].trim();    // Parte después de '-> Amount = '
+		                double amount;
+		                try {
+		                    amount = Double.parseDouble(amountStr); // Convertir a double
+		                } catch (NumberFormatException e) {
+		                    throw new IllegalArgumentException("El monto no es un número válido: " + amountStr, e);
+		                }
+
+		                // Crear un nuevo objeto PaymentPlan
+		                ProjectPhase savedProjectPhase = new ProjectPhase();
+		                savedProjectPhase.setProyecto(savedProject); // Cambia 1L por el ID real del proyecto
+		                savedProjectPhase.setFase(phaseService.getPhaseByNombre(descripcion)); // Guardar la descripción
+		                savedProjectPhase.setPresupuesto(amount); // Guardar el monto
+
+		                // Guardar el PaymentPlan
+		                projectPhaseService.saveProjectPhase(savedProjectPhase);
+		            } else {
+		                throw new IllegalArgumentException("Formato de phases incorrecto: " + singlePhase);
+		            }
+		        }
+		    }
 	    }
-	    else {
+	    /*else {
 		    // Guardar el nuevo proyecto en la base de datos
 			Project ProjectUpdate = this.projectRepository.findById(projectId).get();
 			
@@ -158,7 +232,7 @@ public class ProjectService {
 		    
 			}
 	    }
-	    
+	    */
 	    return projectRepository.save(newProject);
 	}
 	

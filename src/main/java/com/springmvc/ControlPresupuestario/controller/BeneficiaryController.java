@@ -67,17 +67,18 @@ public class BeneficiaryController {
     }
 
     // Guardar un nuevo Beneficiario
-    @PostMapping("/guardar-beneficiario")
-    public String saveBeneficiary(@ModelAttribute Beneficiary beneficiary, RedirectAttributes redirectAttributes) {
+    @PostMapping("/guardar-beneficiario/{id}")
+    public String saveBeneficiary(@PathVariable("id") Integer id,@ModelAttribute Beneficiary beneficiary, RedirectAttributes redirectAttributes) {
         try {
             beneficiaryService.saveBeneficiary(beneficiary);
-            redirectAttributes.addFlashAttribute("message", "Beneficiario guardado exitosamente.");
+            redirectAttributes.addFlashAttribute("message", "Beneficiary saved successfully!");
             redirectAttributes.addFlashAttribute("messageType", "success");
-            return "redirect:/beneficiarios/lista-beneficiarios";
+            return (id > 0) ? "redirect:/expenses/registro-egreso/" + id : "redirect:/beneficiarios/lista-beneficiarios";
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("message", "Error al guardar el beneficiario: " + e.getMessage());
             redirectAttributes.addFlashAttribute("messageType", "error");
-            return "redirect:/beneficiarios/registro-beneficiario";
+            return (id > 0) ? "redirect:/expenses/registro-egreso/" + id : "redirect:/beneficiarios/registro-beneficiario";
         }
     }
 

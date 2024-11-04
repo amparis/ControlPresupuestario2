@@ -32,8 +32,8 @@ public class Expense {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "proy_id")
-    private Project proyecto;
+    @JoinColumn(name = "fp_id")
+    private ProjectPhase proyectoFase;
 
     @ManyToOne
     @JoinColumn(name = "ben_id")
@@ -55,10 +55,10 @@ public class Expense {
     @Column(name = "egre_cantidad", nullable = false)
     private Integer cantidad;
 
-    @Column(name = "egre_fecha_inicio", nullable = false)
+    @Column(name = "egre_fecha_inicio")
     private Date fechaInicio;
 
-    @Column(name = "egre_fecha_fin", nullable = false)
+    @Column(name = "egre_fecha_fin")
     private Date fechaFin;
 
     @Column(name = "egre_tiempo", nullable = false, precision = 18, scale = 6)
@@ -110,6 +110,9 @@ public class Expense {
     @Column(name = "egre_fecha_registro")
     private Timestamp fechaRegistro;
 
+    @ManyToOne
+    @JoinColumn(name = "cuenta_id")
+    private Account cuenta;
 	/**
 	 * @return the id
 	 */
@@ -122,20 +125,6 @@ public class Expense {
 	 */
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	/**
-	 * @return the proyecto
-	 */
-	public Project getProyecto() {
-		return proyecto;
-	}
-
-	/**
-	 * @param proyecto the proyecto to set
-	 */
-	public void setProyecto(Project proyecto) {
-		this.proyecto = proyecto;
 	}
 
 	/**
@@ -472,6 +461,34 @@ public class Expense {
 	 */
 	public void setFechaRegistro(Timestamp fechaRegistro) {
 		this.fechaRegistro = fechaRegistro;
+	}
+
+	/**
+	 * @return the cuenta
+	 */
+	public Account getCuenta() {
+		return cuenta;
+	}
+
+	/**
+	 * @param cuenta the cuenta to set
+	 */
+	public void setCuenta(Account cuenta) {
+		this.cuenta = cuenta;
+	}
+
+	/**
+	 * @return the proyectoFase
+	 */
+	public ProjectPhase getProyectoFase() {
+		return proyectoFase;
+	}
+
+	/**
+	 * @param proyectoFase the proyectoFase to set
+	 */
+	public void setProyectoFase(ProjectPhase proyectoFase) {
+		this.proyectoFase = proyectoFase;
 	}
 
     // Getters and Setters

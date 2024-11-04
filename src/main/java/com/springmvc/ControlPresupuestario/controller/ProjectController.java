@@ -7,7 +7,9 @@ import com.springmvc.ControlPresupuestario.model.UserAdmProject;
 import com.springmvc.ControlPresupuestario.service.BeneficiaryService;
 import com.springmvc.ControlPresupuestario.service.CountryService;
 import com.springmvc.ControlPresupuestario.service.IMyUserDetailsService;
+import com.springmvc.ControlPresupuestario.service.PaymentPlanService;
 import com.springmvc.ControlPresupuestario.service.PefilService;
+import com.springmvc.ControlPresupuestario.service.PhaseService;
 import com.springmvc.ControlPresupuestario.service.ProjectHistoryService;
 import com.springmvc.ControlPresupuestario.service.ProjectService;
 import com.springmvc.ControlPresupuestario.service.RolMenuService;
@@ -45,6 +47,9 @@ public class ProjectController {
 	@Autowired
 	private CountryService countryService;
 	
+	@Autowired
+	private PhaseService phaseService;
+
     //-------- mapping para PROYECTOS
     @GetMapping("/lista-proyectos")
     public String getProjects(Model model) {
@@ -75,16 +80,21 @@ public class ProjectController {
     //@GetMapping("/registro-proyecto")
     @GetMapping("/registro-proyecto")
     public String showRegisterFormProject(@RequestParam(required = false) Long id, Model model) {
+    	
         model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
 
     	    // Obtener todos los beneficiarios (para lista de selección en el combo)
-    	    List<Beneficiary> supervisors = beneficiaryService.getAllBeneficiariesEstadoAndTipo("V","Personal");  // Lista de beneficiarios supervisores
-    	    List<Beneficiary> responsables = beneficiaryService.getAllBeneficiariesEstadoAndTipo("V","Persona Natural");  // Lista de beneficiarios responsables
+    	    List<Beneficiary> supervisors = beneficiaryService.getAllBeneficiariesEstadoAndTipo("V","Staff");  // Lista de beneficiarios supervisores
+    	    List<Beneficiary> responsables = beneficiaryService.getAllBeneficiariesEstadoAndTipo("V","Natural Person");  // Lista de beneficiarios responsables
 
     	    model.addAttribute("project", new Project());
     	    model.addAttribute("beneficiarySupervisor", supervisors);
     	    model.addAttribute("beneficiaryResponsable", responsables);
     	    model.addAttribute("paises", countryService.getAllCountries()); 
+    	    
+    	    model.addAttribute("phases",phaseService.getAllPhases());
+    	   // model.addAttribute("paymentPlan",phaseService.getAllPhases());
+    	    //model.addAttribute("programacionPagosPy",paymentPlanService.getPaymentPlanByProjectId(id));
     	    return "registro_proyecto"; // Nombre de la vista Thymeleaf
 
     }
@@ -97,6 +107,9 @@ public class ProjectController {
             @RequestParam(name = "assignSupervisor", required = false) boolean assignSupervisor, // Captura el checkbox
             @RequestParam(name = "assignResponsable", required = false) boolean assignResponsable, // Captura el checkbox
             @RequestParam(required = false) Long id,
+            @RequestParam("paymentList") List<String> paymentList,
+            @RequestParam("phaseList") List<String> phasesList,   
+            
             RedirectAttributes redirectAttributes) {
     	
         // Validar si seleccionó el checkbox de supervisor y responsable
@@ -140,7 +153,7 @@ public class ProjectController {
 
         // Intentar guardar el proyecto si todas las validaciones pasaron
         try {
-            projectService.saveProject(project, supervisorIdToSave, responsableIdToSave, id);
+            projectService.saveProject(project, supervisorIdToSave, responsableIdToSave, id, paymentList, phasesList);
 
             redirectAttributes.addFlashAttribute("message", "Proyecto guardado exitosamente.");
             redirectAttributes.addFlashAttribute("messageType", "success");

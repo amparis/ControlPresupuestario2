@@ -11,15 +11,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.springmvc.ControlPresupuestario.model.Income;
+
+import com.springmvc.ControlPresupuestario.model.Beneficiary;
 import com.springmvc.ControlPresupuestario.model.Expense;
+import com.springmvc.ControlPresupuestario.model.Scale;
 import com.springmvc.ControlPresupuestario.service.AccountService;
+import com.springmvc.ControlPresupuestario.service.BeneficiaryService;
+import com.springmvc.ControlPresupuestario.service.CountryService;
+import com.springmvc.ControlPresupuestario.service.ExpenditureClassificationService;
+import com.springmvc.ControlPresupuestario.service.ExpenseService;
 import com.springmvc.ControlPresupuestario.service.IMyUserDetailsService;
 import com.springmvc.ControlPresupuestario.service.IncomeService;
 import com.springmvc.ControlPresupuestario.service.MenuService;
 import com.springmvc.ControlPresupuestario.service.PefilService;
+import com.springmvc.ControlPresupuestario.service.ProjectPhaseService;
 import com.springmvc.ControlPresupuestario.service.ProjectService;
 import com.springmvc.ControlPresupuestario.service.RolMenuService;
+import com.springmvc.ControlPresupuestario.service.ScaleService;
 import com.springmvc.ControlPresupuestario.service.UserAdmService;
 
 @Controller
@@ -27,7 +35,7 @@ import com.springmvc.ControlPresupuestario.service.UserAdmService;
 public class ExpenseController {
 
 	@Autowired
-	IncomeService incomeService;
+	ExpenseService expenseService;
     @Autowired
     PefilService pefilService;
     @Autowired
@@ -44,24 +52,42 @@ public class ExpenseController {
     AccountService accountService;
     @Autowired
     ProjectService projectService;
+	@Autowired
+	CountryService countryService; 
+	@Autowired
+	BeneficiaryService beneficiaryService;
+	@Autowired
+	ExpenditureClassificationService expenditureClassificationService;
+	@Autowired
+	ProjectPhaseService projectPhaseService;
+	@Autowired
+	ScaleService scaleService;
     
     @GetMapping("/registro-egreso/{id}")
     public String showRegisterFormIngreso( @PathVariable("id") long projectId, Model model) {
-        model.addAttribute("loginUser",
-                this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
+        model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
+
         model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
         model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
-        //System.out.println("ID DEL PY "+projectId); 
         model.addAttribute("project", projectService.getProject(projectId)); 
+        model.addAttribute("expense", new Expense());
+        model.addAttribute("beneficiaries", beneficiaryService.getAllBeneficiariesEstado("V"));
+        model.addAttribute("beneficiary", new Beneficiary());
+        model.addAttribute("fasesProyecto",projectPhaseService.getProjectPhasesByProyectoId(projectId));
         model.addAttribute("cuentas", accountService.getAccounts());
-        model.addAttribute("income", new Expense());
+        model.addAttribute("paises", countryService.getAllCountries()); 
+        model.addAttribute("escalas", scaleService.getAllScalesEstado("V"));
+        model.addAttribute("scale", new Scale());
+        model.addAttribute("paisesBeneficiary", countryService.getAllCountries()); 
+        model.addAttribute("expenditureClassifications",expenditureClassificationService.getExpenditureClassifications());
+               
 
           return "registro_egreso";
     }
     // Guardar
-    /*
+    
     @PostMapping("/guardar-egreso")
-    public String saveIncome(@ModelAttribute Income income,
+    public String saveExpense(@ModelAttribute Expense expense,
             @RequestParam(required = false) Long id,
             @RequestParam(value = "inputproyectoId", required = false) long projectId,
 
@@ -71,7 +97,7 @@ public class ExpenseController {
         // Intentar guardar el proyecto si todas las validaciones pasaron
         try {
         	
-        	incomeService.saveIncome(income, projectId);
+        	expenseService.saveExpense(expense);
 
             redirectAttributes.addFlashAttribute("message", "desembolso guardado exitosamente.");
             redirectAttributes.addFlashAttribute("messageType", "success");
@@ -82,5 +108,5 @@ public class ExpenseController {
             return "redirect:/expenses/registro-egreso/"+projectId;
         }
     }
-*/
+
 }

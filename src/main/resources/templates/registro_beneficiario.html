@@ -22,7 +22,7 @@
                             <h2 th:if="${beneficiary.id==0}">Register Beneficiary</h2>
                             <h2 th:if="${beneficiary.id!=0}">Edit Beneficiary</h2>
                             </div>
-                            <form class="user" th:action="@{/beneficiarios/guardar-beneficiario}" th:method="post" th:object="${beneficiary}">
+                            <form class="user" th:action="@{/beneficiarios/guardar-beneficiario/0}" th:method="post" th:object="${beneficiary}">
                         
                                 <input type="hidden" th:if="${beneficiary.id != 0}" th:field="*{id}" th:value="${beneficiary.id}">
 
@@ -120,7 +120,7 @@
                                     <p th:text="${error}"></p>
                                 </div>
 
-                                <button class="btn btn-primary btn-user btn-block">
+                                <button class="btn btn-primary btn-user btn-block"  onclick="showOverlay()">
                                     SAVE BENEFICIARY
                                 </button>
                                 <div class="text-center">

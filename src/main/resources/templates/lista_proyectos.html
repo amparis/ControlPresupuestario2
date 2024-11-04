@@ -61,8 +61,8 @@
                                             <th>Name of project</th>
                                             <th>Description</th>
                                             <th>Contract amount</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
+                                            <!-- <th>Start Date</th>
+                                            <th>End Date</th> -->
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -73,11 +73,11 @@
                                         <td th:text="${project.cliente}"></td>
                                             <td th:text="${project.nombre}"></td>
                                             <td th:text="${project.descripcion}"></td>
-                                            <!-- <td th:text="${project.montoContrato}"></td> -->
+                                           
                                             <td th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}"></td>
                                             
-                                            <td  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy')}"></td>
-                                            <td th:text="${#dates.format(project.fechaFin, 'MM/dd/yy')}"></td>
+                                            <!-- <td  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy')}"></td>
+                                            <td th:text="${#dates.format(project.fechaFin, 'MM/dd/yy')}"></td> -->
                                             <td>
                                             <!-- Iterar sobre menuRoles para comprobar permiso de actualización -->
 								            <span th:each="menuRole : ${menuRoles}">

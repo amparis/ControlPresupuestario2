@@ -22,6 +22,7 @@ import com.springmvc.ControlPresupuestario.service.AccountService;
 import com.springmvc.ControlPresupuestario.service.IMyUserDetailsService;
 import com.springmvc.ControlPresupuestario.service.IncomeService;
 import com.springmvc.ControlPresupuestario.service.MenuService;
+import com.springmvc.ControlPresupuestario.service.PaymentPlanService;
 import com.springmvc.ControlPresupuestario.service.PefilService;
 import com.springmvc.ControlPresupuestario.service.ProjectService;
 import com.springmvc.ControlPresupuestario.service.RolMenuService;
@@ -49,6 +50,9 @@ public class IncomeController {
     AccountService accountService;
     @Autowired
     ProjectService projectService;
+    @Autowired
+    PaymentPlanService paymentPlanService;
+
 
     @GetMapping("/lista-ingresos")
     public String getIngresos(Model model) {
@@ -72,6 +76,7 @@ public class IncomeController {
         //System.out.println("ID DEL PY "+projectId); 
         model.addAttribute("project", projectService.getProject(projectId)); 
         model.addAttribute("cuentas", accountService.getAccounts());
+        model.addAttribute("planDePagos", paymentPlanService.getPaymentPlanByProjectId(projectId));
         model.addAttribute("income", new Income());
 
           return "registro_desembolso";
@@ -82,13 +87,14 @@ public class IncomeController {
             @RequestParam(required = false) Long id,
             @RequestParam(value = "inputproyectoId", required = false) long projectId,
             @RequestParam(value = "inputmontoTask", required = false) Double montoTask,
+            @RequestParam(value = "pagos") long pagoSelected,
             RedirectAttributes redirectAttributes) {
     	
     	System.out.println(" print   id  "+projectId);
         // Intentar guardar el proyecto si todas las validaciones pasaron
         try {
         	
-        	incomeService.saveIncome(income, projectId, montoTask);
+        	incomeService.saveIncome(income, projectId, montoTask, pagoSelected);
 
             redirectAttributes.addFlashAttribute("message", "desembolso guardado exitosamente.");
             redirectAttributes.addFlashAttribute("messageType", "success");
@@ -99,8 +105,6 @@ public class IncomeController {
             return "redirect:/incomes/registro-desembolso/"+projectId;
         }
     }
-    
-
 
     @GetMapping("/eliminar-ingreso/{id}/{projectId}")
     public String deleteIngreso(@PathVariable("id") Integer id,
@@ -199,4 +203,101 @@ public class IncomeController {
             return "redirect:/incomes/registro-transferencia/"+projectId;
         }
     }    
+  
+    //METODOS DE PRESTAMO
+    @GetMapping("/registro-prestamo/{id}")
+    public String showRegisterFormPrestamo( @PathVariable("id") long projectId, Model model) {
+        model.addAttribute("loginUser",this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
+        model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
+        model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
+        model.addAttribute("project", projectService.getProject(projectId)); 
+        model.addAttribute("projectsDestiny", projectService.getProjects());    
+        model.addAttribute("cuentasDestiny", accountService.getAccounts());    
+        model.addAttribute("income", new Income());
+        model.addAttribute("saldosCuenta",incomeService.getAllSaldosAndAccountByProjectId(projectId));
+     
+
+
+          return "registro_prestamo";
+    }
+    
+    // Guardar prestamo
+    @PostMapping("/guardar-prestamo")
+    public String savePrestamo(@ModelAttribute Income income,
+            @RequestParam(required = false) Long id,
+            @RequestParam(value = "inputproyectoId", required = false) long projectId,
+            @RequestParam(value = "inputmontoTask", required = false) Double montoTask,
+            @RequestParam(value = "inputcuentaOrigen", required = false) long inputcuentaOrigen,
+            @RequestParam(value = "inputProjectDestiny", required = false) long projectIdDestiny,
+            @RequestParam(value = "inputAccountDestiny", required = false) long accountDestiny,
+            RedirectAttributes redirectAttributes) {
+    	
+        // Intentar guardar el proyecto si todas las validaciones pasaron
+        try {
+        	
+        	incomeService.saveIncomeLoan(income, projectId, accountService.getAccount(inputcuentaOrigen),projectIdDestiny,montoTask,accountService.getAccount(accountDestiny));
+
+            redirectAttributes.addFlashAttribute("message", "Loan saved success.");
+            redirectAttributes.addFlashAttribute("messageType", "success");
+            return "redirect:/ejecucion/registro-ejecucion/"+projectId;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "Error al guardar el prestamo: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/incomes/registro-prestamo/"+projectId;
+        }
+    }  
+    
+    //METODOS DE DEVOLUCION
+    @GetMapping("/registro-devolucion/{id}")
+    public String showRegisterFormDevolucion( @PathVariable("id") long projectId, Model model) {
+        model.addAttribute("loginUser",this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
+        model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
+        model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
+        model.addAttribute("project", projectService.getProject(projectId)); 
+        model.addAttribute("loansReceived", incomeService.getLoansReceivedByProjectId(projectId));
+        model.addAttribute("saldosCuenta",incomeService.getAllSaldosAndAccountByProjectId(projectId));
+        model.addAttribute("income", new Income());
+        
+        List<Income> incomesAccountOrigin = incomeService.getAllSaldosByProjectIdAndAccount(projectId,incomeService.getAllAccountOriginByProjectId(projectId));
+
+        // Calcular sumas
+        double totalAmountDeudor = incomesAccountOrigin.stream().mapToDouble(Income::getMonto).sum();
+        double totalRecurringAmountDeudor = incomesAccountOrigin.stream().mapToDouble(Income::getMontoRecurrente).sum();
+        double totalNonRecurringAmountDeudor = incomesAccountOrigin.stream().mapToDouble(Income::getMontoNoRecurrente).sum();
+
+        // Añadir los totales al modelo, Cuenta Origin
+        model.addAttribute("totalAmountOrigin", totalAmountDeudor);
+        model.addAttribute("totalRecurringAmountOrigin", totalRecurringAmountDeudor);
+        model.addAttribute("totalNonRecurringAmountOrigin", totalNonRecurringAmountDeudor);
+
+          return "registro_devolucion";
+    }
+    
+    // Guardar devolucion
+    @PostMapping("/guardar-devolucion")
+    public String saveDevolucion(@ModelAttribute Income income,
+            @RequestParam(required = false) Long id,
+            @RequestParam(value = "inputproyectoId", required = false) long projectId,
+            //@RequestParam(value = "inputmontoTask", required = false) Double montoTask,
+            @RequestParam(value = "inputcuentaOrigen", required = false) long inputcuentaOrigen,
+            @RequestParam(value = "inputcuentaAcreedor", required = false) long inputcuentaAcreedor,//cuenta acreedor
+            @RequestParam(value = "inputproyectoAcreedor", required = false) long projectIdDestiny,//acreedor
+            RedirectAttributes redirectAttributes) {
+    	
+        // Intentar guardar el proyecto si todas las validaciones pasaron
+        try {
+        	
+        	incomeService.saveIncomeRepayment(income, projectIdDestiny, accountService.getAccount(inputcuentaAcreedor),accountService.getAccount(inputcuentaOrigen), projectId);
+
+            redirectAttributes.addFlashAttribute("message", "Loan saved success.");
+            redirectAttributes.addFlashAttribute("messageType", "success");
+            return "redirect:/ejecucion/registro-ejecucion/"+projectId;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "Error al guardar el prestamo: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/incomes/registro-devolucion/"+projectId;
+        }
+    }  
+    
+    
 }

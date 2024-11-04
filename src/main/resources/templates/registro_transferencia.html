@@ -11,24 +11,79 @@
         style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
         <span th:text="${message}"></span>
     </div>
-<div class="container" style="max-width: 800px;">
+<div class="container" style="max-width: 80%;">
     <div class="card o-hidden border-0 shadow-lg my-2">
         <div class="card-body p-0">
             <!-- Nested Row within Card Body -->
             <div>
                 <div>
                     <div class="p-3">
+                    	<div class="box box-primary">
+	 						<div class="box-header with-border">
+							<h6>PROJECT DETAILS</h6>
+							</div>
+							<div class="box-body">
+								<div class="row-header-max">
+									<div class="col-6">
+										<div class="row-header">
+											<div class="col-7">
+												<strong><i class="fa fa-book margin-r-5"></i> Project Name</strong>
+												<p class="p-header"  th:text="${project.nombre}">PROJECT IDB	</p>
+											</div>
+											<div class="col-5">
+												<strong>Country</strong>
+												<p  class="p-header"  th:text="${project.pais}">Chile</p>
+											
+											</div>
+										</div>
+										<div class="row-header">
+											<div class="col">
+												<strong>Dates</strong>
+												<p class="p-header"  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy') + ' - ' + #dates.format(project.fechaFin, 'MM/dd/yy')}"></p>
+
+											</div>
+											<div class="col">
+												<strong>Financier</strong>
+												<p class="p-header"  th:text="${project.cliente}"></p>
+
+											</div>											
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row-header-montos">
+											<div class="col">
+												<strong><i class="fa fa-money margin-r-5"></i> Contract Amount (USD)</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Recurring Amount (USD)&nbsp;&nbsp;
+														<span th:text="${#numbers.formatDecimal(project.porcentajeRecurrente, 1, 'COMMA', 2, 'POINT')}+ '%'">0.00%</span>
+												
+												</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoRecurrente, 1, 'COMMA', 2, 'POINT')}">$20,000.00</p>
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<p  class="p-header" th:text="${#numbers.formatDecimal(project.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}">$80,000.00</p>
+											</div>								
+										</div>	
+									</div>
+								</div>
+								<hr>
+	
+							</div>
+							
+						</div>                    
                         <div class="text-center">
-                       
-                            <h2 th:if="${income.id==0}">Transfer Register</h2>
-                            <h2 th:if="${income.id!=0}">Transfer Edit</h2>
+							<h2 th:if="${income.id == null}">Transfer Register</h2>
+							<h2 th:if="${income.id != null and income.id != 0}">Transfer Edit</h2>
+
                         </div>
                         <form id="miFormulario"  class="user" th:action="@{/incomes/guardar-transferencia}" th:method="post" th:object="${income}">
                             <input type="hidden" th:if="${income.id!=0}" th:field="*{id}" th:value="${income.id}">
                             <div class="form-group">
-                                <label for="inputproyecto" class="form-label">SELECTED PROJECT:</label>
-                                <input  type="text" class="form-control form-control-user"
-                                           id="inputproyecto" th:value="${project.nombre}"  readonly>
                                 <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
                             </div>
                             <div class="row">
@@ -189,11 +244,11 @@
                             <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
                                 <p th:text="${error}"></p>
                             </div>
-                             <button class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" onclick="prepareMonto('inputmontoRecurrente'); prepareMonto('inputmontoNoRecurrente');">
+                             <button class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" onclick="prepareMonto('inputmontoRecurrente'); prepareMonto('inputmontoNoRecurrente'); showOverlay();">
                                 SAVE TRANSFER
                              </button>
 							<div class="text-center">
-                                <a class="medium" href="/ejecucion/registro-ejecucion">GO BACK</a>
+                                <a class="medium" th:href="@{/ejecucion/registro-ejecucion/{id}(id=${project.id})}">GO BACK</a>
                             </div>
                         </form>
 

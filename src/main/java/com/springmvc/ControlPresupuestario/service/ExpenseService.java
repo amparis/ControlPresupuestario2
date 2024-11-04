@@ -25,6 +25,8 @@ public class ExpenseService {
 	
 	@Autowired
 	AccountService accountService;
+	@Autowired
+	ExpenditureClassificationService expenditureClassificationService;
     @Autowired
     UserAdmService userService;
     @Autowired
@@ -48,22 +50,47 @@ public class ExpenseService {
 		
 		return this.expenseRepository.findById(id).get();
 	}
-	/*
-	public Expense saveExpense(Expense newExpense,Integer incomeId, long projectId) {
+	
+	public Expense saveExpense(Expense newExpense) {
 		long millis = System.currentTimeMillis();
 		   
-		Project proyecto = projectService.getProject(projectId);
-		
-		newExpense.setTipo(null);
-		newExpense.setObjeto(newIncome.getConcepto().toUpperCase());
-		newExpense.setConcepto(newIncome.getConcepto().toUpperCase());
+		//Project proyecto = projectService.getProject(projectId);
+		newExpense.setAguinaldo(0);
 		newExpense.setFechaRegistro(new Timestamp(millis));
 		newExpense.setEstado("V");
-		newExpense.setProyIdPrestamo(null);
 	    UserAdm loginUser = userService.getUser(userDetailsService.getUserDetailsService().getId());
 	    newExpense.setUsuarioId((int) loginUser.getId());
 		
-	    return incomeRepository.save(newExpense);
+	    expenseRepository.save(newExpense);
+	    
+	    if (newExpense.getFee()>0)
+	    {
+	    	Expense expenseFee= new Expense();
+	    	expenseFee.setTipo("Non-recurring");
+	    	expenseFee.setProyectoFase(newExpense.getProyectoFase());
+	    	expenseFee.setClasificacionEgreso(expenditureClassificationService.getExpenditureClassificationByNombre("cargos bancarios"));//
+	    	expenseFee.setObjeto("FEE/CARGO BANCARIO");
+	    	expenseFee.setCargoItem("FEE/CARGO BANCARIO");
+	    	expenseFee.setCantidad(1);
+	    	expenseFee.setFechaInicio(newExpense.getFechaInicio());
+	    	expenseFee.setFechaFin(newExpense.getFechaFin());
+	    	expenseFee.setTiempo(1);
+	    	expenseFee.setCostoUnitario(newExpense.getFee());
+	    	expenseFee.setAguinaldo(0);
+	    	expenseFee.setMontoTotal(newExpense.getFee());
+	    	expenseFee.setEstado("V");
+	    	expenseFee.setUsuarioId((int) loginUser.getId());
+	    	expenseFee.setDescargo(false);
+	    	expenseFee.setPais(newExpense.getPais());
+	    	expenseFee.setFecha(newExpense.getFecha());
+	    	expenseFee.setTipoTransferencia("TRANSFER");
+	    	expenseFee.setFee(0);
+	    	expenseFee.setCambio(newExpense.getCambio());
+	    	expenseFee.setFechaRegistro(new Timestamp(millis));
+	    	expenseFee.setTotalLCU(newExpense.getTotalLCU());
+	    	expenseRepository.save(expenseFee);
+	    }
+	    
+	    return expenseRepository.save(newExpense);
 	}
-    */
 }

@@ -179,24 +179,7 @@
 <div th:replace="design/script :: scripts"></div>
 <script>
     // Función para habilitar/deshabilitar los permisos según si el menú está seleccionado
-/*function togglePermissions(menuId) {
-	   const subMenuCheckboxes = document.querySelectorAll(`input[id^='subMenuCheckbox-${menuId}']`);
-	    const isChecked = document.getElementById(`menuCheckbox-${menuId}`).checked;
 
-	    subMenuCheckboxes.forEach((checkbox) => {
-	        checkbox.checked = isChecked; // Marcar o desmarcar todos los submenús
-	        const subCrearCheckbox = document.getElementById(`subCrearCheckbox-${checkbox.id.split('-')[1]}`);
-	        const subLeerCheckbox = document.getElementById(`subLeerCheckbox-${checkbox.id.split('-')[1]}`);
-	        const subEditarCheckbox = document.getElementById(`subEditarCheckbox-${checkbox.id.split('-')[1]}`);
-	        const subEliminarCheckbox = document.getElementById(`subEliminarCheckbox-${checkbox.id.split('-')[1]}`);
-
-	        // Deshabilitar permisos
-	        subCrearCheckbox.disabled = !isChecked;
-	        subLeerCheckbox.disabled = !isChecked;
-	        subEditarCheckbox.disabled = !isChecked;
-	        subEliminarCheckbox.disabled = !isChecked;
-	    });
-}*/
 	function togglePermissions(menuId) {
 	    const menuCheckbox = document.getElementById(`menuCheckbox-${menuId}`);
 	    const isChecked = menuCheckbox.checked;

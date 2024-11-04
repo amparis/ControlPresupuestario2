@@ -95,8 +95,6 @@
                             <button type="submit" class="btn btn-primary" showOverlay();>SAVE GENERAL DATA</button>
                             </form>
                             </div>
-
-                
 							<!-- Tab 2: Campos Críticos -->
 							<div id="tab2" class="container tab-pane fade">
 						<form id="formTab2" class="user" th:action="@{/proyectos/guardarDatosCriticos-proyecto}" th:method="post" th:object="${project}" onsubmit="return validateDates()">
