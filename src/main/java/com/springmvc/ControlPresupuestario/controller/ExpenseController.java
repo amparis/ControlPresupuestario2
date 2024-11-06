@@ -1,6 +1,18 @@
 package com.springmvc.ControlPresupuestario.controller;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+
+
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +21,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 
 import com.springmvc.ControlPresupuestario.model.Beneficiary;
@@ -62,6 +80,8 @@ public class ExpenseController {
 	@Autowired
 	ScaleService scaleService;
     
+	private final String DIRECTORIO_BASE = "D:/SISTEMAS_integrales/descargosStaff";
+	
     @GetMapping("/registro-egreso/{id}")
     public String showRegisterFormIngreso( @PathVariable("id") long projectId, Model model) {
         model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
@@ -89,22 +109,112 @@ public class ExpenseController {
     public String saveExpense(@ModelAttribute Expense expense,
             @RequestParam(required = false) Long id,
             @RequestParam(value = "inputproyectoId", required = false) long projectId,
+            @RequestParam("file") MultipartFile file,  // Nuevo parámetro para el archivo
 
             RedirectAttributes redirectAttributes) {
     	
     	System.out.println(" print   id  "+projectId);
         // Intentar guardar el proyecto si todas las validaciones pasaron
-        try {
-        	
+    	try {
+            // Definir la ruta de almacenamiento
+            String uploadDir = "D:/SISTEMAS_integrales/descargosStaff/";
+            
+            // Guardar el archivo en el directorio definido
+            String fileName = file.getOriginalFilename();
+            Path path = Paths.get(uploadDir + fileName);
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            
+            // Establecer la ruta del archivo en el objeto expense
+            expense.setAttach(uploadDir + fileName);
+            
         	expenseService.saveExpense(expense);
 
-            redirectAttributes.addFlashAttribute("message", "desembolso guardado exitosamente.");
+            redirectAttributes.addFlashAttribute("message", "Expense saved success.");
             redirectAttributes.addFlashAttribute("messageType", "success");
             return "redirect:/ejecucion/registro-ejecucion/"+projectId;
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", "Error al guardar el desembolso: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("message", "Error saving expense: " + e.getMessage());
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/expenses/registro-egreso/"+projectId;
+        }
+    }
+    
+    public String saveFile(MultipartFile file) throws IOException {
+        // Definir el directorio donde se guardará el archivo
+        String uploadDir = "/uploads/";
+        
+        // Obtener el nombre original del archivo
+        String fileName = file.getOriginalFilename();
+        
+        // Definir la ruta completa donde se guardará el archivo
+        String filePath = uploadDir + fileName;
+        
+        // Guardar el archivo en el servidor
+        Path path = Paths.get(filePath);
+        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        
+        // Devolver la URL o la ruta relativa del archivo guardado
+        return filePath;
+    }
+    
+    @GetMapping("/descargar/{filename:.+}")
+    public ResponseEntity<Resource> descargarArchivo(@PathVariable String filename) throws FileNotFoundException {
+    /*    Path path = Paths.get("D:\\SISTEMAS_integrales\\descargosStaff").resolve(filename);
+        Resource resource = new FileSystemResource(path);
+
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+    
+        try {
+            Path path = Paths.get("D:/SISTEMAS_integrales/descargosStaff", filename);
+            Resource resource = new UrlResource(path.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                // Devolver el archivo para que se abra en el navegador
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                throw new FileNotFoundException("El archivo no existe o no es accesible.");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error al procesar el archivo.", e);
+        }
+        */
+        try {
+            Path filePath  = Paths.get(DIRECTORIO_BASE).resolve(filename).normalize();//Paths.get("D:/SISTEMAS_integrales/descargosStaff", filename);
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+            	 String contentType;//String contentType = Files.probeContentType(path);
+            	
+            	try {
+                    contentType = Files.probeContentType(filePath);
+                } catch (IOException e) {
+                    contentType = "application/octet-stream"; // Tipo por defecto en caso de error
+                }
+
+                if (contentType == null) {
+                    contentType = "application/octet-stream"; // Tipo por defecto si no se puede determinar
+                }
+
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType)) // Use the correct content type
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                throw new FileNotFoundException("El archivo no existe o no es accesible.");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error al procesar el archivo.", e);
         }
     }
 
