@@ -79,7 +79,7 @@ public class ExpenseDisclaimersController {
 	@Autowired
 	ExpenseCategoryService expenseCategoryService;
 
-	private final String DIRECTORIO_BASE = "D:/SISTEMAS_integrales/descargosStaff/descargosBeneficiario";
+	private final String DIRECTORIO_BASE = "D:/SISTEMAS_integrales/descargosStaff";
 	   @GetMapping("/lista-descargos/{id}")
 	    public String showListDescargo( @PathVariable("id") long projectId, Model model) {
 	        model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
@@ -168,7 +168,7 @@ public class ExpenseDisclaimersController {
 	   @GetMapping("/getCategoriesByPhase")
 	   @ResponseBody
 	   public List<ExpenseCategory> getCategoriesByPhase(@RequestParam Long phaseId) {
-		   	System.out.println("ingreso a METODO: "+phaseId);
+		   	
 	       return expenseCategoryService.getExpenseCategoryByPhase(phaseId); 
 	   }	   
 	   

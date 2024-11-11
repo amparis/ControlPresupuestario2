@@ -68,6 +68,12 @@ public class ExpenseService {
 		
 	    expenseRepository.save(newExpense);
 	    
+	    if(newExpense.getDescargo()) {
+	    	//En caso de el que el Expense presente descargo, verificar si corresponde crear usuario,
+	    	Long userId = projectService.getOrCreateUserForBeneficiary(newExpense.getBeneficiario().getId(), 3L);
+	    	System.out.println("userId new "+userId);
+	    	projectService.linkUserToProject(newExpense.getProyectoFase().getProyecto(), userId);// y asociarlo al proyecto
+	    }
 	    if (newExpense.getFee()>0)
 	    {
 	    	Expense expenseFee= new Expense();

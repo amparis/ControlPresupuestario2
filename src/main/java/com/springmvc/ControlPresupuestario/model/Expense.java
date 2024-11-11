@@ -120,6 +120,14 @@ public class Expense {
     @ManyToOne
     @JoinColumn(name = "cuenta_id")
     private Account cuenta;
+    
+    @ManyToOne
+    @JoinColumn(name = "divisa_id")
+    private Currency divisa;
+    
+    @ManyToOne
+    @JoinColumn(name = "fpag_id")
+    private PaymentMethod paymentMethod;
 	/**
 	 * @return the id
 	 */
@@ -500,6 +508,22 @@ public class Expense {
 	 */
 	public void setProyectoFase(ProjectPhase proyectoFase) {
 		this.proyectoFase = proyectoFase;
+	}
+
+	public Currency getDivisa() {
+		return divisa;
+	}
+
+	public void setDivisa(Currency divisa) {
+		this.divisa = divisa;
+	}
+
+	public PaymentMethod getPaymentMethod() {
+		return paymentMethod;
+	}
+
+	public void setPaymentMethod(PaymentMethod paymentMethod) {
+		this.paymentMethod = paymentMethod;
 	}
 
     // Getters and Setters

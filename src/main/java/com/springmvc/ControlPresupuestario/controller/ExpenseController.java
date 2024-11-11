@@ -7,9 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-
-
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.core.io.FileSystemResource;
@@ -32,10 +33,12 @@ import org.springframework.http.MediaType;
 
 import com.springmvc.ControlPresupuestario.model.Beneficiary;
 import com.springmvc.ControlPresupuestario.model.Expense;
+import com.springmvc.ControlPresupuestario.model.ExpenseCategory;
 import com.springmvc.ControlPresupuestario.model.Scale;
 import com.springmvc.ControlPresupuestario.service.AccountService;
 import com.springmvc.ControlPresupuestario.service.BeneficiaryService;
 import com.springmvc.ControlPresupuestario.service.CountryService;
+import com.springmvc.ControlPresupuestario.service.CurrencyService;
 import com.springmvc.ControlPresupuestario.service.ExpenditureClassificationService;
 import com.springmvc.ControlPresupuestario.service.ExpenseService;
 import com.springmvc.ControlPresupuestario.service.IMyUserDetailsService;
@@ -73,6 +76,8 @@ public class ExpenseController {
 	@Autowired
 	CountryService countryService; 
 	@Autowired
+	CurrencyService currencyService;
+	@Autowired
 	BeneficiaryService beneficiaryService;
 	@Autowired
 	ExpenditureClassificationService expenditureClassificationService;
@@ -99,6 +104,7 @@ public class ExpenseController {
         model.addAttribute("paymentMethod",paymentMethodService.getAllPaymentMethods());
         model.addAttribute("cuentas", accountService.getAccounts());
         model.addAttribute("paises", countryService.getAllCountries()); 
+        model.addAttribute("divisas", currencyService.getAllCurrencies()); 
         model.addAttribute("escalas", scaleService.getAllScalesEstado("V"));
         model.addAttribute("scale", new Scale());
         model.addAttribute("paisesBeneficiary", countryService.getAllCountries()); 
@@ -107,6 +113,15 @@ public class ExpenseController {
 
           return "registro_egreso";
     }
+    
+	// Método para recuperar beneficiarios por clasificacion de egreso
+	   @GetMapping("/getBeneficiariesByClassExpense")
+	   @ResponseBody
+	   public List<Beneficiary> getBeneficiariesByClassExpense(@RequestParam String classExpense) {
+		   	//System.out.println("ingreso a METODO: "+classExpense);
+	       return beneficiaryService.getBeneficiariesByClassExpense(classExpense); 
+	   }	   
+	   
     // Guardar
     
     @PostMapping("/guardar-egreso")
@@ -114,26 +129,41 @@ public class ExpenseController {
             @RequestParam(required = false) Long id,
             @RequestParam(value = "inputproyectoId", required = false) long projectId,
             @RequestParam("file") MultipartFile file,  // Nuevo parámetro para el archivo
+            @RequestParam("paymentCurrency") String paymentCurrency,
             RedirectAttributes redirectAttributes) {
 
     	if (expense.getFechaFin() != null && expense.getFechaFin().toString().trim().isEmpty()) {
     	    expense.setFechaFin(null);
     	}
-    	
+        if ("1".equals(paymentCurrency)) {
+            // El radio button de USD está seleccionado
+            System.out.println("Payment is in USD");
+            expense.setDivisa(currencyService.getCurrencyById((int)144));
+        }    	
 
         // Intentar guardar el proyecto si todas las validaciones pasaron
     	try {
+ 
             if (!file.isEmpty()) {
                 // Definir la ruta de almacenamiento
-                String uploadDir = "D:/SISTEMAS_integrales/descargosStaff/";
-                
+                String uploadDir = DIRECTORIO_BASE+"/";
+                // Obtener la fecha actual en formato MMddyyyy
+                String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMddyyyy"));
+                // Obtener el nombre original del archivo y su extensión
+                String originalFileName = file.getOriginalFilename();
+                String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                String fileBaseName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
+            
                 // Guardar el archivo en el directorio definido
-                String fileName = file.getOriginalFilename();
-                Path path = Paths.get(uploadDir + fileName);
+                //String fileName = file.getOriginalFilename();
+                // Construir el nuevo nombre de archivo con la fecha
+                String newFileName = currentDate + "_" + fileBaseName + fileExtension;
+           
+                Path path = Paths.get(uploadDir + newFileName);
                 Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
                 
                 // Establecer la ruta del archivo en el objeto expense
-                expense.setAttach(uploadDir + fileName);
+                expense.setAttach(uploadDir + newFileName);
             }
             else
             {

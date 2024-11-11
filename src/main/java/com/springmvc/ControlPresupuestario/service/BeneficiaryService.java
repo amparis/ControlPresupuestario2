@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.springmvc.ControlPresupuestario.model.Beneficiary;
+import com.springmvc.ControlPresupuestario.model.ExpenseCategory;
 import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.model.UserAdm;
 import com.springmvc.ControlPresupuestario.repository.BeneficiaryRepository;
@@ -117,4 +118,15 @@ public class BeneficiaryService {
 
     	return beneficiaryRepository.findAllProjectsByBeneficiaryId(id);
     }
+    
+	public List<Beneficiary> getBeneficiariesByClassExpense(String classExpense) {
+		if(classExpense.toUpperCase() =="STAFF") {
+			return beneficiaryRepository.findAllBeneficiariesByClassExpense(classExpense);
+		}
+		else {
+			return beneficiaryRepository.findAllBeneficiariesByClassExpense2(classExpense);
+		}
+		
+		
+	}
 }

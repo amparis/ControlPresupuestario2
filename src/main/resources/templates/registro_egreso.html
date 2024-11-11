@@ -81,7 +81,7 @@
                             <h2 th:if="${expense.id == null}">Expense Register</h2>
                             <h2 th:if="${expense.id != null and expense.id != 0}">Expense Edit</h2>
                         </div>
-                        <form id="miFormulario"  class="user" th:action="@{/expenses/guardar-egreso}" th:method="post" th:object="${expense}" enctype="multipart/form-data">
+                        <form id="miFormulario"  class="user" th:action="@{/expenses/guardar-egreso}" th:method="post" th:object="${expense}" enctype="multipart/form-data" onsubmit="return validateCountrySelection(); return validateTransferSelection();">
                             <input type="hidden" th:if="${expense.id!=0}"  th:field="*{id}" th:value="${expense.id}">
                            
                             <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
@@ -89,6 +89,16 @@
                             <div class="row">
                             	<div class="col-6">
                             		<div class="row">
+                            			<div class="col-4">
+				                            <div class="form-group">
+				                                <label for="inputtipo" class="form-label">Type </label>
+													<select th:field="*{tipo}" class="form-control form-control-user" id="inputtipo">
+													    <option value="Non-Recurring" selected >Non-Recurring</option> <!-- Default selected option -->
+													    <option value="Recurring" disabled>Recurring</option>
+													    
+													</select>
+				                             </div>                               			
+                            			</div>
                             			<div class="col-8">
 				                            <div class="form-group">
 				                                <label for="inputaccount" class="form-label">Project Phases</label>
@@ -100,17 +110,7 @@
 													</select>
 				                             </div>                               			
                             			</div>
-                            			<div class="col-4">
-				                            <div class="form-group">
-				                                <label for="inputtipo" class="form-label">Type of Expense</label>
-													<select th:field="*{tipo}" class="form-control form-control-user" id="inputtipo" disabled >
-													    
-													    <option value="Non-Recurring" selected >Non-Recurring</option> <!-- Default selected option -->
-													    <option value="Recurring" >Recurring</option>
-													    
-													</select>
-				                             </div>                               			
-                            			</div>
+
                             		</div>
                          	
                             	</div>  
@@ -120,7 +120,7 @@
 				                            <div class="form-group">
 				                                <label for="inputClassification" class="form-label">Classification of Expense</label>
 				                                <select th:field="*{clasificacionEgreso}" class="form-control  form-control-user" onchange="toggleFields(this);"
-				                               			 required>
+				                               			 required id= "classificacionEgreso">
 				                                	<option value="" th:if="${expense.id == null}"  selected  >Select classification</option>
 				                                    <option th:each="classification : ${expenditureClassifications}" 
 				                                    		th:value="${classification.id}"
@@ -132,21 +132,18 @@
 				                                <input type="hidden" id="inputPago" name="inputPago">
 											</div>                            			
                             			</div>
-                            			 
+ 
                             			<div class="col-4">
 		                            		<div class="form-group">
-				                                <label for="inputtipo" class="form-label">&nbsp;&nbsp;</label>
-				                                	
-														<select  class="form-control form-control-user" id="inputPago" required  onchange="toggleFechaFin(this)">
-														 <option value="" th:if="${expense.id == null}" selected disabled>Select</option>
+				                                <label for="inputtipo" class="form-label">Method</label>
+														<select th:field="*{paymentMethod}"  class="form-control form-control-user" id="inputPago" required  onchange="toggleFechaFin(this)">
+														 <option value="" th:if="${expense.id == null}" selected >Select</option>
 														 <option th:each="method : ${paymentMethod}"
-														 		 th:value ="${method.descripcion}"
+														 		 th:value ="${method.id}"
 														 		 th:data-formaPago ="${method.descripcion}"
 														 		 th:text="${method.descripcion}">
 														 </option>
-																    
 														</select>
-														
 				                             </div>                              			
                             			</div>                           			
                             		</div>			
@@ -167,7 +164,7 @@
 				                             <div class="form-group">
 				                             	 <label for="inputCargoItem" id="expenseCargoItem" class="form-label">Item</label>
 				                                 <input type="text" class="form-control form-control-user" 
-				       									id="inputItem" name="inputItem" placeholder="Enter item"  style="display: none;"
+				       									id="inputItem" name="inputItem" placeholder="Enter item"  
 				       									oninput="updateCargoItem(this.value)">
 				       									<!-- en caso de item, deberia carga un combo-->
 				                                <select id= "selectCargo" name= "selectCargo" class="form-control  form-control-user" 
@@ -193,21 +190,28 @@
                             	</div>                            	
                             </div>		
                             <div class="row">
-                            	<div class="col-11">
+                            	<div class="col-10">
                             		<label for="beneficiarioE" class="form-label">Beneficiary </label>
  								    <select  th:field="*{beneficiario}" id="beneficiarioE" name="beneficiarioE" class="form-control form-control-user" 
  								    		data-show-subtext="true" data-live-search="true" onchange="loadBeneficiaryData()">
-								                <option value="0" disabled selected>Select staff</option>
+								                <option value="0"  selected>Select </option>
 								                <option th:each="beneficiary : ${beneficiaries}" 
 									                    th:value="${beneficiary.id}" 
 									                    th:data-tipo="${beneficiary.tipo}"
 									                    th:data-documento="${beneficiary.documento}"
 									                    th:data-nombres="${beneficiary.nombres}"
 									                    th:data-apellidos="${beneficiary.apellidos != null ? beneficiary.apellidos : ''}"
-								                        th:text="${beneficiary.tipo +' =>'+ beneficiary.nombres +' '+ (beneficiary.apellidos != null ? beneficiary.apellidos : '') +' - '+beneficiary.documento}">
+												          th:data-razonSocial="${beneficiary.razonSocial != null ? beneficiary.razonSocial : ''}"
+							            th:text="${beneficiary.tipo != 'LEGAL ENTITY' 
+							                     ? beneficiary.tipo +' =>'+ beneficiary.nombres + ' ' + (beneficiary.apellidos != null ? beneficiary.apellidos : '') +' ('+beneficiary.documento+')'
+							                     : beneficiary.tipo +' =>'+ beneficiary.razonSocial+' ('+beneficiary.documento+')'}">
 								                </option>
-								     </select>                            	
-
+								     </select> 
+								     <!--                            	
+                          	<select th:field="*{beneficiario}" class="form-control form-control-user" id="beneficiarioE" 
+                          			data-show-subtext="true" data-live-search="true" required onchange="loadBeneficiaryData()">
+                                <option value="" th:if="${expense.id == null}">Select beneficiary</option>
+                            </select> -->
                             	</div>
                             	<div class="col-1">
                             		<div class="form-group">
@@ -222,7 +226,9 @@
 				                               Add
 				                         </button>
 			                         </div>	                            	
-                            	</div>                            	
+                            	</div> 
+                            	<div class="1">
+                            	</div>                           	
                             </div>	
                             <div class="row">
                             	<div class="col-10">
@@ -249,7 +255,7 @@
                            	
                             	</div>
                             	<div class="col-2">
-	                            	<div class="form-check form-switch">
+	                            	<div class="form-check form-switch" id ="flexSwitchCheckDefaultDiv" style="display: none;">
 									  <input name="expenseDescargo" th:field="*{descargo}" class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
 									  <label class="form-check-label" for="flexSwitchCheckDefault">Presents discharge?</label>
 									</div>
@@ -337,12 +343,12 @@
 	                            				<div class="form-group">
 												 <label for="inputFee" class="form-label">Fee</label>                            	
 					                       		<input th:field="*{fee}" type="number" class="form-control form-control-user" 
-					       								id="inputFee" name="inputFee" step="0.01" oninput="calculateTotalLCU()" onchange="calculateTotalLCU()" >
+					       								id="inputFee" name="inputFee" step="0.01"  >
 			                            		</div>  
 			                            	</div>                        		
 	                            		</div>                            		 
 									<div class="row">
-									    <div class="col-11">
+									    <div class="col-7">
 									        <label for="inputAttach" class="form-label">Attach</label><br>
 									        <input th:field="*{attach}" type="text" class="form-control form-control-user" id="inputAttach" name="inputAttach" readonly>
 									    </div>
@@ -353,6 +359,9 @@
 									            Add
 									        </button>
 									    </div>
+									   	<div class="col-4">
+								    </div>
+									    
 									</div>
 
                             	</div>
@@ -362,7 +371,8 @@
 		                            		<div class="col">
 		                            			<div class="form-group">
 			                                        <label for="inputpais" class="form-label">Country</label>
-											        <SELECT th:field = "*{pais}"  class="form-control form-control-user"  data-show-subtext="true" data-live-search="true">
+											        <SELECT th:field = "*{pais}" id="paisExpense"  class="form-control form-control-user"  data-show-subtext="true" data-live-search="true" required>
+														<option value="" th:if="${expense.id == null}" selected>Select country</option>
 														<OPTION th:EACH= "pais : ${paises}" 
 																th:VALUE = "${pais.id}" 
 																th:TEXT = "${pais.nombre}" >										 
@@ -373,27 +383,41 @@
 	                            		</div>
 
 	                            		<div class="row">
-	                            			<div class="col-6">
-			                                        <label for="inputpais" class="form-label">Divisa</label>
-											        <SELECT   class="form-control form-control-user"  data-show-subtext="true" data-live-search="true">
-														<OPTION th:EACH= "pais : ${paises}" 
-																th:VALUE = "${pais.id}" 
-																th:TEXT = "${pais.divisa}" >										 
+	                            			<div class="col">
+	                            				<div class="form-group">
+		                            				<label for="inputDivisasPais" class="form-label">Currency </label><br>
+		                            				<input type="radio" id="divisaUsd" name="paymentCurrency" value="1"  checked>   USD
+		                            				<input type="radio" id="divisaOther" name="paymentCurrency" value="0"> Another currency
+		                            			</div>
+	                            			</div>
+	                            		</div>
+	                            		<div class="row">
+	                            			<div class="col">
+	                            				<div class="form-group">
+			                                  
+											        <SELECT  th:field = "*{divisa}"  id="divisaSelect" class="form-control form-control-user"  
+											        		data-show-subtext="true" data-live-search="true" disabled>
+														<OPTION th:each = "divisa : ${divisas}" 
+																th:value = "${divisa.id}" 
+																th:data-cod = "${divisa.divisa_cod}" 
+																th:text = "${divisa.divisa +' ('+divisa.divisa_cod+')'}" >										 
 														</OPTION >		 
 													</SELECT>  
+												</div>
 	                            			</div>
+
+	                            		</div>	
+	                            		<div class="row" id= "divisaRow">
 	                            			<div class="col-6">
 			                            		<div class="form-group">
 												 <label for="inputCambioMoneda" class="form-label">Exchange Rate</label>                            	
 					                       		<input th:field="*{cambio}"  type="number" class="form-control form-control-user" 
-					       								id="inputCambioMoneda" name="inputCambioMoneda" step="0.000001" oninput="calculateTotalLCU()" onchange="calculateTotalLCU()"  >
+					       								id="inputCambioMoneda" name="inputCambioMoneda" step="0.000001"   oninput="calculateTotalMontoPagar()"  onchange="calculateTotalMontoPagar()"  >
 			                            		</div> 
 	                            			</div>
-	                            		</div>	
-	                            		<div class="row">
-			                            	<div class="col">
+			                            	<div class="col-6">
 						                        <div class="form-group">
-												 <label for="inputTotalLCU" class="form-label">Amount in local Currency</label>                            	
+												 <label for="inputTotalLCU" class="form-label">Total in local Currency</label>                            	
 					                       		<input th:field="*{totalLCU}" type="text" class="form-control form-control-user" 
 					       								id="inputTotalLCU" name="inputTotalLCU" step="0.01" 
 					       								placeholder="0.00" readonly>
@@ -490,9 +514,9 @@
                 <label for="inputtipoB" class="form-label">Beneficiary Type</label>
                 <select th:field="*{tipo}" class="form-control form-control-user" id="inputtipoB" required  onchange="updateLabel()">
                   <option value="" th:if="${beneficiary.id == null}" selected disabled>Select type</option>
-                  <option value="Natural Person" th:selected="${beneficiary.tipo == 'Natural Person'}">Natural Person</option>
-                  <option value="Legal Entity" th:selected="${beneficiary.tipo == 'Legal Entity'}">Legal Entity</option>
-                  <option value="Staff" th:selected="${beneficiary.tipo == 'Staff'}">Staff</option>
+                  <option value="NATURAL PERSON" th:selected="${beneficiary.tipo == 'NATURAL PERSON'}">Natural Person</option>
+                  <option value="LEGAL ENTITY" th:selected="${beneficiary.tipo == 'LEGAL ENTITY'}">Legal Entity</option>
+                  <option value="STAFF" th:selected="${beneficiary.tipo == 'STAFF'}">Staff</option>
                 </select>
               </div>
             </div>
@@ -586,74 +610,9 @@
    <footer th:replace="design/footerBar :: footerbar"></footer>
 <!-- End of Footer -->
 <div th:replace="design/script :: scripts"></div>
+	<!-- Custom scripts for all expenses-->
+	<script th:src="@{/js/demo/scriptExpense.js}"></script>
 
-<script>
-// Función para actualizar 'inputCargoItem' con el valor de 'inputItem' o 'selectCargo'
-function updateCargoItem(value) {
-    document.getElementById("inputCargoItem").value = value;
-}
-
-
-</script>
-
-<script>
-
-// Llama a esta función para actualizar el valor antes de enviar el formulario
-function prepareMonto(elementId) {
-	
-    const element = document.getElementById(elementId);
-    element.value = element.value.replace(/,/g, ''); // Elimina comas antes de enviar al servidor
-}
-</script>
-    <script>
-        // Función para prevenir el envío del formulario con la tecla Enter
-        function disableEnterKey(event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // Previene la acción predeterminada (enviar el formulario)
-            }
-        }
-        // Añadir el listener al cargar el documento
-        document.addEventListener("DOMContentLoaded", function() {
-            const form = document.getElementById("miFormulario"); // Cambia "miFormulario" por el ID de tu formulario
-            form.addEventListener("keypress", disableEnterKey);
-        });
-
-    </script>
-<script>
-function loadBeneficiaryData() {
-    var select = document.getElementById("beneficiarioE");
-    var selectedOption = select.options[select.selectedIndex];
-
-    // Obtener los datos del beneficiario seleccionado
-    var tipo = selectedOption.getAttribute("data-tipo");
-    var documento = selectedOption.getAttribute("data-documento");
-    var nombres = selectedOption.getAttribute("data-nombres");
-    var apellidos = selectedOption.getAttribute("data-apellidos");
-
-    // Actualizar los campos de entrada
-    document.getElementById("inputIdBeneficiario").value = selectedOption.value;
-    document.getElementById("inputBeneficiario").value = nombres + ' ' + apellidos;
-
-    // Actualizar las etiquetas <p>
-    document.getElementById("beneficiarioTipo").textContent = tipo;
-    document.getElementById("beneficiarioDocumento").textContent = documento;
-    document.getElementById("beneficiarioNombre").textContent = nombres + ' ' + apellidos;
-}
-</script>   
-<script>
-function openModal() {
-    // Limpiar el campo ID para crear un nuevo registro
-    document.getElementById("inputId").value = 0;
-    
-    // Limpiar otros campos del formulario si es necesario
-    document.getElementById("inputdocumento").value = "";
-    // Limpiar otros campos del formulario...
-
-    // Mostrar el modal
-    $('#myModal').modal('show');
-}
-
-</script> 
 <script type='text/javascript'>
 $(function(){
     $(document).bind("contextmenu",function(e){
@@ -661,261 +620,6 @@ $(function(){
     });
 });
 </script>
-<script>
-function toggleFields(selectElement) {
-    // Obtener el valor de `nombreClase` del atributo data-nombreClase del option seleccionado
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
-    const nombreClase = selectedOption.getAttribute("data-nombreClase");
-    const formaPago = selectedOption.getAttribute("data-formaPago");// Obtener la forma de pago de clasificacion
-
-    const expenseObjetoPuestoLabel = document.getElementById("expenseObjetoPuesto");
-    const expenseCargoItemLabel = document.getElementById("expenseCargoItem");
-    const expensePrecioUnitarioMontoLabel = document.getElementById("expensePrecioUnitarioMonto");
-    const inputCargoItem = document.getElementById("inputCargoItem");
-    const inputItem = document.getElementById("inputItem");
-    const selectCargo = document.getElementById("selectCargo");
-    const btnAddCargo = document.getElementById("btnAddCargo");
-
-    document.getElementById("inputPago").value = formaPago;
-    
-    if (nombreClase === "STAFF") {
-        expenseObjetoPuestoLabel.textContent = "Job Position";
-        expenseCargoItemLabel.textContent = "Scale";
-        expensePrecioUnitarioMontoLabel.textContent = "Amount to pay";
-        selectCargo.style.display = "block";
-        inputItem.style.display = "none";
-        btnAddCargo.style.display = "block";
-     // Reiniciar valor de 'inputCargoItem' para evitar datos inconsistentes
-        inputCargoItem.value = "";
-    } else {
-        expenseObjetoPuestoLabel.textContent = "Object";
-        expenseCargoItemLabel.textContent = "Item";
-        expensePrecioUnitarioMontoLabel.textContent = "Unit Cost";
-        selectCargo.style.display = "none";
-        inputItem.style.display = "block";
-        btnAddCargo.style.display = "none";
-        // Reiniciar el valor de 'inputCargoItem' (puedes agregar más reinicios si es necesario)
-        inputCargoItem.value = "";
-    }
-
-}
-</script>
-
-<script>
-function toggleFechaFin(selectElement) {
-    // Obtener el valor seleccionado
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
-    //const formaPago = selectedOption.value;  // Asumiendo que 'formaPago' está después de '->'
-    const formaPago = selectedOption.getAttribute("data-formaPago");// Obtener la forma de pago de clasificacion
-//alert(formaPago);
-    // Obtener el campo de fechaFin y tiempo
-    const fechaInicioInput = document.getElementById('inputfechaInicio'); 
-    const fechaFinInput = document.getElementById('inputfechaFin'); 
-    const tiempoInput = document.getElementById('inputTiempo');
-    
-
-    // Verificar si formaPago es 'pago único'
-    if (formaPago === 'single payment') {
-    	fechaFinInput.readOnly = true; // fechaFinInput.disabled = true; // Deshabilitar
-    	fechaInicioInput.value='';
-        fechaFinInput.value = ''; // Limpiar valor si está deshabilitado
-        //tiempoInput.disabled = true;
-        tiempoInput.value = '1';
-        
-        
-    } else {
-    	fechaFinInput.readOnly = false; // Quitar readonly
-
-        //fechaFinInput.disabled = false; // Habilitar
-        //tiempoInput.disabled = false;
-    }
-}
-</script>
-<script>
-    
-    function checkDates() {
-        const fechaInicioStr = document.getElementById('inputfechaInicio').value;
-        const fechaFinStr = document.getElementById('inputfechaFin').value;
-        const formaPago = document.getElementById('inputPago').value;
-        
-        // Verificar si se ingresó la fecha de inicio
-        if (fechaInicioStr) {
-            const [yearInicio, monthInicio, dayInicio] = fechaInicioStr.split("-");
-            const fechaInicio = new Date(Date.UTC(yearInicio, monthInicio - 1, dayInicio));
-
-            if (isNaN(fechaInicio.getTime())) {
-                alert("Por favor, ingresa una fecha de inicio válida.");
-                return;
-            }
-
-            let fechaFin;
-            
-            // Si el tipo de forma de pago no es 'single payment', se requiere una fecha de fin válida
-            if (formaPago !== 'single payment') {
-                if (fechaFinStr) {
-                    const [yearFin, monthFin, dayFin] = fechaFinStr.split("-");
-                    fechaFin = new Date(Date.UTC(yearFin, monthFin - 1, dayFin));
-
-                    if (isNaN(fechaFin.getTime())) {
-                        alert("Por favor, ingresa una fecha de fin válida.");
-                        return;
-                    }
-                } else {
-                    alert("Por favor, ingresa la fecha de fin.");
-                    return;
-                }
-            } else {
-                // Si la forma de pago es 'single payment', se permite que fechaFin esté vacía
-                fechaFin = fechaInicio; // Se asigna la fecha de inicio como fecha de fin
-            }
-
-            // Llamar a la función para calcular el tiempo con fechaInicio y fechaFin
-            calculateInputTiempo(fechaInicio, fechaFin);
-
-        } else {
-            alert("Por favor, completa la fecha de inicio.");
-        }
-    }
-
-    function calculateInputTiempo(fechaInicial, fechaFinal) {
-        if (!fechaInicial || !fechaFinal) {
-            return; // No calcular si alguna fecha es nula o indefinida
-        }
-        // Extraer día, mes y año de las fechas
-        //alert(fechaInicial+'jo'+fechaFinal);
-        const diaInicial = fechaInicial.getDate();
-        const mesInicial = fechaInicial.getMonth() + 1; // Los meses en JavaScript son 0-indexed
-        const anoInicial = fechaInicial.getFullYear();
-        
-        const diaFinal = fechaFinal.getDate();
-        const mesFinal = fechaFinal.getMonth() + 1; // Los meses en JavaScript son 0-indexed
-        const anoFinal = fechaFinal.getFullYear();
-        
-        //alert("DIA "+diaInicial);
-        
-        let dias;
-
-        // Ajuste para febrero y el último día del mes
-        if ((mesFinal === 2 && diaFinal >= 28) || (mesFinal !== 2 && diaFinal >= 30)) {
-            diaFinal = 30;
-            
-        }
-        // Ajustar si el día final es menor que el día inicial
-        if (diaFinal < diaInicial) {
-            diaFinal += 30;
-            mesFinal -= 1;
-            alert("Ajustar si el día final es menor que el día inicial");
-        }
-        // Ajustar si el mes final es menor que el mes inicial
-        if (mesFinal < mesInicial) {
-            mesFinal += 12;
-            anoFinal -= 1;
-            alert("Ajustar si el mes final es menor que el mes inicial");
-        }
-    // Calcular el total de días
-        dias = (diaFinal + 1 - diaInicial) +
-               ((mesFinal - mesInicial) * 30) +
-               ((anoFinal - anoInicial) * 360);
-
-        //return dias;
-    alert(dias);
-    document.getElementById('inputTiempo').value = dias; // Establece el valor calculado
-    }
-
-</script>
-<script>
-function calculateTotalMontoPagar() {
-    const cantidad = parseFloat(document.getElementById("inputCantidad").value) || 0;
-    const precioUnitario = parseFloat(document.getElementById("inputPrecioUnitario").value) || 0;
-    const tiempo = parseFloat(document.getElementById("inputTiempo").value) || 1;
-        // Calcular montos
-        const montoTotalPagar = (cantidad * precioUnitario) * tiempo;
-
-        const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        // Formatear monto solo para mostrarlo
-        document.getElementById("inputMontoPagar").value = formateador.format(montoTotalPagar);
-}
-
-function calculateTotalLCU() {
-    const fee = parseFloat(document.getElementById("inputFee").value) || 0;
-    const cambioMoneda = parseFloat(document.getElementById("inputCambioMoneda").value) || 0;
-
-        // Calcular montos
-        const montoLCU = (fee * cambioMoneda);
-
-        const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        document.getElementById("inputTotalLCU").value = formateador.format(montoLCU);
-
-}
-</script>
-<script>
-document.getElementById('btnAttach').addEventListener('click', function() {
-    document.getElementById('fileInput').click();
-});
-
-document.getElementById('fileInput').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        // Aquí podrías subir el archivo a tu servidor y obtener la URL
-        // Por ejemplo, usando una llamada AJAX o un formulario de envío de archivos
-
-        // Por ahora, simplemente añadimos el nombre del archivo al campo de texto
-        document.getElementById('inputAttach').value = file.name;
-    }
-});
-
-</script>
-<script>
-    function updateLabel() {
-        const select = document.getElementById("inputtipoB");
-        const label = document.getElementById("documento");
-        const labelF = document.getElementById("firstName");
-        const labelL = document.getElementById("lastName");
-        const labelE = document.getElementById("email");
-        const labelC = document.getElementById("company");
-        
-        if (select.value === "Staff") {
-            label.textContent = "Identification Document (*)";
-            labelF.textContent ="First Name (*)";
-            labelL.textContent ="Last Name (*)";
-            labelE.textContent = "Email (*)";
-            labelC.textContent = "Company Name";
-            document.getElementById("inputnombre").required=true;
-            document.getElementById("inputapellidos").required=true;
-            document.getElementById("inputrazonSocial").required=false;
-            document.getElementById("inputemail").required=true;
-            
-            
-        } else if  (select.value === "Legal Entity"){
-        	
-            label.textContent = "Number Identification of Company (*)";
-            labelF.textContent ="First Name (Legal representative) ";
-            labelL.textContent ="Last Name (Legal representative) ";
-            labelE.textContent = "Email";
-            labelC.textContent = "Company Name (*)";
-            document.getElementById("inputnombre").required=false;
-            document.getElementById("inputapellidos").required=false;
-            document.getElementById("inputrazonSocial").required=true;
-            document.getElementById("inputemail").required=false;
-        }
-        else
-        	{
-            label.textContent = "Identification Document (*)";
-            labelF.textContent ="First Name (*)";
-            labelL.textContent ="Last Name (*)";
-            labelE.textContent = "Email";
-            labelC.textContent = "Company Name";
-            document.getElementById("inputnombre").required=true;
-            document.getElementById("inputapellidos").required=true;
-            document.getElementById("inputrazonSocial").required=false;
-            document.getElementById("inputemail").required=false;
-        	}
-    }
-
-    // Call updateLabel on page load to set the label correctly if editing an existing record
-    window.onload = updateLabel;
-</script>
-
 </body>
 </html>
 

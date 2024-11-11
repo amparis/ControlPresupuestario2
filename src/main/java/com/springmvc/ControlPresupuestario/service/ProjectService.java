@@ -236,7 +236,7 @@ public class ProjectService {
 	    return projectRepository.save(newProject);
 	}
 	
-	private Long getOrCreateUserForBeneficiary(Integer beneficiaryId, long rolId) {
+	public Long getOrCreateUserForBeneficiary(Integer beneficiaryId, long rolId) {
 	    Optional<UserAdm> userAdmOptional = userService.getUserByBeneficiaryId(beneficiaryId);
 
 	    if (userAdmOptional.isPresent()) {
@@ -260,7 +260,7 @@ public class ProjectService {
 	    }
 	}
 
-	private void linkUserToProject(Project project, Long userId) {
+	public void linkUserToProject(Project project, Long userId) {
 		// Verificar que el proyecto no sea nulo
 	    if (project == null) {
 	        throw new IllegalArgumentException("El proyecto no puede ser nulo");

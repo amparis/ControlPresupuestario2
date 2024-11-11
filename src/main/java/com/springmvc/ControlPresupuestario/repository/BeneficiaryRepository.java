@@ -6,9 +6,10 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.springmvc.ControlPresupuestario.model.Beneficiary;
-
+import com.springmvc.ControlPresupuestario.model.ExpenseCategory;
 import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.model.UserAdm;
 
@@ -27,7 +28,7 @@ public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Intege
 	  @Query("SELECT u.beneficiario.id FROM UserAdmProject up JOIN up.userAdm u WHERE up.project.id = :projectId AND u.perfil.id = :roleId and up.estado='V'")
 	  public Integer findByProjectIdAndRole(Long projectId, Long roleId);
 	  
-	  @Query("SELECT b FROM Beneficiary b  WHERE  b.estado = :estado")
+	  @Query("SELECT b FROM Beneficiary b  WHERE  b.estado = :estado order by b.tipo, b.nombres, b.razonSocial")
 	  public List<Beneficiary> findAllByEstado(String estado);
 	  
 	  @Query("SELECT b FROM Beneficiary b  WHERE  b.estado = :estado and b.tipo=:tipo")
@@ -38,6 +39,11 @@ public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Intege
 		       "JOIN up.userAdm u ON u.id = up.userAdm.id " +
 		       "WHERE u.beneficiario.id = :beneficiaryId")
 	  public List<Project> findAllProjectsByBeneficiaryId(Integer beneficiaryId);
-
 	  
+	  @Query("SELECT b FROM Beneficiary b  WHERE  b.estado = 'V' and UPPER(b.tipo) =UPPER(:classExpense)")
+	  public List<Beneficiary> findAllBeneficiariesByClassExpense(String classExpense);
+	  
+	  @Query("SELECT b FROM Beneficiary b  WHERE  b.estado = 'V' and UPPER(b.tipo) <>UPPER(:classExpense)")
+	  public List<Beneficiary> findAllBeneficiariesByClassExpense2(@Param("classExpense")  String classExpense);
+
 }
