@@ -31,6 +31,13 @@ public class ExpenseCategoryService {
 		
 	}	
 	
+	public List<ExpenseCategory> getExpenseCategoryByListPhases(List<Long> phasesId) {
+		
+		return this.expenseCategoryRepository.findByListPhaseId(phasesId);
+		
+	}	
+	
+	
 	//public ExpenseCategory getExpenseCategoryByNombre(String nombre) {
 		
 		//return this.expenseCategoryRepository.findAllExpenseCategoryByNombre(nombre);

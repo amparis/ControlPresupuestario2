@@ -84,17 +84,38 @@
 									<div class="col-6">
 										<div class="row-header-montos-secondary">
 											<div class="col-7">
+												<label for="beneficiarioE" class="form-label">Beneficiaries with disclaimers </label>
+			 								    <select id="beneficiarioE" name="beneficiarioE" class="form-control form-control-user" 
+			 								    		data-show-subtext="true" data-live-search="true" onchange="loadBeneficiaryData()">
+											                <option value="0" disabled selected>Select staff</option>
+											                <option th:each="summary : ${expenseSummary}" 
+												                    th:value="${summary.id}" 
+												                    th:data-tipo="${summary.tipo}"
+												                    th:data-documento="${summary.documento}"
+												                    th:data-nombres="${summary.nombres}"
+												                    
+												                    th:data-apellidos="${summary.apellidos != null ? summary.apellidos : ''}"
+											                        th:data-summary="${summary.sumatoriaDescargo}"
+											                        th:text="${summary.tipo +' =>'+ summary.nombres +' '+ (summary.apellidos != null ? summary.apellidos : '') +' - '+summary.documento}">
+											                </option>
+											     </select>  
+												<!-- 
 												<strong>Beneficiary Name</strong>
-												<p class="p-header"  th:text="${expenseSelected.beneficiario.nombres + ' ' + (expenseSelected.beneficiario.apellidos != null ? expenseSelected.beneficiario.apellidos : '')}">Jhon Smith	</p>
-											</div>
-											<div class="col-5">
-												<strong>Identification document</strong>
-												<p  class="p-header"  th:text="${expenseSelected.beneficiario.documento}">123456</p>
+											<p class="p-header" th:text="${expenseSelected.beneficiario != null ? (expenseSelected.beneficiario.nombres + ' ' + (expenseSelected.beneficiario.apellidos != null ? expenseSelected.beneficiario.apellidos : '')) : 'Sin beneficiario'}">---	</p>
 											
+											</div> -->
+											<div class="col-5">
+											<!-- 
+												<strong>Identification document</strong>
+												<p  class="p-header"  th:text="${expenseSelected.beneficiario != null ? (expenseSelected.beneficiario.documento) : '--'}">---</p>
+											 -->
 											</div>
 										</div>
 									</div>
 									<div class="col-6">
+												<strong>Summary</strong>
+												<span id="summaryDisclaimer" class="p-header" >$--.--</span>
+									<!--  
 										<div class="row-header-montos-secondary">
 											<div class="col">
 												<strong>Type Expense</strong>
@@ -119,6 +140,7 @@
 												<span  class="p-header" th:text="${#numbers.formatDecimal(expenseSelected.costoUnitario, 1, 'COMMA', 2, 'POINT')}">$00.00</span>
 											</div>								
 										</div>	
+										-->
 									</div>
 								</div>
 								<hr>
@@ -137,11 +159,12 @@
                         <div class="card-body">
 				            <span th:each="menuRole : ${menuRoles}">
 								<div class="d-flex justify-content-end">
-								    <a th:href="@{/gastos/registro-descargo/}+ ${expenseSelected.id}"
+								    <!-- <a th:href="@{/gastos/registro-descargo/}+ ${expenseSummary.id}"
 								       th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.acreate}" 
 								       class="btn btn-outline-success">
 								       <i class="fas fa-plus"></i> + New Registration
 								    </a>
+								     -->
 								</div>
 				            </span>
                             <div class="table-responsive">
@@ -200,7 +223,27 @@
             <footer th:replace="design/footerBar :: footerbar"></footer>
             <!-- End of Footer -->
 <div th:replace="design/script :: scripts"></div>
+<script>
+function loadBeneficiaryData() {
+    var select = document.getElementById("beneficiarioE");
+    var selectedOption = select.options[select.selectedIndex];
 
+    // Obtener los datos del beneficiario seleccionado
+    var tipo = selectedOption.getAttribute("data-tipo");
+    var documento = selectedOption.getAttribute("data-documento");
+    var nombres = selectedOption.getAttribute("data-nombres");
+    var apellidos = selectedOption.getAttribute("data-apellidos");
+    var monto = selectedOption.getAttribute("data-summary");
+    // Actualizar los campos de entrada
+    //document.getElementById("inputIdBeneficiario").value = selectedOption.value;
+    //getElementById("inputBeneficiario").value = nombres + ' ' + apellidos;
+
+    // Actualizar las etiquetas <p>
+    document.getElementById("summaryDisclaimer").textContent = monto;
+    //document.getElementById("beneficiarioDocumento").textContent = documento;
+   // document.getElementById("beneficiarioNombre").textContent = nombres + ' ' + apellidos;
+}
+</script>   
 </body>
 
 </html>

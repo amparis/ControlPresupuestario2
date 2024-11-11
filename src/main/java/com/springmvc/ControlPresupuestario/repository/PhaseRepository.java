@@ -18,4 +18,7 @@ public interface PhaseRepository extends JpaRepository<Phase, Long> {
 	  
 	  @Query("SELECT p FROM Phase p  WHERE  p.nombre = :nombre")
 	  public Phase findPhaseByNombre(String nombre);	
+	  
+	  @Query("SELECT p FROM Phase p  WHERE  p.id IN :phasesId")
+	  public List<Phase>  findPhaseByListId(List<Long> phasesId);
 }

@@ -71,17 +71,23 @@ public class BeneficiaryService {
 	        }
 	    } else {
 		    System.out.println("NUEVO BEN ");
-		    System.out.println(newBeneficiary.getNombres());
-	        // Si es una creación de nuevo beneficiario, hacer la verificación normal
-	        if (beneficiaryRepository.existsByNombresAndApellidosAndDocumento(newBeneficiary.getNombres(),newBeneficiary.getApellidos() ,newBeneficiary.getDocumento())) {
-	            throw new IllegalArgumentException("Ya existe un beneficiario con el mismo nombre completo y documento.");
-	        }
-	        
+		    //Validamos si el tipo de beneficiario es Staff
+		    String tipoBeneficiario = newBeneficiary.getTipo();
+		    if (tipoBeneficiario == "Staff") {
+		        // Si es una creación de nuevo beneficiario, hacer la verificación normal
+		        if (beneficiaryRepository.existsByNombresAndApellidosAndDocumento(newBeneficiary.getNombres(),newBeneficiary.getApellidos() ,newBeneficiary.getDocumento())) {
+		            throw new IllegalArgumentException("Ya existe un beneficiario con el mismo nombre completo y documento.");
+		        }
+			    newBeneficiary.setNombres(newBeneficiary.getNombres().toUpperCase());
+			    newBeneficiary.setApellidos(newBeneficiary.getApellidos().toUpperCase());
+		    }
+		    else
+		    {
+		    	newBeneficiary.setRazonSocial(newBeneficiary.getRazonSocial().toUpperCase());
+		    }
 	    	UserAdm loginUser = userService.getUser(userDetailsService.getUserDetailsService().getId());
 		    newBeneficiary.setUsuarioId((int) loginUser.getId());
 		    newBeneficiary.setEstado("V");
-		    newBeneficiary.setNombres(newBeneficiary.getNombres().toUpperCase());
-		    newBeneficiary.setApellidos(newBeneficiary.getApellidos().toUpperCase());
 	        
 
 	    }

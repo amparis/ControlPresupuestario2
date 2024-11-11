@@ -274,7 +274,7 @@
 
 			                                        
 			                    					<td>
-			                    					   <!-- Iterar sobre menuRoles para comprobar permisos -->
+			                    					   <!-- Iterar sobre menuRoles para comprobar permisos
 											            <span th:each="menuRole : ${menuRoles}">
 											                <a th:href="@{/expenses/modificar-egreso/} + ${expense.id}"
 											                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
@@ -282,7 +282,7 @@
 											                   <img src="/imagenes/editar.png" alt="editar registro" width="20px" height="20px">
 											                   <i class="fas fa-exclamation-triangle"></i>
 											                </a>
-											            </span>
+											            </span> -->
 											             <span th:each="menuRole : ${menuRoles}">
 											                <a th:href="@{/expenses/eliminar-egreso/} + ${expense.id}"
 											                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}" 

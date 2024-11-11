@@ -216,7 +216,8 @@ public class IncomeController {
         model.addAttribute("income", new Income());
         model.addAttribute("saldosCuenta",incomeService.getAllSaldosAndAccountByProjectId(projectId));
      
-
+        Integer idPrestamo = (int) projectId;
+        model.addAttribute("loansReceived", incomeService.getLoanSummariesByProyectoCreditorId(idPrestamo));
 
           return "registro_prestamo";
     }
@@ -254,11 +255,14 @@ public class IncomeController {
         model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
         model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
         model.addAttribute("project", projectService.getProject(projectId)); 
-        model.addAttribute("loansReceived", incomeService.getLoansReceivedByProjectId(projectId));
+        //model.addAttribute("loansReceived", incomeService.getLoanSummaryByProject(projectId));
+        Integer idPrestamo = (int) projectId;
+        model.addAttribute("loansReceived", incomeService.getLoanSummariesByLoanId(idPrestamo));
+
         model.addAttribute("saldosCuenta",incomeService.getAllSaldosAndAccountByProjectId(projectId));
         model.addAttribute("income", new Income());
         
-        List<Income> incomesAccountOrigin = incomeService.getAllSaldosByProjectIdAndAccount(projectId,incomeService.getAllAccountOriginByProjectId(projectId));
+        /*List<Income> incomesAccountOrigin = incomeService.getAllSaldosByProjectIdAndAccount(projectId,incomeService.getAllAccountOriginByProjectId(projectId));
 
         // Calcular sumas
         double totalAmountDeudor = incomesAccountOrigin.stream().mapToDouble(Income::getMonto).sum();
@@ -268,7 +272,7 @@ public class IncomeController {
         // Añadir los totales al modelo, Cuenta Origin
         model.addAttribute("totalAmountOrigin", totalAmountDeudor);
         model.addAttribute("totalRecurringAmountOrigin", totalRecurringAmountDeudor);
-        model.addAttribute("totalNonRecurringAmountOrigin", totalNonRecurringAmountDeudor);
+        model.addAttribute("totalNonRecurringAmountOrigin", totalNonRecurringAmountDeudor);*/
 
           return "registro_devolucion";
     }

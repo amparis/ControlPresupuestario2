@@ -290,4 +290,27 @@ table-details {
 	width:147px;
 	font-size:13px !important;
 }
-       
+.table-descargo{
+	width:80% !important;
+}
+          
+.td-details-descargo { 
+	margin: 0;
+    padding: 0; /* Mínimo padding */
+    font-size: 13px; /* Tamaño de letra pequeño */
+}
+          
+
+.th-details-descargo { 
+	margin: 0;
+    padding: 0; /* Mínimo padding */
+    font-size: 13px; /* Tamaño de letra pequeño */
+    
+}
+.td-details-descargo2 { 
+	margin: 0 0 0 0 !important;
+    padding: 0; /* Mínimo padding */
+    font-size: 13px; /* Tamaño de letra pequeño */
+}
+
+   

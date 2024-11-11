@@ -1,13 +1,18 @@
 package com.springmvc.ControlPresupuestario.service;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.springmvc.ControlPresupuestario.model.BeneficiaryExpenseSummaryDTO;
 import com.springmvc.ControlPresupuestario.model.Expense;
 import com.springmvc.ControlPresupuestario.model.Income;
+import com.springmvc.ControlPresupuestario.model.LoanSummaryDTO;
 import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.model.UserAdm;
 import com.springmvc.ControlPresupuestario.repository.ExpenseRepository;
@@ -93,4 +98,41 @@ public class ExpenseService {
 	    
 	    return expenseRepository.save(newExpense);
 	}
+
+   // public List<BeneficiaryExpenseSummaryDTO> getExpensesVigentesWithDescargo(Long projectId) {
+     //   return expenseRepository.findAllExpensesVigentesWithDescargoByProjectId(projectId);
+   // }
+    
+    public List<BeneficiaryExpenseSummaryDTO> getExpensesVigentesWithDescargo(Long projectId) {
+        List<Object[]> resultList = expenseRepository.findAllExpensesVigentesWithDescargoByProjectId(projectId);
+        List<BeneficiaryExpenseSummaryDTO> loanSummaryList = new ArrayList<>();
+
+        for (Object[] row : resultList) {
+            // Mapea las columnas de la función a variables
+        	Integer id = (Integer) row[0];
+        	String nombres = (String ) row[1];
+        	String apellidos = (String) row[2];
+            String documento = (String) row[3];
+            String tipo = (String) row[4];
+            Double  monto = (Double ) row[5];
+ 
+            // Crear el DTO y establecer los datos
+            BeneficiaryExpenseSummaryDTO summary = new BeneficiaryExpenseSummaryDTO();
+            summary.setId(id);
+            summary.setNombres(nombres);
+            summary.setApellidos(apellidos);
+            summary.setTipo(tipo);
+            summary.setDocumento(documento);
+            summary.setSumatoriaDescargo(monto);
+
+            
+            loanSummaryList.add(summary);
+        }
+
+        return loanSummaryList;
+    }
+    
+    public List<Expense> getExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(Long projectId, Integer beneficiaryId){
+    	return this.expenseRepository.findAllExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(projectId,beneficiaryId);
+    }
 }

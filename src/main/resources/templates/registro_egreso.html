@@ -78,11 +78,10 @@
 							
 						</div>
                         <div class="text-center">
-                       
                             <h2 th:if="${expense.id == null}">Expense Register</h2>
                             <h2 th:if="${expense.id != null and expense.id != 0}">Expense Edit</h2>
                         </div>
-                        <form id="miFormulario"  class="user" th:action="@{/expenses/guardar-egreso}" th:method="post" th:object="${expense}">
+                        <form id="miFormulario"  class="user" th:action="@{/expenses/guardar-egreso}" th:method="post" th:object="${expense}" enctype="multipart/form-data">
                             <input type="hidden" th:if="${expense.id!=0}"  th:field="*{id}" th:value="${expense.id}">
                            
                             <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
@@ -93,8 +92,8 @@
                             			<div class="col-8">
 				                            <div class="form-group">
 				                                <label for="inputaccount" class="form-label">Project Phases</label>
-													<select th:field="*{proyectoFase}" class="form-control form-control-user" id="inputtipo" required>
-													    <option value="" th:if="${expense.id == null}" disabled>Select phase</option>
+													<select th:field="*{proyectoFase}" class="form-control form-control-user"  required>
+													    <option value="" th:if="${expense.id == null}" selected >Select phase</option>
 													    <option th:each="faseproyecto : ${fasesProyecto}" th:value="${faseproyecto.id}"
 													    		th:text="${faseproyecto.fase.nombre+ ' - (' + #numbers.formatDecimal(faseproyecto.presupuesto, 1, 'COMMA', 2, 'POINT')+' USD)'}" ></option>
 													    
@@ -104,10 +103,10 @@
                             			<div class="col-4">
 				                            <div class="form-group">
 				                                <label for="inputtipo" class="form-label">Type of Expense</label>
-													<select th:field="*{tipo}" class="form-control form-control-user" id="inputtipo" required>
-													    <option value="" th:if="${expense.id == null}" disabled>Select type</option>
-													    <option value="Non-Recurring" th:selected="${expense.tipo == 'Non-Recurring' or expense.tipo == null}">Non-Recurring</option>
-													    <option value="Recurring" th:selected="${expense.tipo == 'Recurring'}">Recurring</option>
+													<select th:field="*{tipo}" class="form-control form-control-user" id="inputtipo" disabled >
+													    
+													    <option value="Non-Recurring" selected >Non-Recurring</option> <!-- Default selected option -->
+													    <option value="Recurring" >Recurring</option>
 													    
 													</select>
 				                             </div>                               			
@@ -116,22 +115,48 @@
                          	
                             	</div>  
                             	<div class="col-6">
-		                            <div class="form-group">
-		                                <label for="inputClassification" class="form-label">Classification of Expense</label>
-		                                <select th:field="*{clasificacionEgreso}" class="form-control  form-control-user" onchange="toggleFields(this);toggleFechaFin(this);"
-		                               			 required>
-		                                	<option value="" th:if="${expense.id == null}"  disabled >Select classification</option>
-		                                    <option th:each="classification : ${expenditureClassifications}" th:value="${classification.id}"
-		                                            th:data-nombreClase="${classification.nombreClase}"
-		                                            th:text="${classification.nombreClase +' -> '+classification.formaPago}"></option>
-		                                </select>
-		                             </div>                            	
+                            		<div class="row">
+                            			<div class="col-8">
+				                            <div class="form-group">
+				                                <label for="inputClassification" class="form-label">Classification of Expense</label>
+				                                <select th:field="*{clasificacionEgreso}" class="form-control  form-control-user" onchange="toggleFields(this);"
+				                               			 required>
+				                                	<option value="" th:if="${expense.id == null}"  selected  >Select classification</option>
+				                                    <option th:each="classification : ${expenditureClassifications}" 
+				                                    		th:value="${classification.id}"
+				                                            th:data-nombreClase="${classification.nombreClase}"
+				                                            
+				                                            th:text="${classification.nombreClase}"
+				                                            th:selected="${classification.id == clasificacionEgreso}"></option>
+				                                </select>
+				                                <input type="hidden" id="inputPago" name="inputPago">
+											</div>                            			
+                            			</div>
+                            			 
+                            			<div class="col-4">
+		                            		<div class="form-group">
+				                                <label for="inputtipo" class="form-label">&nbsp;&nbsp;</label>
+				                                	
+														<select  class="form-control form-control-user" id="inputPago" required  onchange="toggleFechaFin(this)">
+														 <option value="" th:if="${expense.id == null}" selected disabled>Select</option>
+														 <option th:each="method : ${paymentMethod}"
+														 		 th:value ="${method.descripcion}"
+														 		 th:data-formaPago ="${method.descripcion}"
+														 		 th:text="${method.descripcion}">
+														 </option>
+																    
+														</select>
+														
+				                             </div>                              			
+                            			</div>                           			
+                            		</div>			
+                          	
                             	</div>                            	                          	
                             </div>
                             <div class="row">
                             	<div class="col-6">
 		                             <div class="form-group">
-		                             	 <label for="inputObjetoPuesto" id="expenseObjetoPuesto" class="form-label"></label>
+		                             	 <label for="inputObjetoPuesto" id="expenseObjetoPuesto" class="form-label">Objeto</label>
 		                                 <input th:field="*{objeto}" type="text" class="form-control form-control-user" 
 		       									id="inputObjetoPuesto" name="inputObjetoPuesto" placeholder="Enter object or position in the company">
 		                             </div>
@@ -140,20 +165,20 @@
                             		<div class="row">
                             			<div class="col-9">
 				                             <div class="form-group">
-				                             	 <label for="inputCargoItem" id="expenseCargoItem" class="form-label"> </label>
+				                             	 <label for="inputCargoItem" id="expenseCargoItem" class="form-label">Item</label>
 				                                 <input type="text" class="form-control form-control-user" 
 				       									id="inputItem" name="inputItem" placeholder="Enter item"  style="display: none;"
 				       									oninput="updateCargoItem(this.value)">
 				       									<!-- en caso de item, deberia carga un combo-->
 				                                <select id= "selectCargo" name= "selectCargo" class="form-control  form-control-user" 
-				                                	required  style="display: none;"  onchange="updateCargoItem(this.options[this.selectedIndex].value)">
+				                                	  style="display: none;"  onchange="updateCargoItem(this.options[this.selectedIndex].value)">
 				                                	<option value="" disabled selected>Select expense</option>
 				                                    <option th:each="escala : ${escalas}" 
 				                                    		th:value="${escala.nombre}"
 				                                            th:text="${escala.nombre +' - (' + #numbers.formatDecimal(escala.salario, 1, 'COMMA', 2, 'POINT')+' USD)'}" ></option>
 				                                </select>	 	  
 				                                 <input  th:field="*{cargoItem}" type="hidden" class="form-control form-control-user" 
-				       									id="inputCargoItem" name="inputCargoItem" >     									
+				       									id="inputCargoItem" name="inputCargoItem" required>     									
 				                             </div>                            			
                             			</div>
 		                            	<div class="col-3">
@@ -204,21 +229,21 @@
 			                        <div class="row-header-montos">
 			                            <div class="col">
 			                                <strong> Beneficiary type:</strong>
-			                                <p class="p-header" id="beneficiarioTipo">Staff</p>
+			                                <p class="p-header" id="beneficiarioTipo">---</p>
 			                            </div>
 			                            <div class="col">
 			                                <strong> Identification Document:</strong>
- 											<p class="p-header" id="beneficiarioDocumento">12345678</p> 
+ 											<p class="p-header" id="beneficiarioDocumento">---</p> 
  			                            </div>
 			                        </div>
 			                        <div class="row-header-montos">
 			                            <div class="col">
 			                                <strong> Full Name:</strong>
- 											<p class="p-header" id="beneficiarioNombre">Jhon Smith</p>
+ 											<p class="p-header" id="beneficiarioNombre">---</p>
 			                            </div>
 			                            <div class="col">
 			                                <strong> Company Name:</strong>
- 											<p class="p-header" id="beneficiarioDocumento">----</p> 				                               
+ 											<p class="p-header" id="beneficiarioDocumento">---</p> 				                               
 			                            </div>
 			                        </div>
                            	
@@ -231,9 +256,9 @@
                             	</div>                              	
                             </div>
                             <div class="row">
-                            	<div class="col">
+                            	<div class="col-7">
 		                             <div class="row">
-									    <div class="col-6">
+									    <div class="col-4">
 		                            		<div class="form-group">
 					                              <label for="inputfechaInicial" class="form-label">Start Date</label>
 					                              <input th:field="*{fechaInicio}" 
@@ -243,126 +268,148 @@
 					                                    id="inputfechaInicio" 
 					                                    placeholder="MM/DD/YYYY" 
 					                                    required 
-                           								onchange="formatDate(this.value); checkFormaPago(); checkDates();">
+                           								onchange=" checkDates()">
                              	
 			                               <!-- Elemento para mostrar la fecha formateada -->
 												<p id="formattedDate"></p>
 			                                </div> 
                             			</div>
-                            			<div class="col-6">
+                            			<div class="col-4">
 			                                	<div class="form-group">
 													 <label for="inputfechaFin" class="form-label">End Date</label>
 					                                 <input th:field="*{fechaFin}" type="date" class="form-control form-control-user"
 					                                           id="inputfechaFin" 
-					                                           onchange="checkDates();"
-					                                           required disabled>
+					                                           onchange ="checkDates()"
+					                                            readonly>
 					                            </div>      
                             			</div>
+		                            	<div class="col-4">
+					                        <div class="form-group">
+											 <label for="inputTiempo" class="form-label">Time</label>                            	
+				                       		<input th:field="*{tiempo}" type="number" class="form-control form-control-user" 
+				       								id="inputTiempo" name="inputTiempo" step="0.000001"  readonly>
+		                            		</div>
+		                            	</div>
 		                             </div>
-                            	
-                            	</div>
-                            	<div class="col">
-			                        <div class="form-group">
-									 <label for="inputTiempo" class="form-label">Time</label>                            	
-		                       		<input th:field="*{tiempo}" type="number" class="form-control form-control-user" 
-		       								id="inputTiempo" name="inputTiempo" step="0.000001"  value="1" disabled>
-                            		</div>
-                            	</div>
-                            </div>
-                            <div class="row">
-                            	<div class="col">
-                            		<div class="row">
-                            			<div class="col">
+                            		 <div class="row">
+                            			<div class="col-4">
 					                        <div class="form-group">
 											 <label for="inputCantidad" class="form-label">Quantity</label>                            			
 		                       				<input th:field="*{cantidad}" type="number"  class="form-control form-control-user" 
 		       										id="inputCantidad" name="inputCantidad" step="0.01" oninput="calculateTotalMontoPagar()" onchange="calculateTotalMontoPagar()">
 		       								</div>                            			
                             			</div>
-                            			<div class="col">
+                            			<div class="col-4">
 					                        <div class="form-group">
-											 <label for="inputPrecioUnitario" id="expensePrecioUnitarioMonto" class="form-label">Unit Cost </label>                            			
+											 <label for="inputPrecioUnitario" id="expensePrecioUnitarioMonto" class="form-label">Unit Cost (USD)</label>                            			
 		                       				<input th:field="*{costoUnitario}"  type="number" class="form-control form-control-user" 
 		       									id="inputPrecioUnitario" name="inputPrecioUnitario" step="0.01" oninput="calculateTotalMontoPagar()"  onchange="calculateTotalMontoPagar()" >                             			
 											</div>
                             			</div>
-                            		</div>
+		                            	<div class="col-4">
+							                    <div class="form-group">
+											    <label for="inputMontoPaga" class="form-label">Total (USD) </label>                            			
+				                       			<input th:field="*{montoTotal}"  type="text" class="form-control form-control-user" 
+				       								id="inputMontoPagar" name="inputMontoPagar" step="0.01" 
+				       								placeholder="0.00" readonly > 
+				       							</div>	                             	
+		                            	</div>                            			
+                            		 </div>  
+	                            		<div class="row">
+	                            			<div class="col-4">
+				                               <div class="form-group">
+													<label for="inputfecha" class="form-label">Date Transfer</label>
+						                            <input th:field="*{fecha}" type="date" class="form-control form-control-user"
+						                                           id="inputfecha" onchange="formatDate(this.value)" required>
+						                       </div>                             			
+	                            			</div>
+	                            			<div class="col-4">
+					                            <div class="form-group">
+					                                <label for="inputaccount" class="form-label">Payment type</label>
+														<select th:field="*{tipoTransferencia}" class="form-control form-control-user" id="inputTipoTransferencia" name="inputTipoTransferencia" required>
+														    <option value="" th:if="${expense.id == null}">Select type</option>
+														    <option value="TRANSFER" th:selected="${expense.tipoTransferencia == 'TRANSFER'}">Transfer</option>
+														    <option value="CASH" th:selected="${expense.tipoTransferencia == 'CASH'}">Cash</option>
+														</select>
+					                             </div>                             			
+	                            			</div>	  
+	                            			<div class="col-4">
+	                            				<div class="form-group">
+												 <label for="inputFee" class="form-label">Fee</label>                            	
+					                       		<input th:field="*{fee}" type="number" class="form-control form-control-user" 
+					       								id="inputFee" name="inputFee" step="0.01" oninput="calculateTotalLCU()" onchange="calculateTotalLCU()" >
+			                            		</div>  
+			                            	</div>                        		
+	                            		</div>                            		 
+									<div class="row">
+									    <div class="col-11">
+									        <label for="inputAttach" class="form-label">Attach</label><br>
+									        <input th:field="*{attach}" type="text" class="form-control form-control-user" id="inputAttach" name="inputAttach" readonly>
+									    </div>
+									    <div class="col-1">
+									        <label for="inputAttach" class="form-label">  &nbsp;&nbsp;</label>
+									        <input type="file" id="fileInput" name ="file" style="display:none;" />
+									        <button id="btnAttach" type="button" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales">
+									            Add
+									        </button>
+									    </div>
+									</div>
+
                             	</div>
-                            	<div class="col">
-					                    <div class="form-group">
-									    <label for="inputMontoPaga" class="form-label">Total Amount to pay </label>                            			
-		                       			<input th:field="*{montoTotal}"  type="text" class="form-control form-control-user" 
-		       								id="inputMontoPagar" name="inputMontoPagar" step="0.01" disabled > 
-		       							</div>	                             	
+                            	<div class="col-5" style="background-color: rgb(245,245,245);">
+
+	                            		<div class="row">
+		                            		<div class="col">
+		                            			<div class="form-group">
+			                                        <label for="inputpais" class="form-label">Country</label>
+											        <SELECT th:field = "*{pais}"  class="form-control form-control-user"  data-show-subtext="true" data-live-search="true">
+														<OPTION th:EACH= "pais : ${paises}" 
+																th:VALUE = "${pais.id}" 
+																th:TEXT = "${pais.nombre}" >										 
+														</OPTION >		 
+													</SELECT>  
+												</div> 	
+		                            		</div>
+	                            		</div>
+
+	                            		<div class="row">
+	                            			<div class="col-6">
+			                                        <label for="inputpais" class="form-label">Divisa</label>
+											        <SELECT   class="form-control form-control-user"  data-show-subtext="true" data-live-search="true">
+														<OPTION th:EACH= "pais : ${paises}" 
+																th:VALUE = "${pais.id}" 
+																th:TEXT = "${pais.divisa}" >										 
+														</OPTION >		 
+													</SELECT>  
+	                            			</div>
+	                            			<div class="col-6">
+			                            		<div class="form-group">
+												 <label for="inputCambioMoneda" class="form-label">Exchange Rate</label>                            	
+					                       		<input th:field="*{cambio}"  type="number" class="form-control form-control-user" 
+					       								id="inputCambioMoneda" name="inputCambioMoneda" step="0.000001" oninput="calculateTotalLCU()" onchange="calculateTotalLCU()"  >
+			                            		</div> 
+	                            			</div>
+	                            		</div>	
+	                            		<div class="row">
+			                            	<div class="col">
+						                        <div class="form-group">
+												 <label for="inputTotalLCU" class="form-label">Amount in local Currency</label>                            	
+					                       		<input th:field="*{totalLCU}" type="text" class="form-control form-control-user" 
+					       								id="inputTotalLCU" name="inputTotalLCU" step="0.01" 
+					       								placeholder="0.00" readonly>
+			                            		</div>                            	
+			                            	</div>                            		
+	                            		</div>
+
                             	</div>
                             </div>
-                            <div class="row">
-                            	<div class="col">
-                            		<div class="form-group">
-                                        <label for="inputpais" class="form-label">Country</label>
-								        <SELECT th:field = "*{pais}"  class="form-control form-control-user"  data-show-subtext="true" data-live-search="true">
-											<OPTION th:EACH= "pais : ${paises}" 
-													th:VALUE = "${pais.nombre}" 
-													th:TEXT = "${pais.nombre +' - (Money Currency -'+ pais.divisa+')' }" >										 
-											</OPTION >		 
-										</SELECT>  
-									</div>                            	
-                            	</div>
-                            	<div class="col">
-                            		<div class="row">
-                            			<div class="col-6">
-			                               <div class="form-group">
-												<label for="inputfecha" class="form-label">Date Transfer</label>
-					                            <input th:field="*{fecha}" type="date" class="form-control form-control-user"
-					                                           id="inputfecha" onchange="formatDate(this.value)" required>
-					                       </div>                             			
-                            			</div>
-                            			<div class="col-6">
-				                            <div class="form-group">
-				                                <label for="inputaccount" class="form-label">Type of Expense</label>
-													<select th:field="*{tipoTransferencia}" class="form-control form-control-user" id="inputTipoTransferencia" name="inputTipoTransferencia" required>
-													    <option value="" th:if="${expense.id == null}">Select type</option>
-													    <option value="TRANSFER" th:selected="${expense.tipoTransferencia == 'TRANSFER'}">Transfer</option>
-													    <option value="CASH" th:selected="${expense.tipoTransferencia == 'CASH'}">Cash</option>
-													</select>
-				                             </div>                             			
-                            			</div>
-                            		</div>
-                            	</div>                            	
-                            </div>
-                            <div class="row">
-                            	<div class="col">
-                            		<div class="row">
-                            			<div class="col">
-		                            		<div class="form-group">
-											 <label for="inputFee" class="form-label">Fee</label>                            	
-				                       		<input th:field="*{fee}" type="number" class="form-control form-control-user" 
-				       								id="inputFee" name="inputFee" step="0.01" oninput="calculateTotalLCU()" onchange="calculateTotalLCU()" >
-		                            		</div> 
-                            			</div>
-                            			<div class="col">
-		                            		<div class="form-group">
-											 <label for="inputCambioMoneda" class="form-label">Exchange Rate</label>                            	
-				                       		<input th:field="*{cambio}"  type="number" class="form-control form-control-user" 
-				       								id="inputCambioMoneda" name="inputCambioMoneda" step="0.000001" oninput="calculateTotalLCU()" onchange="calculateTotalLCU()"  >
-		                            		</div> 
-                            			</div>
-                            		</div>
-                           	
-                            	</div>
-                            	<div class="col">
-			                        <div class="form-group">
-									 <label for="inputTotalLCU" class="form-label">Amount in local Currency</label>                            	
-		                       		<input th:field="*{totalLCU}" type="text" class="form-control form-control-user" 
-		       								id="inputTotalLCU" name="inputTotalLCU" step="0.01" disabled>
-                            		</div>                            	
-                            	</div>
-                            </div>
+
  							<!-- Mostrar mensaje de error si existe -->
                             <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
                                 <p th:text="${error}"></p>
                             </div>
-                             <button id="btnExpense" type="submit" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" >
+                             <button id="btnExpense" type="submit" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales"
+                              		onclick="prepareMonto('inputMontoPagar'); prepareMonto('inputTotalLCU'); showOverlay(); " >
                                 SAVE EXPENSE
                              </button>
 							<div class="text-center">
@@ -440,9 +487,9 @@
               <div class="form-group">
                   <!-- Campo oculto para el ID -->
     			<input type="hidden" th:field="*{id}" th:value="0">
-                <label for="inputtipo" class="form-label">Beneficiary Type</label>
-                <select th:field="*{tipo}" class="form-control form-control-user" id="inputtipo" required>
-                  <option value="" th:if="${beneficiary.id == 0}">Select type</option>
+                <label for="inputtipoB" class="form-label">Beneficiary Type</label>
+                <select th:field="*{tipo}" class="form-control form-control-user" id="inputtipoB" required  onchange="updateLabel()">
+                  <option value="" th:if="${beneficiary.id == null}" selected disabled>Select type</option>
                   <option value="Natural Person" th:selected="${beneficiary.tipo == 'Natural Person'}">Natural Person</option>
                   <option value="Legal Entity" th:selected="${beneficiary.tipo == 'Legal Entity'}">Legal Entity</option>
                   <option value="Staff" th:selected="${beneficiary.tipo == 'Staff'}">Staff</option>
@@ -451,41 +498,41 @@
             </div>
             <div class="col">
               <div class="form-group">
-                <label for="inputdocumento" class="form-label">Identification Document</label>
+                <label for="inputdocumento" class="form-label" id = "documento"></label>
                 <input th:field="*{documento}" type="text" class="form-control form-control-user" id="inputdocumento" placeholder="Document Number" required>
               </div>
             </div>
           </div>
 
-          <div class="row">
+          <div class="row" >
             <div class="col">
               <div class="form-group">
-                <label for="inputnombres" class="form-label">First name</label>
-                <input th:field="*{nombres}" type="text" class="form-control form-control-user" id="inputnombre" placeholder="Enter first name" required>
+                <label for="inputnombres" class="form-label" id ="firstName"></label>
+                <input th:field="*{nombres}" type="text" class="form-control form-control-user" id="inputnombre" placeholder="Enter first name" >
               </div>
             </div>
             <div class="col">
               <div class="form-group">
-                <label for="inputapellidos" class="form-label">Last Name</label>
-                <input th:field="*{apellidos}" type="text" class="form-control form-control-user" id="inputapellidos" placeholder="Enter Last name" required>
+                <label for="inputapellidos" class="form-label" id="lastName"></label>
+                <input th:field="*{apellidos}" type="text" class="form-control form-control-user" id="inputapellidos" placeholder="Enter Last name" >
               </div>
             </div>
           </div>
-
-          <div class="row">
+         <div class="row">
             <div class="col">
               <div class="form-group">
-                <label for="inputrazonSocial" class="form-label">Company Name</label>
-                <input th:field="*{razonSocial}" type="text" class="form-control form-control-user" id="inputrazonSocial" placeholder="Company name if applicable">
+                <label for="inputrazonSocial" class="form-label" id ="company"></label>
+                <input th:field="*{razonSocial}" type="text" class="form-control form-control-user" id="inputrazonSocial" placeholder="Enter company name ">
               </div>
             </div>
             <div class="col">
               <div class="form-group">
                 <label for="inputpaisProcedencia" class="form-label">Country origin</label>
-                <select th:field="*{paisProcedencia}" class="form-control form-control-user" id="inputpaisProcedencia" data-show-subtext="true" data-live-search="true" required>
-                  <option value="na" disabled selected>Select country</option>
+                <select th:field="*{pais}" class="form-control form-control-user" id="inputpaisProcedencia" 
+                	data-show-subtext="true" data-live-search="true" required>
+                  <option value=""  selected>Select country</option>
                   <option th:each="paiss : ${paisesBeneficiary}"
-                  		  th:value="${paiss.nombre}" 
+                  		  th:value="${paiss.id}" 
                   		  th:text="${paiss.nombre}">
                   </option>
                 </select>
@@ -495,8 +542,8 @@
           <div class="row">
             <div class="col">
               <div class="form-group">
-                <label for="inputemail" class="form-label">Email</label>
-                <input th:field="*{email}" type="email" class="form-control form-control-user" id="inputemail" placeholder="example@gmail.com" required>
+                <label for="inputemail" class="form-label" id = "email"></label>
+                <input th:field="*{email}" type="email" class="form-control form-control-user" id="inputemail" placeholder="example@gmail.com" >
               </div>
             </div>
             <div class="col">
@@ -506,7 +553,24 @@
               </div>
             </div>
           </div>
-
+          <div class="row">
+	                                    <div class="col">
+	                                        <div class="form-group">
+	                                            <label for="inputfechaIngreso" class="form-label">Start Date(if applicable)</label>
+	                                            <input th:field="*{fechaIngreso}" type="date" class="form-control form-control-user" id="inputfechaIngreso" >
+	                                        </div>
+	                                    </div>
+	                                    <div class="col">
+	                                        <div class="form-group">
+	                                            <label for="inputobservacion" class="form-label">Observation</label>
+	                                            <textarea th:field="*{observacion}" class="form-control form-control-user" id="inputobservacion" placeholder="Observations" rows="3"></textarea>
+	                                        </div>
+	                                    </div>
+         </div>
+                                         <!-- Mostrar mensaje de error si existe -->
+                                <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
+                                    <p th:text="${error}"></p>
+                                </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary">Save Beneficiary</button>
@@ -529,44 +593,14 @@ function updateCargoItem(value) {
     document.getElementById("inputCargoItem").value = value;
 }
 
-    function toggleFields(selectElement) {
-        // Obtener el valor de `nombreClase` del atributo data-nombreClase del option seleccionado
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const nombreClase = selectedOption.getAttribute("data-nombreClase");
 
-        const expenseObjetoPuestoLabel = document.getElementById("expenseObjetoPuesto");
-        const expenseCargoItemLabel = document.getElementById("expenseCargoItem");
-        const expensePrecioUnitarioMontoLabel = document.getElementById("expensePrecioUnitarioMonto");
-        const inputCargoItem = document.getElementById("inputCargoItem");
-        const inputItem = document.getElementById("inputItem");
-        const selectCargo = document.getElementById("selectCargo");
-        const btnAddCargo = document.getElementById("btnAddCargo");
-
-        if (nombreClase === "Staff") {
-            expenseObjetoPuestoLabel.textContent = "Job Position";
-            expenseCargoItemLabel.textContent = "Scale";
-            expensePrecioUnitarioMontoLabel.textContent = "Amount to pay";
-            selectCargo.style.display = "block";
-            inputItem.style.display = "none";
-            btnAddCargo.style.display = "block";
-        } else {
-            expenseObjetoPuestoLabel.textContent = "Object";
-            expenseCargoItemLabel.textContent = "Item";
-            expensePrecioUnitarioMontoLabel.textContent = "Unit Cost";
-            selectCargo.style.display = "none";
-            inputItem.style.display = "block";
-            btnAddCargo.style.display = "none";
-        }
-        // Reiniciar 'inputCargoItem' cuando cambia el campo activo
-        inputCargoItem.value = "";
-    }
 </script>
 
 <script>
 
 // Llama a esta función para actualizar el valor antes de enviar el formulario
 function prepareMonto(elementId) {
-	alert(elementId);
+	
     const element = document.getElementById(elementId);
     element.value = element.value.replace(/,/g, ''); // Elimina comas antes de enviar al servidor
 }
@@ -578,16 +612,10 @@ function prepareMonto(elementId) {
                 event.preventDefault(); // Previene la acción predeterminada (enviar el formulario)
             }
         }
-
+        // Añadir el listener al cargar el documento
         document.addEventListener("DOMContentLoaded", function() {
-            const form = document.getElementById("miFormulario"); // Reemplaza con el ID de tu formulario
-
-            form.addEventListener("submit", function(event) {
-                prepareMonto('inputMontoPagar');
-                prepareMonto('inputTotalLCU');
-                showOverlay();
-                // Si quieres que el formulario siga enviándose, no uses preventDefault aquí
-            });
+            const form = document.getElementById("miFormulario"); // Cambia "miFormulario" por el ID de tu formulario
+            form.addEventListener("keypress", disableEnterKey);
         });
 
     </script>
@@ -634,69 +662,116 @@ $(function(){
 });
 </script>
 <script>
+function toggleFields(selectElement) {
+    // Obtener el valor de `nombreClase` del atributo data-nombreClase del option seleccionado
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const nombreClase = selectedOption.getAttribute("data-nombreClase");
+    const formaPago = selectedOption.getAttribute("data-formaPago");// Obtener la forma de pago de clasificacion
+
+    const expenseObjetoPuestoLabel = document.getElementById("expenseObjetoPuesto");
+    const expenseCargoItemLabel = document.getElementById("expenseCargoItem");
+    const expensePrecioUnitarioMontoLabel = document.getElementById("expensePrecioUnitarioMonto");
+    const inputCargoItem = document.getElementById("inputCargoItem");
+    const inputItem = document.getElementById("inputItem");
+    const selectCargo = document.getElementById("selectCargo");
+    const btnAddCargo = document.getElementById("btnAddCargo");
+
+    document.getElementById("inputPago").value = formaPago;
+    
+    if (nombreClase === "STAFF") {
+        expenseObjetoPuestoLabel.textContent = "Job Position";
+        expenseCargoItemLabel.textContent = "Scale";
+        expensePrecioUnitarioMontoLabel.textContent = "Amount to pay";
+        selectCargo.style.display = "block";
+        inputItem.style.display = "none";
+        btnAddCargo.style.display = "block";
+     // Reiniciar valor de 'inputCargoItem' para evitar datos inconsistentes
+        inputCargoItem.value = "";
+    } else {
+        expenseObjetoPuestoLabel.textContent = "Object";
+        expenseCargoItemLabel.textContent = "Item";
+        expensePrecioUnitarioMontoLabel.textContent = "Unit Cost";
+        selectCargo.style.display = "none";
+        inputItem.style.display = "block";
+        btnAddCargo.style.display = "none";
+        // Reiniciar el valor de 'inputCargoItem' (puedes agregar más reinicios si es necesario)
+        inputCargoItem.value = "";
+    }
+
+}
+</script>
+
+<script>
 function toggleFechaFin(selectElement) {
     // Obtener el valor seleccionado
     const selectedOption = selectElement.options[selectElement.selectedIndex];
-    const formaPago = selectedOption.text.split(' -> ')[1]; // Asumiendo que 'formaPago' está después de '->'
-
+    //const formaPago = selectedOption.value;  // Asumiendo que 'formaPago' está después de '->'
+    const formaPago = selectedOption.getAttribute("data-formaPago");// Obtener la forma de pago de clasificacion
+//alert(formaPago);
     // Obtener el campo de fechaFin y tiempo
+    const fechaInicioInput = document.getElementById('inputfechaInicio'); 
     const fechaFinInput = document.getElementById('inputfechaFin'); 
     const tiempoInput = document.getElementById('inputTiempo');
+    
 
     // Verificar si formaPago es 'pago único'
     if (formaPago === 'single payment') {
-        fechaFinInput.disabled = true; // Deshabilitar
+    	fechaFinInput.readOnly = true; // fechaFinInput.disabled = true; // Deshabilitar
+    	fechaInicioInput.value='';
         fechaFinInput.value = ''; // Limpiar valor si está deshabilitado
         //tiempoInput.disabled = true;
         tiempoInput.value = '1';
         
         
     } else {
-        fechaFinInput.disabled = false; // Habilitar
+    	fechaFinInput.readOnly = false; // Quitar readonly
+
+        //fechaFinInput.disabled = false; // Habilitar
         //tiempoInput.disabled = false;
     }
 }
 </script>
 <script>
-    function checkFormaPago() {
-        const formaPago = document.querySelector('input[name="formaPago"]:checked').value; // Ajustar selector según tu estructura de formulario
-        const inputTiempo = document.getElementById('inputTiempo');
-        const inputFechaFin = document.getElementById('inputfechaFin');
-
-        if (formaPago === 'single payment') {
-            inputTiempo.value = 1;  // Establecer tiempo a 1
-            inputTiempo.disabled = true;
-            inputFechaFin.disabled = true; // Desactivar fechaFin
-            inputFechaFin.value = ''; // Limpiar fechaFin
-        } else {
-            inputTiempo.disabled = false; // Habilitar inputTiempo
-            inputFechaFin.disabled = false; // Habilitar fechaFin
-        }
-    }
     
     function checkDates() {
         const fechaInicioStr = document.getElementById('inputfechaInicio').value;
         const fechaFinStr = document.getElementById('inputfechaFin').value;
-
-        if (fechaInicioStr && fechaFinStr) {
-            // Convertir las cadenas de fecha a objetos Date usando Date.UTC
+        const formaPago = document.getElementById('inputPago').value;
+        
+        // Verificar si se ingresó la fecha de inicio
+        if (fechaInicioStr) {
             const [yearInicio, monthInicio, dayInicio] = fechaInicioStr.split("-");
-            const [yearFin, monthFin, dayFin] = fechaFinStr.split("-");
-
-            // Crear fechas en UTC (los meses son 0-indexed)
             const fechaInicio = new Date(Date.UTC(yearInicio, monthInicio - 1, dayInicio));
-            const fechaFin = new Date(Date.UTC(yearFin, monthFin - 1, dayFin));
-            //alert(fechaInicio+"---"+fechaFin);
-            // Verificar si las fechas son válidas
-            if (isNaN(fechaInicio.getTime()) || isNaN(fechaFin.getTime())) {
-                alert("Por favor, ingresa fechas válidas.");
+
+            if (isNaN(fechaInicio.getTime())) {
+                alert("Por favor, ingresa una fecha de inicio válida.");
                 return;
             }
 
-            // Llamar a tu función para calcular inputTiempo
+            let fechaFin;
+            
+            // Si el tipo de forma de pago no es 'single payment', se requiere una fecha de fin válida
+            if (formaPago !== 'single payment') {
+                if (fechaFinStr) {
+                    const [yearFin, monthFin, dayFin] = fechaFinStr.split("-");
+                    fechaFin = new Date(Date.UTC(yearFin, monthFin - 1, dayFin));
+
+                    if (isNaN(fechaFin.getTime())) {
+                        alert("Por favor, ingresa una fecha de fin válida.");
+                        return;
+                    }
+                } else {
+                    alert("Por favor, ingresa la fecha de fin.");
+                    return;
+                }
+            } else {
+                // Si la forma de pago es 'single payment', se permite que fechaFin esté vacía
+                fechaFin = fechaInicio; // Se asigna la fecha de inicio como fecha de fin
+            }
+
+            // Llamar a la función para calcular el tiempo con fechaInicio y fechaFin
             calculateInputTiempo(fechaInicio, fechaFin);
-        } else if (fechaInicioStr && !fechaFinStr) {
-            alert("Fecha de fin es opcional, pero asegúrate de que la fecha de inicio esté correcta.");
+
         } else {
             alert("Por favor, completa la fecha de inicio.");
         }
@@ -746,70 +821,7 @@ function toggleFechaFin(selectElement) {
     alert(dias);
     document.getElementById('inputTiempo').value = dias; // Establece el valor calculado
     }
-    /*function calculateInputTiempo(fechaInicio, fechaFin) {
-    	
-    	alert(fechaInicio+'***'+ fechaFin);
-        $.ajax({
-            url: '/calculate/'+fechaInicio+'/'+fechaFin, // Asegúrate de que esta URL sea correcta
-            type: 'POST',
-            data:formData,
-            success: function(data) {
-                // Aquí data debería ser el número de días calculados
-                
-       		alert(data);
-    		document.getElementById('inputTiempo').value = data; // Establece el valor calculado
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Error calculating time:', textStatus, errorThrown);
-                alert('Error calculating the time between dates. Please try again. '+error);
-            }
-        });
-    }*/
-    /*
-    async function calculateInputTiempo(fechaInicio, fechaFin) {
-        try {
-            const response = await fetch('/api/calculate', { // Ajusta la ruta según tu endpoint
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fecha_inicial: fechaInicio,
-                    fecha_final: fechaFin
-                }),
-            });
 
-            if (!response.ok) throw new Error('Network response was not ok');
-
-            const data = await response.json();
-
-            // Suponiendo que data regresa el tiempo que necesitas
-            document.getElementById('inputTiempo').value = data; // Establecer el valor de tiempo calculado
-        } catch (error) {
-            console.error(error);
-            alert('Error calculating the time between dates. Please try again.'+error);
-        }
-    */
-/*
-    async function calculateInputTiempo(fechaInicio, fechaFin) {
-    	
-    	alert(fechaInicio+"    "+fechaFin);
-        try {
-            const { data, error } = await supabase
-                .rpc('fn_obtener_dias_por_rango_fechas', {
-                    fecha_inicial: fechaInicio,
-                    fecha_final: fechaFin
-                });
-
-            if (error) throw error;
-
-            // Suponiendo que data retorna el tiempo que necesitas
-            document.getElementById('inputTiempo').value = data; // Establecer el valor de tiempo calculado
-        } catch (error) {
-            console.error(error);
-            alert('Error calculating the time between dates. Please try again.');
-        }
-    }*/
 </script>
 <script>
 function calculateTotalMontoPagar() {
@@ -817,15 +829,11 @@ function calculateTotalMontoPagar() {
     const precioUnitario = parseFloat(document.getElementById("inputPrecioUnitario").value) || 0;
     const tiempo = parseFloat(document.getElementById("inputTiempo").value) || 1;
         // Calcular montos
-        const montoTotalPagar = (cantidad * precioUnitario) / tiempo;
+        const montoTotalPagar = (cantidad * precioUnitario) * tiempo;
 
         const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         // Formatear monto solo para mostrarlo
         document.getElementById("inputMontoPagar").value = formateador.format(montoTotalPagar);
-
-        // Guardar valor sin formato en una propiedad personalizada para futuros cálculos
-        //document.getElementById("inputMontoPagar").dataset.rawValue = montoTotalPagar;
-
 }
 
 function calculateTotalLCU() {
@@ -836,12 +844,78 @@ function calculateTotalLCU() {
         const montoLCU = (fee * cambioMoneda);
 
         const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        //const numeroFormateado = formateador.format(montoTotalPagar);
         document.getElementById("inputTotalLCU").value = formateador.format(montoLCU);
-        // Guardar valor sin formato en una propiedad personalizada para futuros cálculos
-        //document.getElementById("inputTotalLCU").dataset.rawValue = montoTotalPagar;
+
 }
 </script>
+<script>
+document.getElementById('btnAttach').addEventListener('click', function() {
+    document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // Aquí podrías subir el archivo a tu servidor y obtener la URL
+        // Por ejemplo, usando una llamada AJAX o un formulario de envío de archivos
+
+        // Por ahora, simplemente añadimos el nombre del archivo al campo de texto
+        document.getElementById('inputAttach').value = file.name;
+    }
+});
+
+</script>
+<script>
+    function updateLabel() {
+        const select = document.getElementById("inputtipoB");
+        const label = document.getElementById("documento");
+        const labelF = document.getElementById("firstName");
+        const labelL = document.getElementById("lastName");
+        const labelE = document.getElementById("email");
+        const labelC = document.getElementById("company");
+        
+        if (select.value === "Staff") {
+            label.textContent = "Identification Document (*)";
+            labelF.textContent ="First Name (*)";
+            labelL.textContent ="Last Name (*)";
+            labelE.textContent = "Email (*)";
+            labelC.textContent = "Company Name";
+            document.getElementById("inputnombre").required=true;
+            document.getElementById("inputapellidos").required=true;
+            document.getElementById("inputrazonSocial").required=false;
+            document.getElementById("inputemail").required=true;
+            
+            
+        } else if  (select.value === "Legal Entity"){
+        	
+            label.textContent = "Number Identification of Company (*)";
+            labelF.textContent ="First Name (Legal representative) ";
+            labelL.textContent ="Last Name (Legal representative) ";
+            labelE.textContent = "Email";
+            labelC.textContent = "Company Name (*)";
+            document.getElementById("inputnombre").required=false;
+            document.getElementById("inputapellidos").required=false;
+            document.getElementById("inputrazonSocial").required=true;
+            document.getElementById("inputemail").required=false;
+        }
+        else
+        	{
+            label.textContent = "Identification Document (*)";
+            labelF.textContent ="First Name (*)";
+            labelL.textContent ="Last Name (*)";
+            labelE.textContent = "Email";
+            labelC.textContent = "Company Name";
+            document.getElementById("inputnombre").required=true;
+            document.getElementById("inputapellidos").required=true;
+            document.getElementById("inputrazonSocial").required=false;
+            document.getElementById("inputemail").required=false;
+        	}
+    }
+
+    // Call updateLabel on page load to set the label correctly if editing an existing record
+    window.onload = updateLabel;
+</script>
+
 </body>
 </html>
 

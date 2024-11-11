@@ -33,19 +33,40 @@ public class ExpenseDisclaimersService {
 		return this.expenseDisclaimersRepository.findExpenseDisclaimersByExpenseId(expenseId);
 		
 	}
+	public List<ExpenseDisclaimers> getExpenseDisclaimersByProjectId(Long projectId) {
+		
+		return this.expenseDisclaimersRepository.findExpenseDisclaimersByProjectId(projectId);
+		
+	}
+	
+	public List<ExpenseDisclaimers> getExpenseDisclaimersByProjectIdAndBeneficiaryId(Long projectId, Integer beneficiaryId) {
+		
+		return this.expenseDisclaimersRepository.findExpenseDisclaimersByProjectIdAndBeneficiaryId(projectId,beneficiaryId);
+		
+	}
 
 	//public ExpenseCategory getExpenseCategoryByNombre(String nombre) {
 		
 		//return this.expenseCategoryRepository.findAllExpenseCategoryByNombre(nombre);
 		
 	//}
-	
+	/*
 	public ExpenseDisclaimers saveExpenseDisclaimers(ExpenseDisclaimers newExpenseDisclaimers,long expenseId) {
 
 		long millis = System.currentTimeMillis();
 	    UserAdm loginUser = userService.getUser(userDetailsService.getUserDetailsService().getId());
 	    Expense expenseSelected = expenseService.getExpense(expenseId);
 	    newExpenseDisclaimers.setEgreso(expenseSelected);
+		newExpenseDisclaimers.setUserId((int) loginUser.getId());
+		newExpenseDisclaimers.setFechaRegistro(new Timestamp(millis));
+		return this.expenseDisclaimersRepository.save(newExpenseDisclaimers);
+	}*/
+	public ExpenseDisclaimers saveExpenseDisclaimers(ExpenseDisclaimers newExpenseDisclaimers) {
+
+		long millis = System.currentTimeMillis();
+	    UserAdm loginUser = userService.getUser(userDetailsService.getUserDetailsService().getId());
+	   // Expense expenseSelected = expenseService.getExpense(expenseId);
+	    //newExpenseDisclaimers.setEgreso(expenseSelected);
 		newExpenseDisclaimers.setUserId((int) loginUser.getId());
 		newExpenseDisclaimers.setFechaRegistro(new Timestamp(millis));
 		return this.expenseDisclaimersRepository.save(newExpenseDisclaimers);

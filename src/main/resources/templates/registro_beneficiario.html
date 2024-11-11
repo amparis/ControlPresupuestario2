@@ -19,8 +19,8 @@
                     <div>
                         <div class="p-3">
                             <div class="text-center">
-                            <h2 th:if="${beneficiary.id==0}">Register Beneficiary</h2>
-                            <h2 th:if="${beneficiary.id!=0}">Edit Beneficiary</h2>
+                            <h2 th:if="${beneficiary.id== null}">Register Beneficiary</h2>
+                            <h2 th:if="${beneficiary.id != null and beneficiary.id != 0}">Edit Beneficiary</h2>
                             </div>
                             <form class="user" th:action="@{/beneficiarios/guardar-beneficiario/0}" th:method="post" th:object="${beneficiary}">
                         
@@ -29,9 +29,10 @@
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="inputtipo" class="form-label">Beneficiary Type</label>
-											<select th:field="*{tipo}" class="form-control form-control-user" id="inputtipo" required>
-											    <option value="" th:if="${beneficiary.id == 0}">Select type</option>
+                                            <label for="inputtipoB" class="form-label">Beneficiary Type</label>
+											<select th:field="*{tipo}" class="form-control form-control-user" id="inputtipoB" required 
+													onchange="updateLabel()" th:disabled="${beneficiary.id != null}">
+											    <option value="" th:if="${beneficiary.id == null}" selected>Select type</option>
 											    <option value="Natural Person" th:selected="${beneficiary.tipo == 'Natural Person'}">Natural Person</option>
 											    <option value="Legal Entity" th:selected="${beneficiary.tipo == 'Legal Entity'}">Legal Entity</option>
 											    <option value="Staff" th:selected="${beneficiary.tipo == 'Staff'}">Staff</option>
@@ -40,7 +41,7 @@
                                     </div>
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="inputdocumento" class="form-label">Identification Document</label>
+                                            <label for="inputdocumento" class="form-label"  id = "documento"></label>
                                             <input th:field="*{documento}" type="text" class="form-control form-control-user" id="inputdocumento" placeholder="Document Number" required>
                         
                                         </div>
@@ -51,35 +52,34 @@
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="inputnombres" class="form-label">First name</label>
-                                            <input th:field="*{nombres}" type="text" class="form-control form-control-user" id="inputnombre" placeholder="Enter first name" required>
-                                        
+                                            <label for="inputnombres" class="form-label"  id ="firstName"></label>
+                                            <input th:field="*{nombres}" type="text" class="form-control form-control-user" id="inputnombre" placeholder="Enter first name" >
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="inputapellidos" class="form-label">Last Name</label>
-                                            <input th:field="*{apellidos}" type="text" class="form-control form-control-user" id="inputapellidos" placeholder="Enter Last name" required>
-                              
-                                        </div>
+                                            <label for="inputapellidos" class="form-label"  id="lastName"></label>
+                                            <input th:field="*{apellidos}" type="text" class="form-control form-control-user" id="inputapellidos" placeholder="Enter Last name" >
+                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="inputrazonSocial" class="form-label">Company Name</label>
+                                            <label for="inputrazonSocial" class="form-label"  id ="company"></label>
                                             <input th:field="*{razonSocial}" type="text" class="form-control form-control-user" id="inputrazonSocial" placeholder="Company name if applicable">
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-group">
                                             <label for="inputpaisProcedencia" class="form-label">Country origin</label>
-												<SELECT th:field ="*{paisProcedencia}" class="form-control form-control-user" id="inputpaisProcedencia"  data-show-subtext="true" data-live-search="true" required>
-												<option value="" th:if="${pais.nombre == ''}">Select country</option>
-												<OPTION th:EACH= "pais : ${paises}" 
-														th:VALUE = "${pais.nombre}" th:TEXT = "${pais.nombre}" >										 
-												</OPTION >		 
+												<SELECT th:field ="*{pais}" class="form-control form-control-user" id="inputpaisProcedencia"  
+													data-show-subtext="true" data-live-search="true" required>
+												<option value="" selected>Select country</option>
+								                  <option th:each="paiss : ${paisesBeneficiary}"
+								                  		  th:value="${paiss.id}" 
+								                  		  th:text="${paiss.nombre}">
+								                  </option>	 
 											</SELECT>  
                                         </div>
                                     </div>
@@ -88,8 +88,8 @@
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="inputemail" class="form-label">Email</label>
-                                            <input th:field="*{email}" type="email" class="form-control form-control-user" id="inputemail" placeholder="example@gmail.com" required>
+                                            <label for="inputemail" class="form-label" id = "email"></label>
+                                            <input th:field="*{email}" type="email" class="form-control form-control-user" id="inputemail" placeholder="example@gmail.com" >
                                         </div>
                                     </div>
                                     <div class="col">
@@ -137,6 +137,57 @@
             <footer th:replace="design/footerBar :: footerbar"></footer>
             <!-- End of Footer -->
     <div th:replace="design/script :: scripts"></div>
+ <script>
+    function updateLabel() {
+        const select = document.getElementById("inputtipoB");
+        const label = document.getElementById("documento");
+        const labelF = document.getElementById("firstName");
+        const labelL = document.getElementById("lastName");
+        const labelE = document.getElementById("email");
+        const labelC = document.getElementById("company");
+        
+        if (select.value === "Staff") {
+            label.textContent = "Identification Document (*)";
+            labelF.textContent ="First Name (*)";
+            labelL.textContent ="Last Name (*)";
+            labelE.textContent = "Email (*)";
+            labelC.textContent = "Company Name";
+            document.getElementById("inputnombre").required=true;
+            document.getElementById("inputapellidos").required=true;
+            document.getElementById("inputrazonSocial").required=false;
+            document.getElementById("inputemail").required=true;
+            
+            
+        } else if  (select.value === "Legal Entity"){
+        	
+            label.textContent = "Number Identification of Company (*)";
+            labelF.textContent ="First Name (Legal representative)";
+            labelL.textContent ="Last Name (Legal representative)";
+            labelE.textContent = "Email";
+            labelC.textContent = "Company Name (*)";
+            document.getElementById("inputnombre").required=false;
+            document.getElementById("inputapellidos").required=false;
+            document.getElementById("inputrazonSocial").required=true;
+            document.getElementById("inputemail").required=false;
+        }
+        else
+        	{
+            label.textContent = "Identification Document (*)";
+            labelF.textContent ="First Name (*)";
+            labelL.textContent ="Last Name (*)";
+            labelE.textContent = "Email";
+            labelC.textContent = "Company Name";
+            document.getElementById("inputnombre").required=true;
+            document.getElementById("inputapellidos").required=true;
+            document.getElementById("inputrazonSocial").required=false;
+            document.getElementById("inputemail").required=false;
+        	}
+    }
+
+    // Call updateLabel on page load to set the label correctly if editing an existing record
+    window.onload = updateLabel;
+</script>
+    
 </body>
 </html>
 

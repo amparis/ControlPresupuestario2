@@ -80,7 +80,7 @@
                             <h2 th:if="${income.id == null}">Repayment Register</h2>
                             <h2 th:if="${income.id != null and income.id != 0}">Repayment Edit</h2>
                         </div>
-                        <form id="miFormulario"  class="user" th:action="@{/incomes/guardar-prestamo}" th:method="post" th:object="${income}">
+                        <form id="miFormulario"  class="user" th:action="@{/incomes/guardar-devolucion}" th:method="post" th:object="${income}">
                             <input type="hidden" th:if="${income.id!=0}" th:field="*{id}" th:value="${income.id}">
                                <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
 									
@@ -91,30 +91,40 @@
  			                                <table class="table table-bordered " id="dataTableLoans" width="95%" cellspacing="0">
 			                                    <thead>
 			                                        <tr>
-			                                        	<th class="row-details">Date</th>
-			                                        	<th class="row-details">Concept</th>
-			                                        	<th class="row-details">Amount</th>
-			                                         	<th class="row-details">Recurring Amount</th>
-			                                         	<th class="row-details">Non-recurring Amount</th>                                        	                                       	
+			                                        	<th class="row-details">Creditor Project name</th>
+			            			                    <th class="row-details">Amount received</th>
+			                                         	<th class="row-details">Amount repayment</th>
+			                                         	<th class="row-details">Amount pending</th>                                        	                                       	
 			                                        	<th>  </th>
 			                                        </tr>
 			                                    </thead>
 			                                    <tbody>
 			                                        <tr th:each="loanReceived : ${loansReceived}">
-													<td class="row-details" th:text="${#dates.format(loanReceived.fecha, 'MM/dd/yy')}"></td>                                        
-			                                        <td class="row-details" th:text="${loanReceived.concepto}"></td>
-													<td class="td-montos row-details " th:classappend="${loanReceived.monto < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(loanReceived.monto *(-1), 1, 'COMMA', 2, 'POINT')}"></td>
-													<td class="td-montos row-details" th:classappend="${loanReceived.montoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(loanReceived.montoRecurrente *(-1), 1, 'COMMA', 2, 'POINT')}"></td>
-													<td class="td-montos row-details" th:classappend="${loanReceived.montoNoRecurrente < 0} ? 'text-negativo' : ''" th:text="${#numbers.formatDecimal(loanReceived.montoNoRecurrente *(-1), 1, 'COMMA', 2, 'POINT')}"></td>
+														<td class=" row-details" 
+														    th:text="${loanReceived.nombre}" >
+														</td>
+													    <td class="td-montos row-details" 
+													        th:classappend="${loanReceived.prestado*(-1) < 0} ? 'text-negativo' : ''" 
+													        th:text="${#numbers.formatDecimal(loanReceived.prestado*(-1), 1, 'COMMA', 2, 'POINT')}">
+													    </td>
+													    <td class="td-montos row-details" 
+													        th:classappend="${loanReceived.devuelto*(-1) < 0} ? 'text-negativo' : ''" 
+													        th:text="${#numbers.formatDecimal(loanReceived.devuelto*(-1), 1, 'COMMA', 2, 'POINT')}">
+													    </td>
+													    <td class="td-montos row-details" 
+													        th:classappend="${loanReceived.saldo < 0} ? 'text-negativo' : ''" 
+													        th:text="${#numbers.formatDecimal(loanReceived.saldo*(-1), 1, 'COMMA', 2, 'POINT')}">
+													    </td>
+
 			                    					<td class="row-details" >
 													<button type="button" class="btn btn-info" 
-												        th:id="'btn-' + ${loanReceived.id}"
-												        th:data-id="${loanReceived.proyecto.id}"
-												        th:data-project="${loanReceived.proyecto.nombre}"
-												        th:data-cuenta="${loanReceived.account.id}"
-												        th:data-cuentaNombre="${loanReceived.account.nameBank}"
-												        th:data-concepto="|${loanReceived.concepto}|"
-												        th:data-monto="|${loanReceived.monto}|"
+												      th:if="${loanReceived.saldo*(-1) > 0}"
+												        th:data-id="${loanReceived.proyectoId}"
+												        th:data-project="${loanReceived.nombre}"
+												        th:data-cuenta="${loanReceived.cuentaId}"
+												        th:data-cuentaNombre="${loanReceived.nameBank}"
+														th:data-monto="|${loanReceived.saldo}|"
+														
 												        onclick="selectLoanRow(this)">
 												    Choose
 													</button>
@@ -123,13 +133,14 @@
 										    </td>
 			                                       </tr>
 			                                    </tbody>
-			                                </table>   
+			                                </table> 
+			                                  
 	                            </div>
                             </div>
                             <div class="row">
 	                            <div class="col">
                                 		
-                                		<input type="hidden" id="inputcuentaOrigen" name="inputcuentaOrigen" value="1">
+                                		<input type="hidden" id="inputcuentaOrigen" name="inputcuentaOrigen" >
 									    <select id="cuentaSelect" class="form-control" name="cuentaSelect" required onchange="updateTotalAmount(); calculateMontos();">
 									        <option value="0" disabled selected>Select account</option>
 									        <option th:each="cuenta : ${saldosCuenta}" 
@@ -174,7 +185,7 @@
 										<div class="row-header-montos">
 											<div class="col">
 	                             			    <input type="hidden" id="inputproyectoAcreedor" name="inputproyectoAcreedor" value="0">   
-	                            			    <input type="hidden" id="inputcuentaAcreedor" name="inputcuentaOrigen" value="0"> 
+	                            			    <input type="hidden" id="inputcuentaAcreedor" name="inputcuentaAcreedor" value="0"> 
 				                                <input type="hidden" id="inputMontoPrestadoSeleccionado" name="inputMontoPrestadoSeleccionado" value="0">  
 												<strong>Creditor Project</strong>
 												<p class="p-header" id="nombreProyectoAcreedor">---</p>	

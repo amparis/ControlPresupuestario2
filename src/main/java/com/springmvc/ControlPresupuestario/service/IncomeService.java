@@ -1,6 +1,8 @@
 package com.springmvc.ControlPresupuestario.service;
 
 import java.sql.Timestamp;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.springmvc.ControlPresupuestario.model.Income;
+import com.springmvc.ControlPresupuestario.model.LoanReturnDTO;
+import com.springmvc.ControlPresupuestario.model.LoanSummaryDTO;
 import com.springmvc.ControlPresupuestario.model.PaymentPlan;
 import com.springmvc.ControlPresupuestario.model.Account;
 import com.springmvc.ControlPresupuestario.model.AccountBalanceDTO;
@@ -83,11 +87,72 @@ public class IncomeService {
     	return this.incomeRepository.findAllSaldosAndAccountByProjectId(projectId);
     }
     //OBTENER LISTA DE PRESTAMOS RECIBIDOS POR PROYECTO
-    public  List<Income> getLoansReceivedByProjectId(long projectId){
+    /*public  List<Object[]>      getLoanSummaryByProject(long projectId){
     	
-    	return this.incomeRepository.findLoansReceivedByProjectId(projectId);
+    	//return this.incomeRepository.findLoanSummaryByProject(projectId);
+    	return this.incomeRepository.findLoanReturnSummaryByLoanId(projectId);
+    }*/
+    /*
+    	public List<LoanSummaryDTO> getLoanSummaryByProject(Long prestamoId) {
+    	    List<Object[]> rawData = incomeRepository.findLoanReturnSummaryByLoanId(prestamoId);
+    	    List<LoanSummaryDTO> loanSummaries = new ArrayList<>();
+
+    	    for (Object[] row : rawData) {
+    	        LoanSummaryDTO dto = new LoanSummaryDTO();
+    	        dto.setPrestamoId((Long) row[0]);
+    	        dto.setPrestado(row[1] != null ? (Double) row[1] : 0.0);
+    	        dto.setProyectoId((Long) row[2]);
+    	        dto.setNombre((String) row[3]);
+    	        dto.setCuentaId((Long) row[4]);
+    	        dto.setNameBank((String) row[5]);
+    	        dto.setDevuelto(row[6] != null ? (Double) row[6] : 0.0);
+    	        dto.setSaldo(row[7] != null ? (Double) row[7] : 0.0);
+
+    	        loanSummaries.add(dto);
+    	    }
+
+    	    return loanSummaries;
+    	}*/
+    /*public List<LoanSummaryDTO> getLoanSummaryByLoanId(Long prestamoId) {
+        // Obtener el monto prestado (podría haber múltiples resultados)
+        Lng) row[5]; // Nombre del banco
+
+            // Encontrar el monto devuelto correspondiente al proyectoId actual
+            Double devuelto = 0.0;
+            for (LoanReturnDTO devueltoData : devueltoDataList) {
+                if (proyectoId.equals(devueltoData.getPrestamoId())) {
+                    devuelto = devueltoData.getDevuelto();
+                    break;
+                }
+            }
+
+            // Calcular el saldo
+            Double saldo = prestado - devuelto;
+
+            // Crear el DTO para este resultado
+            LoanSummaryDTO summary = new LoanSummaryDTO();
+            summary.setPrestamoId(prestamoId);
+            summary.setPrestado(prestado);
+            summary.setProyectoId(proyectoId);
+            summary.setNombre(nombre);
+            summary.setCuentaId(cuentaId);
+            summary.setNameBank(nameBank);
+            summary.setDevuelto(devuelto);
+            summary.setSaldo(saldo);
+
+            // Añadir a la lista de resultados
+            summaryList.add(summary);
+        }/*
+
+        return summaryList;
     }
-    public List<AccountBalanceDTO> getAllSaldosAndAccountByProjectId(Long projectId) {
+
+
+
+
+
+
+    /*public List<AccountBalanceDTO> getAllSaldosAndAccountByProjectId(Long projectId) {
         List<Object[]> results = incomeRepository.findAllSaldosAndAccountByProjectId(projectId);
         List<AccountBalanceDTO> saldosCuenta = new ArrayList<>();
 
@@ -103,9 +168,72 @@ public class IncomeService {
         }
 
         return saldosCuenta;
-    }
+    }*/
 	//public Income getIncomeById(Long id);
+    
+    public List<LoanSummaryDTO> getLoanSummariesByLoanId(Integer prestamoId) {
+        List<Object[]> resultList = incomeRepository.findLoanAmountByLoanId(prestamoId);
+        List<LoanSummaryDTO> loanSummaryList = new ArrayList<>();
+
+        for (Object[] row : resultList) {
+            // Mapea las columnas de la función a variables
+            BigInteger prestamoIdResult = (BigInteger) row[0];
+            BigDecimal   prestado = (BigDecimal ) row[1];
+            Integer proyectoId = (Integer) row[2];
+            String nombre = (String) row[3];
+            Integer cuentaId = (Integer) row[4];
+            String nameBank = (String) row[5];
+            BigDecimal  devuelto = (BigDecimal ) row[6];
+            BigDecimal  saldo = (BigDecimal ) row[7];
+ 
+            // Crear el DTO y establecer los datos
+            LoanSummaryDTO summary = new LoanSummaryDTO();
+            summary.setPrestamoId(prestamoIdResult);
+            summary.setPrestado(prestado);
+            summary.setProyectoId(proyectoId);
+            summary.setNombre(nombre);
+            summary.setCuentaId(cuentaId);
+            summary.setNameBank(nameBank);
+            summary.setDevuelto(devuelto);
+            summary.setSaldo(saldo);
+            loanSummaryList.add(summary);
+        }
+
+        return loanSummaryList;
+    }
 	
+    public List<LoanSummaryDTO> getLoanSummariesByProyectoCreditorId(Integer prestamoId) {
+        List<Object[]> resultList = incomeRepository.findLoanAmountByProyectoCreditorId(prestamoId);
+        List<LoanSummaryDTO> loanSummaryList = new ArrayList<>();
+
+        for (Object[] row : resultList) {
+            // Mapea las columnas de la función a variables
+            BigInteger prestamoIdResult = (BigInteger) row[0];
+            BigDecimal   prestado = (BigDecimal ) row[1];
+            Integer proyectoId = (Integer) row[2];
+            String nombre = (String) row[3];
+            Integer cuentaId = (Integer) row[4];
+            String nameBank = (String) row[5];
+            BigDecimal  devuelto = (BigDecimal ) row[6];
+            BigDecimal  saldo = (BigDecimal ) row[7];
+ 
+            // Crear el DTO y establecer los datos
+            LoanSummaryDTO summary = new LoanSummaryDTO();
+            summary.setPrestamoId(prestamoIdResult);
+            summary.setPrestado(prestado);
+            summary.setProyectoId(proyectoId);
+            summary.setNombre(nombre);
+            summary.setCuentaId(cuentaId);
+            summary.setNameBank(nameBank);
+            summary.setDevuelto(devuelto);
+            summary.setSaldo(saldo);
+            loanSummaryList.add(summary);
+        }
+
+        return loanSummaryList;
+    }
+	
+
 	public Income saveIncome(Income newIncome, long projectId,Double montoTask, long pagoSelected ) {
 		long millis = System.currentTimeMillis();
 		   

@@ -74,164 +74,217 @@
 								<hr>
 	
 							</div>
-							
 						</div>                    
-                        <div class="text-center">
-                       
-                            <h2 th:if="${income.id == null}">Loan Register</h2>
-                            <h2 th:if="${income.id != null and income.id != 0}">Loan Edit</h2>
-                        </div>
-                        <form id="miFormulario"  class="user" th:action="@{/incomes/guardar-prestamo}" th:method="post" th:object="${income}"  onsubmit="return validateForm()">
-                            <input type="hidden" th:if="${income.id!=0}" th:field="*{id}" th:value="${income.id}">
-                            <div class="form-group">
-                                <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
-                            </div>
-                            <div class="row">
-	                            <div class="col">
-                                		<label for="inputaccount" class="form-label">Origin Account:</label>
-                                		 <input type="hidden" id="inputcuentaOrigen" name="inputcuentaOrigen" value="1">
-									    <select id="cuentaSelect" class="form-control" name="cuentaSelect" required onchange="updateTotalAmount(); calculateMontos();">
-									        <option value="0" disabled selected>Select account</option>
-									        <option th:each="cuenta : ${saldosCuenta}" 
-											        th:value="${cuenta[0]}"
-											        th:data-total="${cuenta[3]}" 
-											        th:data-recurring="${cuenta[4]}" 
-											        th:data-non-recurring="${cuenta[5]}"
-											        th:text="${cuenta[2] + ' - ' + cuenta[1] + ' - Total: ' + #numbers.formatDecimal(cuenta[3], 1, 'COMMA', 2, 'POINT')}">
-									        </option>
-									    </select>
-		                        	    
-										<div class="row-header-montos">
-											<div class="col">
-												<strong>Contract Amount (USD)</strong>
-										        <p class="p-header" id="totalAmount">$##.##</p>
-										        <input type="hidden" id="inputTotalAmountOrigin" name="inputTotalAmountOrigin">
-				
-											</div>
-										</div>	
-										<div class="row-header-montos">
-											<div class="col-6">
-												<strong> Recurring Amount (USD)&nbsp;&nbsp;
-												</strong>
-												<p class="p-header"  id="totalRecurringAmountOrigin" >$##.##</p>
-												<input type="hidden" id="inputTotalRecurringAmountOrigin" name="inputTotalRecurringAmountOrigin">
-											</div>
-											<div class="col-6">
-												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
-												<p  class="p-header"  id="totalNonRecurringAmountOrigin">$##.##</p>
-												 <input type="hidden"  id="inputTotalNonRecurringAmountOrigin" name="inputTotalNonRecurringAmountOrigin">
-											</div>								
-										</div>	
-									                        
-	                            </div>
-	                            <div class="col">
-		                            <div class="form-group">
-		                                <label for="inputaccount" class="form-label">Destiny Project</label>
-		                                <select class="form-control" id="inputProjectDestiny" name ="inputProjectDestiny" required >
-		                                    <option value="0" disabled selected>Select Project</option>
-		                                    <option th:each="projectDestiny : ${projectsDestiny}" 
-		                  		                    th:if ="${projectDestiny!= null and projectDestiny.id != project.id}"
-		                                    		th:value="${projectDestiny.id}"
-		                                            th:text="${projectDestiny.nombre}" >
-		                                    </option>
-		                                </select>
-		                                <label for="inputaccount" class="form-label">Destiny Account</label>
-		                                <select class="form-control" id="inputAccountDestiny" name ="inputAccountDestiny" required onchange="checkCuentaSelection()">
-		                                	<option value="0" disabled selected>Select account</option>
-		                                    <option th:each="cuentaDestiny : ${cuentasDestiny}" 
-		                                    		th:value="${cuentaDestiny.id}"
-		                                            th:text="${cuentaDestiny.accountNumber +' ' +cuentaDestiny.nameBank}" >
-		                                    </option>
-		                                </select>
-		                                <input type="hidden" id="cuentaDestinyInput" name="cuentaDestinyInput">
-		                             </div>	                            
-	                            </div>	                            
-                            </div>
-                            <div class="row">
-	                            <div class="col">                            
-		                            <div class="form-group row">
-		                                <div class="col-sm-6 mb-3 mb-sm-0">
-		                                <label for="inputfecha" class="form-label">Loan Date</label>
-		                                <input th:field="*{fecha}" type="date" class="form-control form-control-user"
-		                                           id="inputfecha"  value="Mark" required>
-		                                </div>
-		                            </div>
-		                        </div>	  
-		                        <div class="col">
-		                           <div class="form-group">
-		                                <label for="inputdescripcion" class="form-label">Concept</label>
-		                                <input th:field="*{concepto}" type="text" class="form-control form-control-user"
-		                                       id="inputconcepto"
-		                                       placeholder="Concept of loan"  required>
-		                            </div>
+						<!-- Pestañas -->
+	                    <ul class="nav nav-tabs" role="tablist">
+	                        <li class="nav-item">
+	                            <a class="nav-link active" data-toggle="tab" href="#tab1">Register</a>
+	                        </li>
+	                        <li class="nav-item">
+	                            <a class="nav-link" data-toggle="tab" href="#tab2">Historical</a>
+	                        </li>
+	                    </ul>
+	                    <!-- Contenido de las pestañas -->
+                        <div class="tab-content">
+                             <!-- Tab 1: Incomes -->
+                            <div id="tab1" class="container tab-pane active">
+		                       <div class="text-center">
+		                       
+		                            <h2 th:if="${income.id == null}">Loan Register</h2>
+		                            <h2 th:if="${income.id != null and income.id != 0}">Loan Edit</h2>
 		                        </div>
-		                    </div>
-                            <div class="row">
-	                            <div class="col">
+		                        <form id="miFormulario"  class="user" th:action="@{/incomes/guardar-prestamo}" th:method="post" th:object="${income}"  onsubmit="return validateForm()">
+		                            <input type="hidden" th:if="${income.id!=0}" th:field="*{id}" th:value="${income.id}">
 		                            <div class="form-group">
-		                                <label for="inputmonto" class="form-label">Loan Amount</label>
-		                                <input th:field="*{monto}" type="number" step="0.01" class="form-control form-control-user"
-		                                       id="inputmonto"   placeholder="0.00"  min="1" oninput="updateNonRecurring()" onchange="calculateMontos()">
-		                                       
-		                                <small id="errorMonto" class="text-danger" style="display: none;">The amount cannot be less than 0</small>
-		                                						<!-- Display error message if validation fails -->
-										<div id="error-message" style="color:red; display:none;">Loan amount cannot be greater than total Non-recurring amount.</div>
-						                                
-								        </div>                            
-	                            </div>
-	                            <div class="col">
-						                <label for="inputmonto" class="form-label">Task Amount</label>
-						                <input  type="number" step="0.01" class="form-control form-control-user"
-				                               id="inputmontoTask" name="inputmontoTask" placeholder="0.00"  min="0" value="0" style="display: none;">	                            
-	                            </div>
-                          
-                            </div>
-                            <div class="row">
-	                            <div class="col">
-		                            <div class="form-group">
-				                        <label for="inputsaldo" class="form-label">The balance of the amount remains of the selected project</label>
-		                                 <!-- Input for 'AJUSTADO APLICANDO EL PRESTAMO' -->
-					                    
-		                            </div>	      
-		                				<div class="row-header-montos">
-											<div class="col-3">
-											</div>
-											<div class="col-6 ">
-												<strong>Contract Amount (USD)</strong>
-												<input type="text" step="0.01" class="form-control form-control-user td-montos" id="inputmontoSaldo" placeholder="0.00" min="0" readonly>
-											</div>		
-											<div class="col-3">
-											</div>
-										</div>	
-										<div class="row-header-montos">
-											<div class="col-6">
-												<strong> Recurring Amount (USD)&nbsp;&nbsp;
-												</strong>
-												<input type="text" step="0.01" class="form-control form-control-user td-montos" id="inputmontoRecurrenteSaldo" placeholder="0.00" min="0"readonly> 
-											</div>
-											<div class="col-6">
-												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
-												 <input type="text" step="0.01" class="form-control form-control-user td-montos" id="inputmontoNoRecurrenteSaldo" placeholder="0.00" min="0"  readonly> 
-											</div>								
-										</div>		                            
-		                                                  
-	                            </div>
+		                                <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
+		                            </div>
+		                            <div class="row">
+			                            <div class="col">
+		                                		<label for="inputaccount" class="form-label">Origin Account:</label>
+		                                		 <input type="hidden" id="inputcuentaOrigen" name="inputcuentaOrigen" value="1">
+											    <select id="cuentaSelect" class="form-control" name="cuentaSelect" required onchange="updateTotalAmount(); calculateMontos();">
+											        <option value="0" disabled selected>Select account</option>
+											        <option th:each="cuenta : ${saldosCuenta}" 
+													        th:value="${cuenta[0]}"
+													        th:data-total="${cuenta[3]}" 
+													        th:data-recurring="${cuenta[4]}" 
+													        th:data-non-recurring="${cuenta[5]}"
+													        th:text="${cuenta[2] + ' - ' + cuenta[1] + ' - Total: ' + #numbers.formatDecimal(cuenta[3], 1, 'COMMA', 2, 'POINT')}">
+											        </option>
+											    </select>
+				                        	    
+												<div class="row-header-montos">
+													<div class="col">
+														<strong>Contract Amount (USD)</strong>
+												        <p class="p-header" id="totalAmount">$##.##</p>
+												        <input type="hidden" id="inputTotalAmountOrigin" name="inputTotalAmountOrigin">
+						
+													</div>
+												</div>	
+												<div class="row-header-montos">
+													<div class="col-6">
+														<strong> Recurring Amount (USD)&nbsp;&nbsp;
+														</strong>
+														<p class="p-header"  id="totalRecurringAmountOrigin" >$##.##</p>
+														<input type="hidden" id="inputTotalRecurringAmountOrigin" name="inputTotalRecurringAmountOrigin">
+													</div>
+													<div class="col-6">
+														<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+														<p  class="p-header"  id="totalNonRecurringAmountOrigin">$##.##</p>
+														 <input type="hidden"  id="inputTotalNonRecurringAmountOrigin" name="inputTotalNonRecurringAmountOrigin">
+													</div>								
+												</div>	
+											                        
+			                            </div>
+			                            <div class="col">
+				                            <div class="form-group">
+				                                <label for="inputaccount" class="form-label">Destiny Project</label>
+				                                <select class="form-control" id="inputProjectDestiny" name ="inputProjectDestiny" required >
+				                                    <option value="0" disabled selected>Select Project</option>
+				                                    <option th:each="projectDestiny : ${projectsDestiny}" 
+				                  		                    th:if ="${projectDestiny!= null and projectDestiny.id != project.id}"
+				                                    		th:value="${projectDestiny.id}"
+				                                            th:text="${projectDestiny.nombre}" >
+				                                    </option>
+				                                </select>
+				                                <label for="inputaccount" class="form-label">Destiny Account</label>
+				                                <select class="form-control" id="inputAccountDestiny" name ="inputAccountDestiny" required onchange="checkCuentaSelection()">
+				                                	<option value="0" disabled selected>Select account</option>
+				                                    <option th:each="cuentaDestiny : ${cuentasDestiny}" 
+				                                    		th:value="${cuentaDestiny.id}"
+				                                            th:text="${cuentaDestiny.accountNumber +' ' +cuentaDestiny.nameBank}" >
+				                                    </option>
+				                                </select>
+				                                <input type="hidden" id="cuentaDestinyInput" name="cuentaDestinyInput">
+				                             </div>	                            
+			                            </div>	                            
+		                            </div>
+		                            <div class="row">
+			                            <div class="col">                            
+				                            <div class="form-group row">
+				                                <div class="col-sm-6 mb-3 mb-sm-0">
+				                                <label for="inputfecha" class="form-label">Loan Date</label>
+				                                <input th:field="*{fecha}" type="date" class="form-control form-control-user"
+				                                           id="inputfecha"  value="Mark" required>
+				                                </div>
+				                            </div>
+				                        </div>	  
+				                        <div class="col">
+				                           <div class="form-group">
+				                                <label for="inputdescripcion" class="form-label">Concept</label>
+				                                <input th:field="*{concepto}" type="text" class="form-control form-control-user"
+				                                       id="inputconcepto"
+				                                       placeholder="Concept of loan"  required>
+				                            </div>
+				                        </div>
+				                    </div>
+		                            <div class="row">
+			                            <div class="col">
+				                            <div class="form-group">
+				                                <label for="inputmonto" class="form-label">Loan Amount</label>
+				                                <input th:field="*{monto}" type="number" step="0.01" class="form-control form-control-user"
+				                                       id="inputmonto"   placeholder="0.00"  min="1" oninput="updateNonRecurring()" onchange="calculateMontos()">
+				                                       
+				                                <small id="errorMonto" class="text-danger" style="display: none;">The amount cannot be less than 0</small>
+				                                						<!-- Display error message if validation fails -->
+												<div id="error-message" style="color:red; display:none;">Loan amount cannot be greater than total Non-recurring amount.</div>
+								                                
+										        </div>                            
+			                            </div>
+			                            <div class="col">
+								                <label for="inputmonto" class="form-label">Task Amount</label>
+								                <input  type="number" step="0.01" class="form-control form-control-user"
+						                               id="inputmontoTask" name="inputmontoTask" placeholder="0.00"  min="0" value="0" style="display: none;">	                            
+			                            </div>
+		                          
+		                            </div>
+		                            <div class="row">
+			                            <div class="col">
+				                            <div class="form-group">
+						                        <label for="inputsaldo" class="form-label">The balance of the amount remains of the selected project</label>
+				                                 <!-- Input for 'AJUSTADO APLICANDO EL PRESTAMO' -->
+							                    
+				                            </div>	      
+				                				<div class="row-header-montos">
+													<div class="col-3">
+													</div>
+													<div class="col-6 ">
+														<strong>Contract Amount (USD)</strong>
+														<input type="text" step="0.01" class="form-control form-control-user td-montos" id="inputmontoSaldo" placeholder="0.00" min="0" readonly>
+													</div>		
+													<div class="col-3">
+													</div>
+												</div>	
+												<div class="row-header-montos">
+													<div class="col-6">
+														<strong> Recurring Amount (USD)&nbsp;&nbsp;
+														</strong>
+														<input type="text" step="0.01" class="form-control form-control-user td-montos" id="inputmontoRecurrenteSaldo" placeholder="0.00" min="0"readonly> 
+													</div>
+													<div class="col-6">
+														<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+														 <input type="text" step="0.01" class="form-control form-control-user td-montos" id="inputmontoNoRecurrenteSaldo" placeholder="0.00" min="0"  readonly> 
+													</div>								
+												</div>		                            
+				                                                  
+			                            </div>
+		                            
+			                            <div class="col">
+			                            </div>
+			                        </div>                          
+						 							<!-- Mostrar mensaje de error si existe -->
+		                            <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
+		                                <p th:text="${error}"></p>
+		                            </div>
+		                             <button id="saveLoanBtn" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" onclick="showOverlay()" disabled>
+		                                SAVE LOAN
+		                             </button>
+									<div class="text-center">
+		                                <a class="medium" th:href="@{/ejecucion/registro-ejecucion/{id}(id=${project.id})}">GO BACK</a>
+		                            </div>
+		                        </form>
                             
-	                            <div class="col">
-	                            </div>
-	                        </div>                          
-				 							<!-- Mostrar mensaje de error si existe -->
-                            <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
-                                <p th:text="${error}"></p>
                             </div>
-                             <button id="saveLoanBtn" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" onclick="showOverlay()" disabled>
-                                SAVE LOAN
-                             </button>
-							<div class="text-center">
-                                <a class="medium" th:href="@{/ejecucion/registro-ejecucion/{id}(id=${project.id})}">GO BACK</a>
-                            </div>
-                        </form>
-
+                        	<!-- Tab 2: Expenses -->
+							<div id="tab2" class="container tab-pane fade">
+	                            <div class="row">
+		                            <div class="col">
+	                                		<label for="inputaccount" class="form-label">LOANS MADE:</label>
+	 			                                <table class="table table-bordered " id="dataTableLoans" width="95%" cellspacing="0">
+				                                    <thead>
+				                                        <tr>
+				                                        	<th class="row-details">Loaned Project name</th>
+				            			                    <th class="row-details">Amount loaned</th>
+				                                         	<th class="row-details">Amount repayment</th>
+				                                         	<th class="row-details">Amount pending</th>                                        	                                       	
+				                                        </tr>
+				                                    </thead>
+				                                    <tbody>
+				                                        <tr th:each="loanReceived : ${loansReceived}">
+															<td class=" row-details" 
+															    th:text="${loanReceived.nombre}" >
+															</td>
+														    <td class="td-montos row-details" 
+														        th:classappend="${loanReceived.prestado*(-1) < 0} ? 'text-negativo' : ''" 
+														        th:text="${#numbers.formatDecimal(loanReceived.prestado*(-1), 1, 'COMMA', 2, 'POINT')}">
+														    </td>
+														    <td class="td-montos row-details" 
+														        th:classappend="${loanReceived.devuelto*(-1) < 0} ? 'text-negativo' : ''" 
+														        th:text="${#numbers.formatDecimal(loanReceived.devuelto*(-1), 1, 'COMMA', 2, 'POINT')}">
+														    </td>
+														    <td class="td-montos row-details" 
+														        th:classappend="${loanReceived.saldo < 0} ? 'text-negativo' : ''" 
+														        th:text="${#numbers.formatDecimal(loanReceived.saldo*(-1), 1, 'COMMA', 2, 'POINT')}">
+														    </td>
+				                                       </tr>
+				                                    </tbody>
+				                                </table> 
+				                                  
+		                            </div>
+	                            </div>							
+							</div>
+						</div>
+ 
                     </div>
                 </div>
             </div>

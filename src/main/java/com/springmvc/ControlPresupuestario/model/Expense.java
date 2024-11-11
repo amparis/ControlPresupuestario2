@@ -8,6 +8,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,6 +60,7 @@ public class Expense {
     @Column(name = "egre_fecha_inicio")
     private Date fechaInicio;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "egre_fecha_fin")
     private Date fechaFin;
 
@@ -86,8 +89,12 @@ public class Expense {
     @JoinColumn(name = "uni_id")
     private UnitOfMeasurement unidadMedida;
 
-    @Column(name = "egre_pais", length = 250)
-    private String pais;
+    //@Column(name = "egre_pais", length = 250)
+    //private String pais;
+    
+    @ManyToOne
+    @JoinColumn(name = "pais_id")
+    private Country pais;
 
     @Column(name = "egre_fecha")
     private Date fecha;
@@ -353,23 +360,27 @@ public class Expense {
 
 	/**
 	 * @return the pais
-	 */
+	 
 	public String getPais() {
 		return pais;
 	}
-
-	/**
-	 * @param pais the pais to set
-	 */
 	public void setPais(String pais) {
 		this.pais = pais;
-	}
+	}*/
 
 	/**
 	 * @return the fecha
 	 */
 	public Date getFecha() {
 		return fecha;
+	}
+
+	public Country getPais() {
+		return pais;
+	}
+
+	public void setPais(Country pais) {
+		this.pais = pais;
 	}
 
 	/**

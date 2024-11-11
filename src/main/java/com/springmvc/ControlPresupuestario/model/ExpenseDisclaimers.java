@@ -72,6 +72,9 @@ public class ExpenseDisclaimers {
 
 	    @Column(name = "gas_cantidad_pagos")
 	    private Integer cantidadPagos;
+	    
+	    @Column(name = "gas_attach", columnDefinition = "text")
+	    private String attach;
 
 		/**
 		 * @return the id
@@ -269,5 +272,18 @@ public class ExpenseDisclaimers {
 			this.cantidadPagos = cantidadPagos;
 		}
 
-	    
+		/**
+		 * @return the attach
+		 */
+		public String getAttach() {
+			return attach;
+		}
+
+		/**
+		 * @param attach the attach to set
+		 */
+		public void setAttach(String attach) {
+			this.attach = attach;
+		}
+
 }

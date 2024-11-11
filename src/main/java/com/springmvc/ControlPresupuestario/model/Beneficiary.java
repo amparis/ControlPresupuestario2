@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
@@ -47,8 +49,9 @@ public class Beneficiary {
     @Column(name = "ben_observacion", length = 1024)
     private String observacion;
 
-    @Column(name = "ben_pais_procedencia", length = 50)
-    private String paisProcedencia;
+    @ManyToOne
+    @JoinColumn(name = "pais_id")
+    private Country pais;
 
     @Column(name = "ben_email", length = 100)
     private String email;
@@ -134,13 +137,6 @@ public class Beneficiary {
         this.observacion = observacion;
     }
 
-    public String getPaisProcedencia() {
-        return paisProcedencia;
-    }
-
-    public void setPaisProcedencia(String paisProcedencia) {
-        this.paisProcedencia = paisProcedencia;
-    }
 
     public String getEmail() {
         return email;
@@ -173,5 +169,16 @@ public class Beneficiary {
     public void setFechaIngreso(Date fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
+
+
+	public Country getPais() {
+		return pais;
+	}
+
+
+	public void setPais(Country pais) {
+		this.pais = pais;
+	}
+    
     
 }

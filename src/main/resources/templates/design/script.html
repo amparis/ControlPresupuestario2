@@ -41,7 +41,15 @@ function showOverlay() {
     document.getElementById('overlay').style.display = 'flex';
 }
 </script>
+<script>
 
+// Llama a esta función para actualizar el valor antes de enviar el formulario
+function prepareMonto(elementId) {
+	
+    const element = document.getElementById(elementId);
+    element.value = element.value.replace(/,/g, ''); // Elimina comas antes de enviar al servidor
+}
+</script>
 
 </div>
 </body>

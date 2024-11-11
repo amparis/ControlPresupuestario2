@@ -14,4 +14,11 @@ public interface ExpenseDisclaimersRepository extends JpaRepository<ExpenseDiscl
 
 	  @Query("SELECT ed FROM ExpenseDisclaimers ed  WHERE  ed.egreso.id = :expenseId")
 	  public List<ExpenseDisclaimers> findExpenseDisclaimersByExpenseId(long expenseId);
+	  
+	  @Query("SELECT ed FROM ExpenseDisclaimers ed  WHERE  ed.egreso.proyectoFase.proyecto.id = :projectId")
+	  public List<ExpenseDisclaimers> findExpenseDisclaimersByProjectId(Long projectId);
+	  
+	  @Query("SELECT ed FROM ExpenseDisclaimers ed  WHERE  ed.egreso.proyectoFase.proyecto.id = :projectId and ed.egreso.beneficiario.id = :beneficiaryId")
+	  public List<ExpenseDisclaimers> findExpenseDisclaimersByProjectIdAndBeneficiaryId(Long projectId, Integer beneficiaryId);
+	  
 }

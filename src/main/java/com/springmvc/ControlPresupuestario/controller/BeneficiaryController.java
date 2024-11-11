@@ -61,15 +61,41 @@ public class BeneficiaryController {
     public String showRegisterForm(Model model) {
        
         model.addAttribute("beneficiary", new Beneficiary());
-	    model.addAttribute("paises", countryService.getAllCountries()); 
-
+	    model.addAttribute("paisesBeneficiary", countryService.getAllCountries()); 
         return "registro_beneficiario"; // Nombre de la vista Thymeleaf
     }
 
     // Guardar un nuevo Beneficiario
     @PostMapping("/guardar-beneficiario/{id}")
     public String saveBeneficiary(@PathVariable("id") Integer id,@ModelAttribute Beneficiary beneficiary, RedirectAttributes redirectAttributes) {
-        try {
+    	String nom = null;
+    	String ap = null; String doc = null; String mail = null;
+    	if(beneficiary.getTipo()=="Staff") {
+        	// datos obligatorios documento, fisrt name, lastname, email
+            if (beneficiary.getNombres()==null || beneficiary.getNombres()=="") {nom = " enter the firstname."; } 
+            if (beneficiary.getApellidos()==null || beneficiary.getApellidos()=="") {ap = " enter the lastname." ;}
+            if (beneficiary.getDocumento()==null || beneficiary.getDocumento()=="") {doc = " enter the document number." ;}
+            if (beneficiary.getEmail()==null || beneficiary.getEmail()=="") {mail = " enter the email." ;}
+            
+                redirectAttributes.addFlashAttribute("message", "Please,"+nom+ap+doc+mail);
+                redirectAttributes.addFlashAttribute("messageType", "error");
+                return (id > 0) ? "redirect:/expenses/registro-egreso/" + id : "redirect:/beneficiarios/registro-beneficiario";
+           
+    	}
+    	else if(beneficiary.getTipo()=="Legal Entity")   	{
+    		// datos obligatorios numero de idetificacion, company name
+            if (beneficiary.getRazonSocial()==null || beneficiary.getRazonSocial()=="") {nom = " enter the name of company."; } 
+            if (beneficiary.getDocumento()==null || beneficiary.getDocumento()=="") {doc = " enter the document number." ;}
+            
+            redirectAttributes.addFlashAttribute("message", "Please,"+nom+doc);
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return (id > 0) ? "redirect:/expenses/registro-egreso/" + id : "redirect:/beneficiarios/registro-beneficiario";
+    	}
+    	else {
+    		
+    	}
+
+    	try {
             beneficiaryService.saveBeneficiary(beneficiary);
             redirectAttributes.addFlashAttribute("message", "Beneficiary saved successfully!");
             redirectAttributes.addFlashAttribute("messageType", "success");
@@ -86,6 +112,7 @@ public class BeneficiaryController {
     @GetMapping("/modificar-beneficiario/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
         model.addAttribute("beneficiary", beneficiaryService.getBeneficiaryById(id));
+        model.addAttribute("paisesBeneficiary", countryService.getAllCountries()); 
         return "registro_beneficiario"; // Reutilizamos el formulario de registro
     }
 

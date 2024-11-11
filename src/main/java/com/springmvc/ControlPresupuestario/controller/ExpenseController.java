@@ -40,6 +40,7 @@ import com.springmvc.ControlPresupuestario.service.ExpenditureClassificationServ
 import com.springmvc.ControlPresupuestario.service.ExpenseService;
 import com.springmvc.ControlPresupuestario.service.IMyUserDetailsService;
 import com.springmvc.ControlPresupuestario.service.MenuService;
+import com.springmvc.ControlPresupuestario.service.PaymentMethodService;
 import com.springmvc.ControlPresupuestario.service.PefilService;
 import com.springmvc.ControlPresupuestario.service.ProjectPhaseService;
 import com.springmvc.ControlPresupuestario.service.ProjectService;
@@ -79,6 +80,8 @@ public class ExpenseController {
 	ProjectPhaseService projectPhaseService;
 	@Autowired
 	ScaleService scaleService;
+	@Autowired
+	PaymentMethodService paymentMethodService;
     
 	private final String DIRECTORIO_BASE = "D:/SISTEMAS_integrales/descargosStaff";
 	
@@ -93,6 +96,7 @@ public class ExpenseController {
         model.addAttribute("beneficiaries", beneficiaryService.getAllBeneficiariesEstado("V"));
         model.addAttribute("beneficiary", new Beneficiary());
         model.addAttribute("fasesProyecto",projectPhaseService.getProjectPhasesByProyectoId(projectId));
+        model.addAttribute("paymentMethod",paymentMethodService.getAllPaymentMethods());
         model.addAttribute("cuentas", accountService.getAccounts());
         model.addAttribute("paises", countryService.getAllCountries()); 
         model.addAttribute("escalas", scaleService.getAllScalesEstado("V"));
@@ -110,24 +114,32 @@ public class ExpenseController {
             @RequestParam(required = false) Long id,
             @RequestParam(value = "inputproyectoId", required = false) long projectId,
             @RequestParam("file") MultipartFile file,  // Nuevo parámetro para el archivo
-
             RedirectAttributes redirectAttributes) {
+
+    	if (expense.getFechaFin() != null && expense.getFechaFin().toString().trim().isEmpty()) {
+    	    expense.setFechaFin(null);
+    	}
     	
-    	System.out.println(" print   id  "+projectId);
+
         // Intentar guardar el proyecto si todas las validaciones pasaron
     	try {
-            // Definir la ruta de almacenamiento
-            String uploadDir = "D:/SISTEMAS_integrales/descargosStaff/";
-            
-            // Guardar el archivo en el directorio definido
-            String fileName = file.getOriginalFilename();
-            Path path = Paths.get(uploadDir + fileName);
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-            
-            // Establecer la ruta del archivo en el objeto expense
-            expense.setAttach(uploadDir + fileName);
-            
-        	expenseService.saveExpense(expense);
+            if (!file.isEmpty()) {
+                // Definir la ruta de almacenamiento
+                String uploadDir = "D:/SISTEMAS_integrales/descargosStaff/";
+                
+                // Guardar el archivo en el directorio definido
+                String fileName = file.getOriginalFilename();
+                Path path = Paths.get(uploadDir + fileName);
+                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                
+                // Establecer la ruta del archivo en el objeto expense
+                expense.setAttach(uploadDir + fileName);
+            }
+            else
+            {
+            	expense.setAttach(null);
+            }
+            expenseService.saveExpense(expense);
 
             redirectAttributes.addFlashAttribute("message", "Expense saved success.");
             redirectAttributes.addFlashAttribute("messageType", "success");

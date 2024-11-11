@@ -67,7 +67,7 @@
                                             <td th:text="${beneficiary.nombres+' '+ (beneficiary.apellidos != null ? beneficiary.apellidos : '') }"></td>
                                             <td th:text="${beneficiary.documento}"></td>
                                             <td th:text="${beneficiary.razonSocial}"></td>
-                                            <td th:text="${beneficiary.paisProcedencia}"></td>
+                                            <td th:text="${beneficiary.pais.nombre}"></td>
                                             <td>
                                                 <span th:text="${beneficiary.estado == 'V' ? 'ACTIVE' : 'INACTIVE'}"
          							 				th:classappend="${beneficiary.estado == 'V' ? 'badge bg-success' : 'badge bg-danger'}"></span>

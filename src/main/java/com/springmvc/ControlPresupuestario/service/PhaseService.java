@@ -40,5 +40,9 @@ public class PhaseService {
     public void deletePhase(Long id) {
     	phaseRepository.deleteById(id);
     }
+    
+    public List<Phase> getPhaseByListId(List<Long> phasesId) {
 
+    	return phaseRepository.findPhaseByListId(phasesId);
+    }
 }

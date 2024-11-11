@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body class="bg-sistemasIntegrales" onload="hideMessage()">
+    <!-- Mostrar el mensaje si está presente -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+    </div>
+<div class="container" style="width: 80%;">
+    <div class="card o-hidden border-0 shadow-lg my-2">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div>
+                <div>
+                    <div class="p-3">
+                    	<div class="box box-primary">
+	 						<div class="box-header with-border">
+							<h6>PROJECT DETAILS</h6>
+							</div>
+							<div class="box-body">
+								<div class="row-header-max">
+									<div class="col-6">
+										<div class="row-header">
+											<div class="col-7">
+												<strong><i class="fa fa-book margin-r-5"></i> Project Name</strong>
+												<p class="p-header"  th:text="${project.nombre}">PROJECT IDB	</p>
+											</div>
+											<div class="col-5">
+												<strong>Country</strong>
+												<p  class="p-header"  th:text="${project.pais}">Chile</p>
+											
+											</div>
+										</div>
+										<div class="row-header">
+											<div class="col">
+												<strong>Dates</strong>
+												<p class="p-header"  th:text="${#dates.format(project.fechaInicial, 'MM/dd/yy') + ' - ' + #dates.format(project.fechaFin, 'MM/dd/yy')}"></p>
+
+											</div>
+											<div class="col">
+												<strong>Financier</strong>
+												<p class="p-header"  th:text="${project.cliente}"></p>
+
+											</div>											
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row-header-montos">
+											<div class="col">
+												<strong><i class="fa fa-money margin-r-5"></i> Contract Amount (USD)</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoContrato, 1, 'COMMA', 2, 'POINT')}">$100,000.00</p>
+											</div>
+										</div>	
+										<div class="row-header-montos">
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Recurring Amount (USD)&nbsp;&nbsp;
+														<span th:text="${#numbers.formatDecimal(project.porcentajeRecurrente, 1, 'COMMA', 2, 'POINT')}+ '%'">20.00%</span>
+												
+												</strong>
+												<p class="p-header"  th:text="${#numbers.formatDecimal(project.montoRecurrente, 1, 'COMMA', 2, 'POINT')}">$20,000.00</p>
+											</div>
+											<div class="col-6">
+												<strong><i class="fa fa-money margin-r-5"></i> Non-Recurring Amount (USD)</strong>
+												<p  class="p-header" th:text="${#numbers.formatDecimal(project.montoNoRecurrente, 1, 'COMMA', 2, 'POINT')}">$80,000.00</p>
+											</div>								
+										</div>	
+									</div>
+								</div>
+							</div>
+
+						</div>
+						<div class="box box-secondary">
+						   <div class="table-responsive">
+                                <table class="table table-descargo" id="dataTableExpenses" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="4" class="th-details-descargo">Transfers Received</th>
+                                            <th colspan="2" class="th-details-descargo">Amount in Local Currency</th>
+                                            <!-- 
+                                        	<th class="th-details-descargo">Class</th>
+                                        	<th class="th-details-descargo">Item</th>
+                                        	<th class="th-details-descargo">Dates</th>
+                                            <th class="th-details-descargo">Amount</th>
+											 -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="expense : ${expenseDescargos}">
+	                                        <td class="td-details-descargo" th:text="${expense.clasificacionEgreso.nombreClase}"></td>
+	 										<td class="td-details-descargo" th:text="${expense.cargoItem}"></td>
+	 										<td class="td-details-descargo" th:text="${#dates.format(expense.fechaInicio, 'MM/dd/yy')+' - ' +#dates.format(expense.fechaFin, 'MM/dd/yy')}"></td>  
+	                                        <td class="td-details-descargo td-montos" th:text="${#numbers.formatDecimal(expense.montoTotal, 1, 'COMMA', 2, 'POINT')+'(USD)'}">
+	                                        <td class="td-details-descargo td-montos" 
+												th:text="${#numbers.formatDecimal(expense.cambio, 1, 'COMMA', 2, 'POINT') + ' (' + (expense.pais != null ? expense.pais.codDivisa : 'N/A') + ')'}" 
+	                                        	></td>
+	                                        <td class="td-details-descargo td-montos" 
+	                                            th:text="${#numbers.formatDecimal(expense.totalLCU, 1, 'COMMA', 2, 'POINT') + ' (' + (expense.pais != null ? expense.pais.codDivisa : 'N/A') + ')'}" >
+											    ...<span th:text="${(expense.pais != null ? expense.pais.divisa : 'N/A')}">*</span>
+											</td>
+	                                         
+                                        </tr>
+
+                                    </tbody>
+										<tfoot>
+										    <tr>
+										        <td colspan="3" class="th-details-descargo text-right"><strong>Total Received:</strong></td>
+										        <td class="td-details-descargo td-montos" th:text="${#numbers.formatDecimal(totalAmountExpenses, 1, 'COMMA', 2, 'POINT')+'(USD)'}"></td>
+										        <td class="th-details-descargo text-right"><strong>Total:</strong></td>
+										        <td class="td-details-descargo td-montos" th:text="${#numbers.formatDecimal(totalAmountExpensesLCU, 1, 'COMMA', 2, 'POINT')}"></td>
+			
+										    </tr>
+										</tfoot>                                    
+                                </table>
+                            </div>
+						</div>
+						 <div class="card-header py-3">
+                            <h6>Registered expense disclaimers</h6>
+                        </div>
+				            <span th:each="menuRole : ${menuRoles}">
+								<div class="d-flex justify-content-end">
+								    <a th:href="@{/proyectos/registro-proyecto}"
+								       th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.acreate}" 
+								       class="btn btn-outline-success" 
+								       data-toggle="modal" data-target="#expenseDisclaimerModal" >
+								       <i class="fas fa-plus"></i> + New Registration
+								    </a>
+								</div>
+				            </span>		
+<div th:each="expenseGroup : ${gastoDescargosGroupedByExpense}">
+    <h6 th:text="${expenseGroup.key.id}"> </h6>
+    <h6 th:text="${expenseGroup.key.nombreClaseCargoItem}"></h6> <!-- Mostrar nombreClase y cargoItem -->
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                
+                <th>Description</th>
+                <th>Phase</th>
+                <th>Category</th>
+                <th>Total Cost</th>
+                <th>Total USD</th>
+                <th>Attachment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        
+            <tr th:each="descargos : ${expenseGroup.value}">
+                <td>
+                    <span th:text="${descargos.descripcion}"></span><br>
+                    <a href="#" onclick="toggleDetails(this); return false;">+</a>
+                    <div class="details-table" style="display: none;">
+                        <table>
+                            <tr>
+                                <td class="td-details-descargo2">Date</td>
+                                <td class="td-details-descargo2" th:text="${#dates.format(descargos.fecha, 'MM/dd/yy')}"></td>
+                            </tr>
+                            <tr>
+                                <td class="td-details-descargo2">Quantity</td>
+                                <td class="td-details-descargo2" th:text="${#numbers.formatDecimal(descargos.cantidad, 1, 'COMMA', 2, 'POINT')}"></td>
+                            </tr>
+                            <tr>
+                                <td class="td-details-descargo2">Quantity payments</td>
+                                <td class="td-details-descargo2" th:text="${#numbers.formatDecimal(descargos.cantidadPagos, 1, 'COMMA', 2, 'POINT')}"></td>
+                            </tr>
+                            <tr>
+                                <td class="td-details-descargo2">Cost Unit</td>
+                                <td class="td-details-descargo2" th:text="${#numbers.formatDecimal(descargos.costoUnitario, 1, 'COMMA', 2, 'POINT')}"></td>
+                            </tr>
+                            <tr>
+                                <td class="td-details-descargo2">Unit</td>
+                                <td class="td-details-descargo2" th:text="${descargos.unidadMedida.descripcionUnidad}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+                <td th:text="${descargos.categoriaGastos.fase.nombre}"></td>
+                <td th:text="${descargos.categoriaGastos.categoria}"></td>                                         
+                <td th:text="${#numbers.formatDecimal(descargos.costoTotal, 1, 'COMMA', 2, 'POINT')}"></td>  
+                <td th:text="${#numbers.formatDecimal(descargos.totalUSD, 1, 'COMMA', 2, 'POINT')}"></td>  
+                <td>
+                    <a th:if="${descargos.attach != null}" 
+                       th:href="@{'/gastos/descargar/' + ${#strings.substring(descargos.attach, descargos.attach.lastIndexOf('/') + 1)}}" 
+                       target="_blank">
+                        <img src="/imagenes/clip.jpg" alt="view" width="17px" height="20px">
+                    </a>
+                    <span th:if="${descargos.attach == null}"></span>
+                </td>
+                <td>
+                    <span th:each="menuRole : ${menuRoles}">
+                        <a th:href="@{/gastos/eliminar-descargo/} + ${project.id}"
+                           th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}" 
+                           class="btn btn-danger btn-circle btn-sm">
+                           <img src="/imagenes/eliminar.png" alt="eliminar registro" width="17px" height="19px">
+                           <i class="fas fa-exclamation-triangle"></i>
+                        </a>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+					
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- Modal para Registrar/Editar Descargo -->
+<div class="modal fade" id="expenseDisclaimerModal" tabindex="-1" aria-labelledby="expenseDisclaimerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                
+                
+                <h5 class="modal-title" th:if="${expenseDisclaimer.id == null}" id="expenseDisclaimerModalLabel">Expense Disclaimer Register</h5>
+                <h5 class="modal-title" th:if="${expenseDisclaimer.id != null and expenseDisclaimer.id != 0}" id="expenseDisclaimerModalLabel">Expense Disclaimer Edit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="miFormulario" class="user" th:action="@{/gastos/guardar-descargoB}" th:method="post" th:object="${expenseDisclaimer}" enctype="multipart/form-data">
+                    <input type="hidden" th:if="${expenseDisclaimer.id!=0}" th:field="*{id}" th:value="${expenseDisclaimer.id}">
+                    <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
+    				<!-- Expenses by Project -->
+                    <div class="mb-3">
+                        <label for="inputaccount" class="form-label" th:value="${'Expenses Received from: '+project.nombre}"></label>
+                        <select th:field="*{egreso}" class="form-control form-control-user" id="expensesBeneficiary" required  onchange="updateCambioValue()">
+								<option value="" th:if="${expenseDisclaimer.id == null}">Select expense</option>
+								<option th:each="expenseD : ${expenseDescargos}" 
+										th:value="${expenseD.id}"
+										th:data-cambio="${expenseD.cambio}"
+										th:text="${expenseD.clasificacionEgreso.nombreClase+ ' - '+expenseD.objeto+ ' ( '+expenseD.cargoItem+') = '+ expenseD.montoTotal}" ></option>
+													
+						</select>
+						 <input type="hidden"  id="inputCambioExpense" >
+                        <!-- Add the actual input field here if required -->
+                    </div>
+                    <!-- Project Phases -->
+                    <div class="mb-3">
+                        <label for="inputaccount" class="form-label">Project Phases</label>
+                        <select  class="form-control form-control-user" id="fasesExpense" required >
+								<option value="" th:if="${expenseDisclaimer.id == null}">Select phase</option>
+								<option th:each="fase : ${fasesByProyecto}" 
+										th:value="${fase.id}"
+										th:text="${fase.nombre+ ' - '+fase.faseDescripcion}" ></option>
+													
+						</select>
+                        <!-- Add the actual input field here if required -->
+                    </div>
+
+                    <!-- Expense Category and Unit of Measurement -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="inputtipo" class="form-label">Expense Category</label>
+                            <select th:field="*{categoriaGastos}" class="form-control form-control-user" id="categoriesFases" required>
+                                <option value="" th:if="${expenseDisclaimer.id == null}">Select category</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputClassification" class="form-label">Unit of Measurement</label>
+                            <select th:field="*{unidadMedida}" class="form-control form-control-user" id="unidadSelect" required>
+                                <option value="" th:if="${expenseDisclaimer.id == null}">Select unit</option>
+                                <option th:each="unit : ${unitOfMeasurements}" th:value="${unit.id}" th:text="${unit.descripcionUnidad}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="inputDescripcion" class="form-label">Description</label>
+                        <input th:field="*{descripcion}" type="text" class="form-control form-control-user" id="inputDescripcion" name="inputDescripcion" placeholder="Enter description of expense">
+                    </div>
+
+                    <!-- Quantity, Quantity of Pays, and Unit Cost -->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="inputCantidad" class="form-label">Quantity</label>
+                            <input th:field="*{cantidad}" type="number" class="form-control form-control-user" id="inputCantidad" name="inputCantidad" step="0.01" oninput="calculateTotalCosto()">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="inputCantidadPagos" class="form-label">Quantity of Pays</label>
+                            <input th:field="*{cantidadPagos}" type="number" class="form-control form-control-user" id="inputCantidadPagos" name="inputCantidadPagos" step="0.01" oninput="calculateTotalCosto()">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="inputPrecioUnitario" class="form-label">Unit Cost</label>
+                            <input th:field="*{costoUnitario}" type="number" class="form-control form-control-user" id="inputPrecioUnitario" name="inputPrecioUnitario" step="0.01" oninput="calculateTotalCosto()">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="inputCostoTotal" class="form-label">Total Cost</label>
+                           <!--  <span th:text="${(expense.pais != null ? expense.pais.divisa : 'N/A')}">*</span>  -->
+                            <input th:field="*{costoTotal}" type="text" class="form-control form-control-user" id="inputCostoTotal" name="inputCostoTotal" step="0.01" readonly>
+                        </div>                        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9">
+                        <div class="row">
+									    <div class="col-8">
+									        <label for="inputAttach" class="form-label">Attach</label>
+									        <input th:field="*{attach}" type="text" class="form-control form-control-user" id="inputAttach" name="inputAttach" readonly>
+									    </div>
+									    <div class="col-4">
+									        <label for="inputAttachbtn" class="form-label">&nbsp;&nbsp;</label>
+									        
+									        <button id="btnAttach" type="button" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales">
+									            Add
+									        </button>
+									        <input type="file" id="fileInput" name ="file" style="display:none;" />
+									    </div>                        
+                        </div>
+                        </div>
+                         <div class="col-md-3">
+                            <label for="inputTotalUSD" class="form-label">Total USD</label>
+                            <input th:field="*{totalUSD}" type="text" class="form-control form-control-user" 
+                            		id="inputTotalUSD" name="inputTotalUSD"  step="0.01" readonly>
+                        </div>                        
+                    </div>
+                    <!-- Total Cost, Date Transfer, and Observation -->
+                    <div class="row">
+
+                        <div class="col-md-3">
+                            <label for="inputfecha" class="form-label">Date Transfer</label>
+                            <input th:field="*{fecha}" type="date" class="form-control form-control-user" id="inputfecha" onchange="formatDate(this.value)" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputObservacion" class="form-label">Observation</label>
+                            <input th:field="*{observacion}" type="text" class="form-control form-control-user" id="inputObservacion" name="inputObservacion" placeholder="Enter observation if necessary">
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger mt-3" role="alert">
+                        <p th:text="${error}"></p>
+                    </div>
+
+                    <!-- Save Button and Back Link -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales" onclick="prepareMonto('inputCostoTotal'); prepareMonto('inputTotalUSD'); showOverlay();">
+                            SAVE EXPENSE
+                        </button>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+   <footer th:replace="design/footerBar :: footerbar"></footer>
+<!-- End of Footer -->
+<div th:replace="design/script :: scripts"></div>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
+// Llama a esta función para actualizar el valor antes de enviar el formulario
+function prepareMonto(elementId) {
+    const element = document.getElementById(elementId);
+    element.value = element.value.replace(/,/g, ''); // Elimina comas antes de enviar al servidor
+}
+</script>
+    <script>
+        // Función para prevenir el envío del formulario con la tecla Enter
+        function disableEnterKey(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Previene la acción predeterminada (enviar el formulario)
+            }
+        }
+
+        // Añadir el listener al cargar el documento
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("miFormulario"); // Cambia "miFormulario" por el ID de tu formulario
+            form.addEventListener("keypress", disableEnterKey);
+        });
+    </script>
+
+<script>
+function openModal() {
+    // Limpiar el campo ID para crear un nuevo registro
+    document.getElementById("inputId").value = 0;
+    
+    // Limpiar otros campos del formulario si es necesario
+    document.getElementById("inputdocumento").value = "";
+    // Limpiar otros campos del formulario...
+
+    // Mostrar el modal
+    $('#myModal').modal('show');
+}
+
+</script> 
+<script type='text/javascript'>
+$(function(){
+    $(document).bind("contextmenu",function(e){
+        return false;
+    });
+});
+</script>
+<script>
+function calculateTotalCosto() {
+    const cantidad = parseFloat(document.getElementById("inputCantidad").value) || 0;
+    const cantidadPagos = parseFloat(document.getElementById("inputCantidadPagos").value) || 0;
+    const precioUnitario = parseFloat(document.getElementById("inputPrecioUnitario").value) || 0;
+    const cambio = parseFloat(document.getElementById("inputCambioExpense").value) || 0;
+
+        // Calcular montos
+        const montoTotalPagar = (cantidad*cantidadPagos*precioUnitario);
+        const montoUSD = cambio ? montoTotalPagar / cambio : 0;
+        const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        //const numeroFormateado = formateador.format(montoTotalPagar);
+        document.getElementById("inputCostoTotal").value = formateador.format(montoTotalPagar);
+        document.getElementById("inputTotalUSD").value = formateador.format(montoUSD);
+}
+</script>
+<script>
+function toggleDetails(element) {
+    // Selecciona el contenedor de detalles para mostrar/ocultar
+    const detailsTable = element.closest('td').querySelector('.details-table');
+    if (detailsTable.style.display === 'none') {
+        detailsTable.style.display = 'block';
+        element.textContent = '-'; // Cambia el ícono a '-'
+    } else {
+        detailsTable.style.display = 'none';
+        element.textContent = '+'; // Cambia el ícono a '+'
+    }
+}
+</script>
+<script>
+    document.getElementById("fasesExpense").addEventListener("change", function() {
+        const selectedPhaseId = this.value;
+        
+        if (selectedPhaseId) {
+            // Realiza la solicitud AJAX para obtener las categorías
+            fetch(`/gastos/getCategoriesByPhase?phaseId=${selectedPhaseId}`)
+                .then(response => response.json())
+                .then(categories => {
+                    const categorySelect = document.getElementById("categoriesFases");
+
+                    // Limpia las opciones de categorías
+                    categorySelect.innerHTML = '<option value="">Select category</option>';
+
+                    // Llena las opciones con los datos recibidos
+                    categories.forEach(category => {
+                        const option = document.createElement("option");
+                        option.value = category.id;
+                        option.textContent = category.categoria;
+                        categorySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching categories:', error));
+        }
+    });
+</script>
+<style>
+/* Estilo para hacer que la tabla de detalles se vea indentada */
+.details-table {
+    margin-top: 5px;
+    padding-left: 20px;
+}
+</style>
+<script>
+    function updateCambioValue() {
+        const select = document.getElementById("expensesBeneficiary");
+        const selectedOption = select.options[select.selectedIndex];
+        const cambioValue = selectedOption.getAttribute("data-cambio");
+        
+        document.getElementById("inputCambioExpense").value = cambioValue;
+    }
+</script>
+<script>
+document.getElementById('btnAttach').addEventListener('click', function() {
+    document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // Aquí podrías subir el archivo a tu servidor y obtener la URL
+        // Por ejemplo, usando una llamada AJAX o un formulario de envío de archivos
+
+        // Por ahora, simplemente añadimos el nombre del archivo al campo de texto
+        document.getElementById('inputAttach').value = file.name;
+    }
+});
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
