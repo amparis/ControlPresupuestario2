@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +34,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springmvc.ControlPresupuestario.model.Beneficiary;
 import com.springmvc.ControlPresupuestario.model.EgresoKey;
+import com.springmvc.ControlPresupuestario.model.EgresoProjectKey;
 import com.springmvc.ControlPresupuestario.model.Expense;
 import com.springmvc.ControlPresupuestario.model.ExpenseCategory;
 import com.springmvc.ControlPresupuestario.model.ExpenseDisclaimers;
@@ -80,7 +84,7 @@ public class ExpenseDisclaimersController {
 	ExpenseCategoryService expenseCategoryService;
 
 	private final String DIRECTORIO_BASE = "D:/SISTEMAS_integrales/descargosStaff";
-	   @GetMapping("/lista-descargos/{id}")
+	   /*@GetMapping("/lista-descargos/{id}")
 	    public String showListDescargo( @PathVariable("id") long projectId, Model model) {
 	        model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
 	        model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
@@ -95,25 +99,88 @@ public class ExpenseDisclaimersController {
                
 
 	          return "lista_descargos";
-	    }
+	    }*/
 	   
 	   @GetMapping("/registro-descargo/{id}")
-	    public String showRegisterFormDescargo( @PathVariable("id") long expenseId, Model model) {
+	    public String showRegisterFormDescargo( @PathVariable("id") long projectId, Model model) {
 	        model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
 	        model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
 	        model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
-	        model.addAttribute("expenseSelected",expenseService.getExpense(expenseId));
-	        model.addAttribute("project", projectService.getProject(expenseService.getExpense(expenseId).getProyectoFase().getProyecto().getId())); 
-	        model.addAttribute("fasesProyecto",projectPhaseService.getProjectPhasesByProyectoId(expenseService.getExpense(expenseId).getProyectoFase().getProyecto().getId()));
-	        model.addAttribute("expenseCategories",expenseCategoryService.getExpenseCategoryByPhase(expenseService.getExpense(expenseId).getProyectoFase().getFase().getId()));
-	        model.addAttribute("unitOfMeasurements", unitOfMeasurementService.getUnitOfMeasurements());
-	       // model.addAttribute("gastoDescargos", expenseDisclaimersService.getExpenseDisclaimersByExpenseId(expenseId));
-	        model.addAttribute("expenseDisclaimer", new ExpenseDisclaimers());
-              
+		   
+	        model.addAttribute("project", projectService.getProject(projectId)); 
+		       // Obtener la lista de fases con descargo del servicio
+	        List<Expense> expensesWithDescargo = expenseService.getExpensesVigentesWithDescargoByProjectId(projectId);
+	     // Extrae solo los IDs de fase asociados a cada Expense
+	        List<Long> phasesList = expensesWithDescargo.stream()
+	            .map(expense -> expense.getProyectoFase().getFase().getId()) 
+	            .distinct() // Opcional: para evitar IDs duplicados
+	            .collect(Collectors.toList());
+	       
+	        model.addAttribute("gastoDescargos", expenseDisclaimersService.getExpenseDisclaimersByProjectId(projectId));
+	        
+	        List<ExpenseDisclaimers> descargosByProject =  expenseDisclaimersService.getExpenseDisclaimersByProjectId(projectId);
+	        double totalAmountDescargos = descargosByProject.stream().mapToDouble(ExpenseDisclaimers::getCostoTotal).sum();
+	        double totalAmountDescargosUSD = descargosByProject.stream().mapToDouble(ExpenseDisclaimers::getTotalUSD).sum();
+	        model.addAttribute("totalAmountDescargos", totalAmountDescargos);
+	        model.addAttribute("totalAmountDescargosUSD", totalAmountDescargosUSD);
+	       
+	       // List<ExpenseDisclaimers> descargosByProject =  expenseDisclaimersService.getExpenseDisclaimersByProjectId(projectId);
+	        Map<String, Map<EgresoProjectKey, List<ExpenseDisclaimers>>> groupedGastos = descargosByProject.stream()
+	        	    .collect(Collectors.groupingBy(
+	        	        descargo -> {             // Determinar si el tipo es 'LEGAL ENTITY' o 'NATURAL PERSON' y asignar el nombre correspondiente
+	                    if ("LEGAL ENTITY".equals(descargo.getEgreso().getBeneficiario().getTipo())) {
+	                        return descargo.getEgreso().getBeneficiario().getRazonSocial()+'_'+descargo.getEgreso().getBeneficiario().getId(); // Si es entidad legal, usa la razón social
+	                    } else {
+	                        // Si es persona natural, combina los nombres y apellidos
+	                        return descargo.getEgreso().getBeneficiario().getNombres() + " " + descargo.getEgreso().getBeneficiario().getApellidos()+'_'+descargo.getEgreso().getBeneficiario().getId();
+	                    }
+	                },
+	        	        Collectors.groupingBy(
+	        	            descargo -> {
+	        	                String beneficiarioFullName;
+	        	                // Condición para verificar si el tipo es 'LEGAL ENTITY'
+	        	                if ("LEGAL ENTITY".equals(descargo.getEgreso().getBeneficiario().getTipo())) {
+	        	                    beneficiarioFullName = descargo.getEgreso().getBeneficiario().getRazonSocial(); // Usar razonSocial si es entidad legal
+	        	                } else {
+	        	                    beneficiarioFullName = descargo.getEgreso().getBeneficiario().getNombres() + " " + descargo.getEgreso().getBeneficiario().getApellidos(); // Nombres y apellidos
+	        	                }
 
+	        	                // Crear la clave EgresoProjectKey con el nombre o razón social del beneficiario
+	        	                return new EgresoProjectKey(
+	        	                    descargo.getEgreso().getBeneficiario().getId(),     // beneficiarioId
+	        	                    beneficiarioFullName,                               // nombre completo o razón social
+	        	                    descargo.getEgreso().getId(),                       // expenseId
+	        	                    descargo.getEgreso().getClasificacionEgreso().getNombreClase(),
+	        	                    descargo.getEgreso().getCargoItem()                 // nombreClaseCargoItem
+	        	                );
+	        	            }
+	        	        )
+	        	    ));
+
+	        	model.addAttribute("gastosGroupedByBeneficiaryAndExpense", groupedGastos);
+
+		    //model.addAttribute("expenseDescargos",expenseService.getExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(projectId, null));
+		    model.addAttribute("fasesByProyecto",phaseService.getPhaseByListId(phasesList));
+
+	        model.addAttribute("unitOfMeasurements", unitOfMeasurementService.getUnitOfMeasurements());
+	        model.addAttribute("expenseDisclaimer", new ExpenseDisclaimers());
+             
+	        List<Expense> expenses = expenseService.getExpensesVigentesWithDescargoByProjectId(projectId);
+	        double totalAmount = expenses.stream().mapToDouble(Expense::getMontoTotal).sum();
+	        double totalAmountLCU = expenses.stream().mapToDouble(Expense::getTotalLCU).sum();
+	        model.addAttribute("totalAmountExpenses", totalAmount);
+	        model.addAttribute("totalAmountExpensesLCU", totalAmountLCU);
+  	         
 	          return "registro_descargo";
 	    }
 	   
+	   @GetMapping("/getExpensesByBeneficiary")
+	   @ResponseBody
+	   public List<Expense> getExpensesByBeneficiary(@RequestParam Long projectId, @RequestParam Integer beneficiaryId) {
+	       return expenseService.getExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(projectId, beneficiaryId); 
+	   }	 
+
+   
 	   @GetMapping("/registro-descargoBeneficiario/{id}")
 	    public String showRegisterFormDescargoByBeneficiary(  @PathVariable("id") long projectId, Model model) {
 	        model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
@@ -162,6 +229,7 @@ public class ExpenseDisclaimersController {
 	        model.addAttribute("totalAmountExpensesLCU", totalAmountLCU);
 	        
 	          return "registro_descargoBeneficiario";
+	          
 	    }
 	   
 	// Método para recuperar cattegoria de gastos por fase
@@ -235,15 +303,25 @@ public class ExpenseDisclaimersController {
 	    	try {
 	            if (!file.isEmpty()) {
 	                // Definir la ruta de almacenamiento
-	                String uploadDir = DIRECTORIO_BASE+'/';
-	                
+	                String uploadDir = DIRECTORIO_BASE+"/";
+	                // Obtener la fecha actual en formato MMddyyyy
+	                String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMddyyyy"));
+	                // Obtener el nombre original del archivo y su extensión
+	                String originalFileName = file.getOriginalFilename();
+	                String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+	                String fileBaseName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
+	            
 	                // Guardar el archivo en el directorio definido
-	                String fileName = file.getOriginalFilename();
-	                Path path = Paths.get(uploadDir + fileName);
+	                //String fileName = file.getOriginalFilename();
+	                // Construir el nuevo nombre de archivo con la fecha
+	                String newFileName = currentDate + "_" + fileBaseName + fileExtension;
+	           
+	                Path path = Paths.get(uploadDir + newFileName);
 	                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 	                
 	                // Establecer la ruta del archivo en el objeto expense
-	                expenseDisclaimer.setAttach(uploadDir + fileName);
+	                expenseDisclaimer.setAttach(uploadDir + newFileName);
+
 	            }
 	            else
 	            {
@@ -260,8 +338,9 @@ public class ExpenseDisclaimersController {
 	            return "redirect:/gastos/registro-descargo/"+expenseId;
 	        }
 	    }
-	    @PostMapping("/guardar-descargoB")
-	    public String saveExpenseBeneficiario(@ModelAttribute ExpenseDisclaimers expenseDisclaimer,
+	   
+	    @PostMapping("/guardar-descargoNonRecurring")
+	    public String saveDescargoByBeneficiario(@ModelAttribute ExpenseDisclaimers expenseDisclaimer,
 	            @RequestParam(required = false) Long id,
 	            @RequestParam(value = "inputproyectoId", required = false) long projectId,
 	            //@RequestParam(value = "inputexpenseId", required = false) long expenseId,

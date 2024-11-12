@@ -22,12 +22,13 @@ public interface ExpenseRepository extends JpaRepository<Expense,Long>  {
 	  		+ "SUM(e.montoTotal) AS sumatoriaDescargo FROM Expense e "
 	  		+ "WHERE e.proyectoFase.proyecto.id = :projectId and e.estado='V' and e.descargo = true and e.beneficiario.id IS NOT NULL "
 	  		+ "GROUP BY e.beneficiario.id, e.beneficiario.nombres, e.beneficiario.apellidos,e.beneficiario.documento, e.beneficiario.tipo")
-	  public List<Object[]> findAllExpensesVigentesWithDescargoByProjectId(Long projectId);//para admin
+	  public List<Object[]> findAllExpensesVigentesWithDescargoByProjectIdGroupBeneficiary(Long projectId);//para admin
 	  
 	  @Query("SELECT e FROM Expense e WHERE e.proyectoFase.proyecto.id = :projectId and e.beneficiario.id = :beneficiaryId and e.descargo= true and estado='V'")
 	  public List<Expense> findAllExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(Long projectId, Integer beneficiaryId);//para beneficiary
 	  
-	  //@Query("SELECT e FROM Expense e WHERE e.proyectoFase.proyecto.id = :projectId and e.beneficiario.id = :beneficiaryId and e.descargo= true and estado='V'")
-	  //public List<Expense> findAllPhasesOfExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(Long projectId, Integer beneficiaryId);//para beneficiary
+	  @Query("SELECT e FROM Expense e WHERE e.proyectoFase.proyecto.id = :projectId and e.descargo= true and estado='V'")
+	  public List<Expense> findAllExpensesVigentesWithDescargoByProjectId(Long projectId);//para beneficiary
+
 	  
 }

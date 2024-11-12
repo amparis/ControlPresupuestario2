@@ -110,7 +110,7 @@ public class ExpenseService {
    // }
     
     public List<BeneficiaryExpenseSummaryDTO> getExpensesVigentesWithDescargo(Long projectId) {
-        List<Object[]> resultList = expenseRepository.findAllExpensesVigentesWithDescargoByProjectId(projectId);
+        List<Object[]> resultList = expenseRepository.findAllExpensesVigentesWithDescargoByProjectIdGroupBeneficiary(projectId);
         List<BeneficiaryExpenseSummaryDTO> loanSummaryList = new ArrayList<>();
 
         for (Object[] row : resultList) {
@@ -138,6 +138,9 @@ public class ExpenseService {
         return loanSummaryList;
     }
     
+    public List<Expense> getExpensesVigentesWithDescargoByProjectId(Long projectId){
+    	return this.expenseRepository.findAllExpensesVigentesWithDescargoByProjectId(projectId);
+    }
     public List<Expense> getExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(Long projectId, Integer beneficiaryId){
     	return this.expenseRepository.findAllExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(projectId,beneficiaryId);
     }

@@ -1,13 +1,9 @@
 
-
+//FUNCTIONS  BY EXPENSE REGISTER
 // Función para actualizar 'inputCargoItem' con el valor de 'inputItem' o 'selectCargo'
 function updateCargoItem(value) {
     document.getElementById("inputCargoItem").value = value;
 }
-
-
-
-
 
 
 // Llama a esta función para actualizar el valor antes de enviar el formulario
@@ -106,7 +102,6 @@ function toggleFields(selectElement) {
     }
 
 }
-
 
 
 function toggleFechaFin(selectElement) {
@@ -429,3 +424,205 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
     }
     return true; // Permite el envío del formulario si la validación pasa
 }
+////////////////**************************************//////////////////// */
+// FUNCTIONS BY EXPENSE VOUCHERS
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
+
+function openModal() {
+    // Limpiar el campo ID para crear un nuevo registro
+    document.getElementById("inputId").value = 0;
+    
+    // Limpiar otros campos del formulario si es necesario
+    document.getElementById("inputdocumento").value = "";
+    // Limpiar otros campos del formulario...
+
+    // Mostrar el modal
+    $('#myModal').modal('show');
+}
+// Llama a esta función para actualizar el valor antes de enviar el formulario
+function prepareMonto(elementId) {
+    const element = document.getElementById(elementId);
+    element.value = element.value.replace(/,/g, ''); // Elimina comas antes de enviar al servidor
+}
+        // Función para prevenir el envío del formulario con la tecla Enter
+        function disableEnterKey(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Previene la acción predeterminada (enviar el formulario)
+            }
+        }
+
+        // Añadir el listener al cargar el documento
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("miFormulario"); // Cambia "miFormulario" por el ID de tu formulario
+            form.addEventListener("keypress", disableEnterKey);
+        });
+ //calcula el total cost/ basado en el cambio de divisa registrado en expense
+function calculateTotalCosto() {
+    const cantidad = parseFloat(document.getElementById("inputCantidad").value) || 0;
+    const cantidadPagos = parseFloat(document.getElementById("inputCantidadPagos").value) || 0;
+    const precioUnitario = parseFloat(document.getElementById("inputPrecioUnitario").value) || 0;
+    const cambio = parseFloat(document.getElementById("inputCambioExpense").value) || 0;
+
+        // Calcular montos
+        const montoTotalPagar = (cantidad*cantidadPagos*precioUnitario);
+        const montoUSD = cambio ? montoTotalPagar / cambio : 0;
+        const formateador = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        //const numeroFormateado = formateador.format(montoTotalPagar);
+        document.getElementById("inputCostoTotal").value = formateador.format(montoTotalPagar);
+        document.getElementById("inputTotalUSD").value = formateador.format(montoUSD);
+}
+//despliega el detalle de cada voucher registrado de INTERFAZ beneficiario
+function toggleDetailsB(element) {
+    // Selecciona el contenedor de detalles para mostrar/ocultar
+    const detailsTable = element.closest('td').querySelector('.details-table');
+    if (detailsTable.style.display === 'none') {
+        detailsTable.style.display = 'block';
+        element.textContent = '-'; // Cambia el ícono a '-'
+    } else {
+        detailsTable.style.display = 'none';
+        element.textContent = '+'; // Cambia el ícono a '+'
+    }
+}
+
+//evento onchange en selectExpense
+    function updatePhaseDivisaSelection() {
+        const expensesSelect = document.getElementById("expensesBeneficiary");
+        const selectedOption = expensesSelect.options[expensesSelect.selectedIndex];
+        
+        const cambioValue = selectedOption.getAttribute("data-cambio");
+        const divisa = selectedOption.getAttribute("data-divisa");
+        document.getElementById("inputCambioExpense").value = cambioValue;
+        document.getElementById("labelDivisa").textContent = 'Total ('+divisa+')';
+        
+        // Obtiene el data-fase-id del expense seleccionado
+        const faseId = selectedOption.getAttribute("data-fase-id");
+        
+        // Selecciona la fase correspondiente en el select de fases
+        const fasesSelect = document.getElementById("fasesExpense");
+        Array.from(fasesSelect.options).forEach(option => {
+            option.selected = option.value === faseId;
+        });
+        
+        //document.getElementById("fasesExpense").addEventListener("change", function() {
+            const selectedPhaseId = faseId;//this.value;
+            
+            if (selectedPhaseId) {
+                // Realiza la solicitud AJAX para obtener las categorías
+                fetch(`/gastos/getCategoriesByPhase?phaseId=${selectedPhaseId}`)
+                    .then(response => response.json())
+                    .then(categories => {
+                        const categorySelect = document.getElementById("categoriesFases");
+
+                        // Limpia las opciones de categorías
+                        categorySelect.innerHTML = '<option value="">Select category</option>';
+
+                        // Llena las opciones con los datos recibidos
+                        categories.forEach(category => {
+                            const option = document.createElement("option");
+                            option.value = category.id;
+                            option.textContent = category.categoria;
+                            categorySelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching categories:', error));
+            }
+       // });
+    }
+    
+    document.getElementById('btnAttach').addEventListener('click', function() {
+    document.getElementById('fileInput').click();
+});
+// para recuperar el archivo guardado
+document.getElementById('fileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // Aquí podrías subir el archivo a tu servidor y obtener la URL
+        // Por ejemplo, usando una llamada AJAX o un formulario de envío de archivos
+
+        // Por ahora, simplemente añadimos el nombre del archivo al campo de texto
+        document.getElementById('inputAttach').value = file.name;
+    }
+});
+//despliega el detalle de cada voucher INTERFAZ ADMIN
+function toggleDetails(button, detailsId) {
+    var detailsSection = document.getElementById(detailsId);
+    if (detailsSection.style.display === "none") {
+        detailsSection.style.display = "block";
+        button.innerHTML = "Hide vouchers by expense";
+    } else {
+        detailsSection.style.display = "none";
+        button.innerHTML = "Show vouchers by expense";
+    }
+}
+
+function toggleSubDetails(link) {
+    var subDetails = link.closest('td').querySelector('.details-table');
+    if (subDetails.style.display === "none") {
+        subDetails.style.display = "block";
+        link.innerHTML = "-";
+    } else {
+        subDetails.style.display = "none";
+        link.innerHTML = "+";
+    }
+}// Obtener el valor de beneficiaryId cuando se abre el modal INTERFAZ ADMIN
+    $('#expenseDisclaimerModal').on('show.bs.modal', function (event) {
+        // Obtener el botón que abrió el modal
+        var button = $(event.relatedTarget); 
+        // Extraer el valor del atributo data-beneficiary-id
+        var beneficiaryId = button.data('beneficiary-id');
+        var beneficiaryName = 'Select beneficiary expenses: '+button.data('beneficiary-fullname');
+        // Opcional: asignar este valor a un campo en el modal
+        $('#beneficiaryIdField').val(beneficiaryId);
+        $('#labelBeneficiaryFullName').text(beneficiaryName);
+
+        // Recuperar projectId y beneficiaryId desde los campos del modal
+        const projectId = $('#inputproyectoId').val(); // Suponiendo que tienes un campo con el ID 'inputproyectoId'
+        const beneficiaryIdField = $('#beneficiaryIdField').val();
+
+         if (projectId && beneficiaryIdField) {
+            // Realizar la solicitud AJAX para obtener los gastos por beneficiario y proyecto
+            fetch(`/gastos/getExpensesByBeneficiary?projectId=${projectId}&beneficiaryId=${beneficiaryIdField}`)
+                .then(response => response.json())
+                .then(expenses => {
+                    // Poblado de expensesBeneficiary
+                    const expensesSelect = document.getElementById("expensesBeneficiary");
+                    expensesSelect.innerHTML = '<option value="">Select expense</option>';
+
+                    expenses.forEach(expense => {
+                        const option = document.createElement("option");
+                        option.value = expense.id;
+                        option.textContent = `${expense.clasificacionEgreso.nombreClase} - ${expense.objeto} ( ${expense.cargoItem} ) = ${expense.montoTotal} (USD)`;
+                        option.setAttribute("data-fase-id", expense.proyectoFase.fase.id); // Agrega el data-fase-id
+                        option.setAttribute("data-cambio", expense.cambio); // Agrega el data-fase-id
+                        option.setAttribute("data-divisa", expense.divisa.divisa); // Agrega el data-fase-id
+                        expensesSelect.appendChild(option);
+                    });
+
+                })
+                .catch(error => console.error('Error fetching expenses:', error));
+        } else {
+            console.error('Faltan projectId o beneficiaryId');
+        }
+    });
+    /*
+    // Poblado de fasesExpense
+    const fasesSelect = document.getElementById("fasesExpense");
+    fasesSelect.innerHTML = '<option value="">Select phase</option>';
+
+    const uniquePhases = new Set(); // Para evitar duplicados
+
+    expenses.forEach(expense => {
+        const phaseId = expense.proyectoFase.fase.id;
+        const phaseName = `${expense.proyectoFase.fase.nombre} - ${expense.proyectoFase.fase.faseDescripcion}`;
+
+        if (!uniquePhases.has(phaseId)) {
+            uniquePhases.add(phaseId);
+            const option = document.createElement("option");
+            option.value = phaseId;
+            option.textContent = phaseName;
+            fasesSelect.appendChild(option);
+        }
+    });*/
+
