@@ -76,6 +76,9 @@ public class ExpenseDisclaimers {
 	    @Column(name = "gas_attach", columnDefinition = "text")
 	    private String attach;
 
+
+	    @Column(name = "gas_fecha_estimada")
+	    private Date fechaEstimada;
 		/**
 		 * @return the id
 		 */
@@ -284,6 +287,14 @@ public class ExpenseDisclaimers {
 		 */
 		public void setAttach(String attach) {
 			this.attach = attach;
+		}
+
+		public Date getFechaEstimada() {
+			return fechaEstimada;
+		}
+
+		public void setFechaEstimada(Date fechaEstimada) {
+			this.fechaEstimada = fechaEstimada;
 		}
 
 }

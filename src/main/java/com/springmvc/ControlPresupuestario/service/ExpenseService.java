@@ -141,7 +141,9 @@ public class ExpenseService {
     public List<Expense> getExpensesVigentesWithDescargoByProjectId(Long projectId){
     	return this.expenseRepository.findAllExpensesVigentesWithDescargoByProjectId(projectId);
     }
+    
     public List<Expense> getExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(Long projectId, Integer beneficiaryId){
     	return this.expenseRepository.findAllExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(projectId,beneficiaryId);
     }
+
 }

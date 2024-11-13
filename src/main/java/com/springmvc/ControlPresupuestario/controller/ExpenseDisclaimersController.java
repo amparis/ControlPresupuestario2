@@ -376,4 +376,27 @@ public class ExpenseDisclaimersController {
 	            return "redirect:/gastos/registro-descargoBeneficiario/"+projectId;
 	        }
 	    }
+	    
+	    @GetMapping("/registro-planPagos/{id}")
+	    public String showRegisterFormPlanPagos( @PathVariable("id") long expenseId, Model model) {
+	        model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
+	        model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
+	        model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
+		   
+	        model.addAttribute("project", projectService.getProject(expenseService.getExpense(expenseId).getProyectoFase().getProyecto().getId())); 
+	        model.addAttribute("expenseSelected", expenseService.getExpense(expenseId)); 
+	        model.addAttribute("categoriesGastos",expenseCategoryService.getExpenseCategoryByPhase(expenseService.getExpense(expenseId).getProyectoFase().getFase().getId())); 
+	        model.addAttribute("gastoDescargos", expenseDisclaimersService.getExpenseDisclaimersByExpenseId(expenseId));    
+
+	        model.addAttribute("expensePaymentPlan", new ExpenseDisclaimers());
+             /*
+	        List<Expense> expenses = expenseService.getExpensesVigentesWithDescargoByProjectId(projectId);
+	        double totalAmount = expenses.stream().mapToDouble(Expense::getMontoTotal).sum();
+	        double totalAmountLCU = expenses.stream().mapToDouble(Expense::getTotalLCU).sum();
+	        model.addAttribute("totalAmountExpenses", totalAmount);
+	        model.addAttribute("totalAmountExpensesLCU", totalAmountLCU);
+  	         */
+	          return "registro_planPagos";
+	    }
+	
 }

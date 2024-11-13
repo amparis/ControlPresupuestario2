@@ -217,12 +217,7 @@
 												       EXPENSE DISCLAIMERS
 											</a>
 										</div>
-			                            <div class="col-3">
-											<a th:href="@{/incomes/registro-planPagos/{id}(id=${project.id})}"
-												       class="btn btn-outline-info text-sistemasIntegrales custom-hover-sistemasIntegrales btn-ancho"  onclick="showOverlay()" >
-												       PAYMENT PLAN
-											</a>                         		
-			                            </div>											    
+										    
 	                            	</div>
 		                            <div class="row">
 		                              <div class="col-12">
@@ -249,40 +244,22 @@
 			                                        <td th:text="${expense.cargoItem}"></td>
 			                                        <td th:text="${expense.cantidad}"></td>
 			                                        <td th:text="${expense.costoUnitario}"></td>
-													<!-- <td>
-													    <a th:if="${expense.attach != null}" 
-													       th:href="@{/expenses/descargar/{filename}(filename=${#strings.substring(expense.attach, expense.attach.lastIndexOf('/') + 1)})}" 
-													       th:text="${#strings.substring(expense.attach, expense.attach.lastIndexOf('/') + 1)}">Open file</a>
-													    <span th:if="${expense.attach == null}"> </span>
-													</td>
-
-<td>
-    <a th:if="${expense.attach != null}" 
-    	href="javascript:void(0);" 
-   th:attr="data-file-url=@{/expenses/descargar/} + ${#strings.substring(expense.attach, expense.attach.lastIndexOf('/') + 1)}"
-   onclick="openFileModal(this)">
-    View</a>
-    <span th:if="${expense.attach == null}">No file</span>
-</td> -->
 													<td>
 													<a th:if="${expense.attach != null}" 
 													   th:href="@{'/expenses/descargar/' + ${#strings.substring(expense.attach, expense.attach.lastIndexOf('/') + 1)}}" 
 													   target="_blank">View</a>
 													<span th:if="${expense.attach == null}"></span>
 													</td>
-
-
 			                                        
 			                    					<td>
-			                    					   <!-- Iterar sobre menuRoles para comprobar permisos
+			                    					   <!--  Iterar sobre menuRoles para comprobar permisos -->
 											            <span th:each="menuRole : ${menuRoles}">
-											                <a th:href="@{/expenses/modificar-egreso/} + ${expense.id}"
-											                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
+											                <a th:href="@{/gastos/registro-planPagos/} + ${expense.id}"
+											                   th:if="${(expense.attach == null or expense.attach == '') and menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.aupdate}" 
 											                   class="btn btn-warning btn-circle  btn-sm">
-											                   <img src="/imagenes/editar.png" alt="editar registro" width="20px" height="20px">
-											                   <i class="fas fa-exclamation-triangle"></i>
+											                   planP
 											                </a>
-											            </span> -->
+											            </span> 
 											             <span th:each="menuRole : ${menuRoles}">
 											                <a th:href="@{/expenses/eliminar-egreso/} + ${expense.id}"
 											                   th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}" 
