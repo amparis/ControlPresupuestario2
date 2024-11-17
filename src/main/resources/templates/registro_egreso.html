@@ -155,7 +155,7 @@
 		                             <div class="form-group">
 		                             	 <label for="inputObjetoPuesto" id="expenseObjetoPuesto" class="form-label">Objeto</label>
 		                                 <input th:field="*{objeto}" type="text" class="form-control form-control-user" 
-		       									id="inputObjetoPuesto" name="inputObjetoPuesto" placeholder="Enter object or position in the company">
+		       									id="inputObjetoPuesto" name="inputObjetoPuesto" placeholder="Enter object or position in the company" required>
 		                             </div>
                             	</div>
                             	<div class="col-6">
@@ -193,7 +193,7 @@
                             	<div class="col-10">
                             		<label for="beneficiarioE" class="form-label">Beneficiary </label>
  								    <select  th:field="*{beneficiario}" id="beneficiarioE" name="beneficiarioE" class="form-control form-control-user" 
- 								    		data-show-subtext="true" data-live-search="true" onchange="loadBeneficiaryData()">
+ 								    		data-show-subtext="true" data-live-search="true" onchange="loadBeneficiaryData()" required>
 								                <option value="0"  selected>Select </option>
 								                <option th:each="beneficiary : ${beneficiaries}" 
 									                    th:value="${beneficiary.id}" 
@@ -269,8 +269,7 @@
 					                              <label for="inputfechaInicial" class="form-label">Start Date</label>
 					                              <input th:field="*{fechaInicio}" 
 					                              		th:value="${#dates.format(fechaInicio, 'MM/dd/yyyy')}" 
-					                              		type="date"  
-					                              		class="form-control form-control-user"
+					                              		type="date"  class="form-control form-control-user"
 					                                    id="inputfechaInicio" 
 					                                    placeholder="MM/DD/YYYY" 
 					                                    required 
@@ -289,6 +288,7 @@
 					                                            readonly>
 					                            </div>      
                             			</div>
+                            			<!-- 
 		                            	<div class="col-4">
 					                        <div class="form-group">
 											 <label for="inputTiempo" class="form-label">Time</label>                            	
@@ -296,6 +296,7 @@
 				       								id="inputTiempo" name="inputTiempo" step="0.000001"  readonly>
 		                            		</div>
 		                            	</div>
+		                            	 -->
 		                             </div>
                             		 <div class="row">
                             			<div class="col-4">

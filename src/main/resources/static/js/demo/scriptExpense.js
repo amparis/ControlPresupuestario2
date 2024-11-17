@@ -146,7 +146,7 @@ function toggleFechaFin(selectElement) {
 
 
     
-    function checkDates() {
+    /*function checkDates() {
         const fechaInicioStr = document.getElementById('inputfechaInicio').value;
         const fechaFinStr = document.getElementById('inputfechaFin').value;
         const formaPago = document.getElementById('inputPago').value;
@@ -157,7 +157,7 @@ function toggleFechaFin(selectElement) {
             const fechaInicio = new Date(Date.UTC(yearInicio, monthInicio - 1, dayInicio));
 
             if (isNaN(fechaInicio.getTime())) {
-                alert("Por favor, ingresa una fecha de inicio válida.");
+                alert("Please, enter start date validate.");
                 return;
             }
 
@@ -165,6 +165,7 @@ function toggleFechaFin(selectElement) {
             
             // Si el tipo de forma de pago no es 'single payment', se requiere una fecha de fin válida
             if (formaPago !== 'single payment') {
+               
                 if (fechaFinStr) {
                     const [yearFin, monthFin, dayFin] = fechaFinStr.split("-");
                     fechaFin = new Date(Date.UTC(yearFin, monthFin - 1, dayFin));
@@ -183,13 +184,13 @@ function toggleFechaFin(selectElement) {
             }
 
             // Llamar a la función para calcular el tiempo con fechaInicio y fechaFin
-            calculateInputTiempo(fechaInicio, fechaFin);
+           // calculateInputTiempo(fechaInicio, fechaFin);
 
         } else {
-            alert("Por favor, completa la fecha de inicio.");
+            alert("Please, fill in the start date.");
         }
     }
-
+*/
     function calculateInputTiempo(fechaInicial, fechaFinal) {
         if (!fechaInicial || !fechaFinal) {
             return; // No calcular si alguna fecha es nula o indefinida
