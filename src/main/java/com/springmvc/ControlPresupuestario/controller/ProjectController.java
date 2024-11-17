@@ -55,8 +55,6 @@ public class ProjectController {
     public String getProjects(Model model) {
 
         model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
-        //model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
-       // model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenus());
         model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
         model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
         model.addAttribute("projects", this.projectService.getProjects());
@@ -336,8 +334,8 @@ public class ProjectController {
     	    		}
 
     	    	}
-System.out.println(">>>>****> supervisor "+ beneficiaryService.getSupervisorByProject(id));
-System.out.println(">>>>****> RESP "+ beneficiaryService.getResponsableByProject(id));
+//System.out.println(">>>>****> supervisor "+ beneficiaryService.getSupervisorByProject(id));
+//System.out.println(">>>>****> RESP "+ beneficiaryService.getResponsableByProject(id));
 
     	    // Obtener todos los beneficiarios (para lista de selección en el combo)
 			List<Beneficiary> supervisors = beneficiaryService.getAllBeneficiariesEstadoAndTipo("V","Personal");  // Lista de beneficiarios supervisores

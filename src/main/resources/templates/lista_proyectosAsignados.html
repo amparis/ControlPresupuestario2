@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="design/header :: head">
+
+</head>
+
+<body id="page-top"  onload="hideMessage()" class="bg-sistemasIntegrales">
+    <!-- Mostrar el mensaje si está presente -->
+    <div th:if="${message}" id="notificationMessage"
+        th:classappend="${messageType == 'success'} ? 'alert alert-success' : 'alert alert-danger'"
+        style="padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${message}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+	    <div th:replace="design/sideBar :: sidebar"></div>
+		<!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+				<nav th:replace="design/topBar :: topbar"></nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-2 text-gray-800">Projects</h1>
+
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6>Assigned projects</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Year</th>
+                                        	<th>Country</th>
+                                        	<th>Acronym</th>
+                                            <th>Name of project</th>
+                                            <th>Description</th>
+
+                                            <!-- <th>Start Date</th>
+                                            <th>End Date</th> -->
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    
+                                        <tr th:each="project : ${projects}">
+                                        <td th:text="${project.gestion}"></td>
+                                        <td th:text="${project.pais}"></td>
+                                        <td th:text="${project.sigla}"></td>
+                                            <td th:text="${project.nombre}"></td>
+                                            <td th:text="${project.descripcion}"></td>
+                                            <td>
+                                            <!-- Iterar sobre menuRoles para comprobar permiso de actualización -->
+								            <span >
+								                <a th:href="@{/gastos/registro-descargoBeneficiario/} + ${project.id}"
+								                   class="btn btn-success btn-circle  btn-sm">
+								                   <img src="/imagenes/receipt-payment.png" alt="registro ejecucion" width="20px" height="20px">
+								                   <i class="fas fa-exclamation-triangle"></i>
+								                </a>
+								            </span>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer th:replace="design/footerBar :: footerbar"></footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Listo para irse?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Selecciona "Logout" si desea cerrar la sesión.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="/login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Está seguro que desea eliminar este registro?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Eliminar</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="design/script :: scripts"></div>
+<script>
+    function setDeleteUrl(projectId) {
+        document.getElementById("confirmDeleteBtn").setAttribute("href", "/proyectos/eliminar-proyecto/" + projectId);
+    }
+</script>
+
+</body>
+
+</html>

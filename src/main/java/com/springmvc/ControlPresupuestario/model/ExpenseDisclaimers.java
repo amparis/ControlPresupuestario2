@@ -79,6 +79,10 @@ public class ExpenseDisclaimers {
 
 	    @Column(name = "gas_fecha_estimada")
 	    private Date fechaEstimada;
+	    
+	    
+	    @Column(name = "gas_estado_pago")
+	    private String estadoPago;
 		/**
 		 * @return the id
 		 */
@@ -295,6 +299,14 @@ public class ExpenseDisclaimers {
 
 		public void setFechaEstimada(Date fechaEstimada) {
 			this.fechaEstimada = fechaEstimada;
+		}
+
+		public String getEstadoPago() {
+			return estadoPago;
+		}
+
+		public void setEstadoPago(String estadoPago) {
+			estadoPago = estadoPago;
 		}
 
 }

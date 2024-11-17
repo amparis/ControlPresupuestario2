@@ -2,6 +2,7 @@ package com.springmvc.ControlPresupuestario.controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,6 +10,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,6 +41,7 @@ import com.springmvc.ControlPresupuestario.model.EgresoProjectKey;
 import com.springmvc.ControlPresupuestario.model.Expense;
 import com.springmvc.ControlPresupuestario.model.ExpenseCategory;
 import com.springmvc.ControlPresupuestario.model.ExpenseDisclaimers;
+import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.model.Scale;
 import com.springmvc.ControlPresupuestario.model.UserAdm;
 import com.springmvc.ControlPresupuestario.service.AccountService;
@@ -84,23 +88,7 @@ public class ExpenseDisclaimersController {
 	ExpenseCategoryService expenseCategoryService;
 
 	private final String DIRECTORIO_BASE = "D:/SISTEMAS_integrales/descargosStaff";
-	   /*@GetMapping("/lista-descargos/{id}")
-	    public String showListDescargo( @PathVariable("id") long projectId, Model model) {
-	        model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
-	        model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
-	        model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
-	        
-	        model.addAttribute("project", projectService.getProject(projectId)); 
-	        model.addAttribute("expenseSummary", expenseService.getExpensesVigentesWithDescargo(projectId));
-	        model.addAttribute("fasesProyecto",projectPhaseService.getProjectPhasesByProyectoId(projectId));
-	        model.addAttribute("cuentas", accountService.getAccounts());
-	        model.addAttribute("gastoDescargos", expenseDisclaimersService.getExpenseDisclaimersByProjectId(projectId));
-	        model.addAttribute("descargo", new ExpenseDisclaimers());
-               
-
-	          return "lista_descargos";
-	    }*/
-	   
+   
 	   @GetMapping("/registro-descargo/{id}")
 	    public String showRegisterFormDescargo( @PathVariable("id") long projectId, Model model) {
 	        model.addAttribute("loginUser", this.userService.getUser(userDetailsService.getUserDetailsService().getId()));
@@ -108,6 +96,8 @@ public class ExpenseDisclaimersController {
 	        model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
 		   
 	        model.addAttribute("project", projectService.getProject(projectId)); 
+	        Integer project_Id = (int) projectId;
+	        model.addAttribute("expenseTransferred",expenseDisclaimersService.getSummaryExpenseVoucherByProyectoId(project_Id));
 		       // Obtener la lista de fases con descargo del servicio
 	        List<Expense> expensesWithDescargo = expenseService.getExpensesVigentesWithDescargoByProjectId(projectId);
 	     // Extrae solo los IDs de fase asociados a cada Expense
@@ -161,7 +151,36 @@ public class ExpenseDisclaimersController {
 
 		    //model.addAttribute("expenseDescargos",expenseService.getExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(projectId, null));
 		    model.addAttribute("fasesByProyecto",phaseService.getPhaseByListId(phasesList));
+	        ///////////////////////////////////////////////////////////////////////////////////////////////
+		 // Calcular subtotales
+		    Map<EgresoProjectKey, Map<String, BigDecimal>> subtotalesPorGrupo = new HashMap<>();
+		    groupedGastos.forEach((key, gastosMap) -> {
+		        // Iterar sobre las entradas del mapa, donde la clave es EgresoProjectKey
+		        gastosMap.forEach((egresoProjectKey, gastosList) -> { // egresoProjectKey es EgresoProjectKey
+		            // Calcular el subtotal para "costoTotal"
+		            BigDecimal totalCostSubtotal = gastosList.stream()
+		                .map(g -> !Double.isNaN(g.getCostoTotal()) ? new BigDecimal(g.getCostoTotal()) : BigDecimal.ZERO)
+		                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+		            // Calcular el subtotal para "totalUSD"
+		            BigDecimal totalUSDSubtotal = gastosList.stream()
+		                .map(g ->  !Double.isNaN(g.getTotalUSD()) ? new BigDecimal(g.getTotalUSD()) : BigDecimal.ZERO)
+		                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		            // Crear un mapa de subtotales
+		            Map<String, BigDecimal> subtotales = new HashMap<>();
+		            subtotales.put("costoTotal", totalCostSubtotal);
+		            subtotales.put("totalUSD", totalUSDSubtotal);
+
+		            // Almacenar los subtotales con la clave EgresoProjectKey
+		            subtotalesPorGrupo.put(egresoProjectKey, subtotales);
+		        });
+		    });
+
+		    // Añadir los subtotales al modelo para usarlos en la vista
+		    model.addAttribute("subtotalesPorGrupo", subtotalesPorGrupo);
+
+       ////////////////////////////////////////////////////////////////////////////////////////////////// 		
 	        model.addAttribute("unitOfMeasurements", unitOfMeasurementService.getUnitOfMeasurements());
 	        model.addAttribute("expenseDisclaimer", new ExpenseDisclaimers());
              
@@ -179,7 +198,28 @@ public class ExpenseDisclaimersController {
 	   public List<Expense> getExpensesByBeneficiary(@RequestParam Long projectId, @RequestParam Integer beneficiaryId) {
 	       return expenseService.getExpensesVigentesWithDescargoByProjectIdAndBeneficiaryId(projectId, beneficiaryId); 
 	   }	 
+	    //-------- mapping lista de proyectos asignados a cada beneficiario que Presentara VOUCHERS
+	    @GetMapping("/lista-proyectosAsignados")
+	    public String getProjects(Model model) {
+	    	UserAdm loginUser = userService.getUser(userDetailsService.getUserDetailsService().getId());
+	        model.addAttribute("loginUser",loginUser );
+	        model.addAttribute("menuRoles",this.rolMenuService.getAllRolMenusByRoleId());
+	        model.addAttribute("menuRoles2",this.rolMenuService.getRolMenusByRoleId());
+	        
+	        //model.addAttribute("projects", this.expenseService.getExpenseByBeneficiaryId(loginUser.getBeneficiario().getId()));
+	        
+	        List<Project> projectByBeneficiary = expenseService.getExpenseByBeneficiaryId(loginUser.getBeneficiario().getId());
+	     // Extrae solo los IDs de proyectos asociados a un beneficiario
+	        List<Long> projectList = projectByBeneficiary.stream()
+	            .map(project -> project.getId()) 
+	            .distinct() // Opcional: para evitar IDs duplicados
+	            .collect(Collectors.toList());
+	        
+	        model.addAttribute("projects",projectService.getProjectsByListId(projectList));
 
+	        return "lista_proyectosAsignados";
+	    }
+	    
    
 	   @GetMapping("/registro-descargoBeneficiario/{id}")
 	    public String showRegisterFormDescargoByBeneficiary(  @PathVariable("id") long projectId, Model model) {
@@ -206,9 +246,7 @@ public class ExpenseDisclaimersController {
 	        double totalAmountDescargosUSD = descargosByProjectBeneficiary.stream().mapToDouble(ExpenseDisclaimers::getTotalUSD).sum();
 	        model.addAttribute("totalAmountDescargos", totalAmountDescargos);
 	        model.addAttribute("totalAmountDescargosUSD", totalAmountDescargosUSD);
-	       
-	        //Map<Long, List<ExpenseDisclaimers>> groupedGastos = descargosByProjectBeneficiary.stream()
-	        //	    .collect(Collectors.groupingBy(d -> d.getEgreso().getId()));
+
 	        Map<EgresoKey, List<ExpenseDisclaimers>> groupedGastos = descargosByProjectBeneficiary.stream()
 	        	    .collect(Collectors.groupingBy(d -> new EgresoKey(
 	        	        d.getEgreso().getId(),
@@ -217,8 +255,27 @@ public class ExpenseDisclaimersController {
 	        	    )));
 
 	        model.addAttribute("gastoDescargosGroupedByExpense", groupedGastos);
+	        model.addAttribute("totalUSDvouchers", expenseDisclaimersService.getSummaryExpenseDisclaimersByProjectIdAndBeneficiaryId(projectId,loginUser.getBeneficiario().getId()));
+	        ///////////////////////////////////////////////////////////////////////////////////////////////
+	        	// Calcular subtotales para cada grupo
+	        	Map<EgresoKey, Map<String, BigDecimal>> subtotalesPorGrupo = new HashMap<>();
+	        	groupedGastos.forEach((key, gastos) -> {
+	        		BigDecimal totalCostSubtotal = gastos.stream()
+	        			    .map(g -> new BigDecimal(g.getCostoTotal())) // Conversión explícita a BigDecimal
+	        			    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+	        			BigDecimal totalUSDSubtotal = gastos.stream()
+	        			    .map(g -> new BigDecimal(g.getTotalUSD())) // Conversión explícita a BigDecimal
+	        			    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+	        	    Map<String, BigDecimal> subtotales = new HashMap<>();
+	        	    subtotales.put("costoTotal", totalCostSubtotal);
+	        	    subtotales.put("totalUSD", totalUSDSubtotal);
+	        	    subtotalesPorGrupo.put(key, subtotales);
+	        	});
+	        	model.addAttribute("subtotalesPorGrupo", subtotalesPorGrupo);
+
+	       ////////////////////////////////////////////////////////////////////////////////////////////////// 		
 	        model.addAttribute("unitOfMeasurements", unitOfMeasurementService.getUnitOfMeasurements());
 	        model.addAttribute("expenseDisclaimer", new ExpenseDisclaimers());
              
@@ -329,11 +386,11 @@ public class ExpenseDisclaimersController {
 	            }
 	        	//expenseDisclaimersService.saveExpenseDisclaimers(expenseDisclaimer,expenseId);
 	        	expenseDisclaimersService.saveExpenseDisclaimers(expenseDisclaimer);
-	            redirectAttributes.addFlashAttribute("message", "Expense Disclaimer saved success.");
+	            redirectAttributes.addFlashAttribute("message", "Expense voucher saved success.");
 	            redirectAttributes.addFlashAttribute("messageType", "success");
 	            return "redirect:/gastos/lista-descargos/"+expenseId;
 	        } catch (Exception e) {
-	            redirectAttributes.addFlashAttribute("message", "Error saving expense disclaimer: " + e.getMessage());
+	            redirectAttributes.addFlashAttribute("message", "Error saving expense voucher: " + e.getMessage());
 	            redirectAttributes.addFlashAttribute("messageType", "error");
 	            return "redirect:/gastos/registro-descargo/"+expenseId;
 	        }
@@ -343,7 +400,7 @@ public class ExpenseDisclaimersController {
 	    public String saveDescargoByBeneficiario(@ModelAttribute ExpenseDisclaimers expenseDisclaimer,
 	            @RequestParam(required = false) Long id,
 	            @RequestParam(value = "inputproyectoId", required = false) long projectId,
-	            //@RequestParam(value = "inputexpenseId", required = false) long expenseId,
+	            @RequestParam(value = "inputTipoSend", required = false) long tipo,
 	            @RequestParam("file") MultipartFile file,  // Nuevo parámetro para el archivo
 	            RedirectAttributes redirectAttributes) {
 
@@ -351,7 +408,7 @@ public class ExpenseDisclaimersController {
 	    	try {
 	            if (!file.isEmpty()) {
 	                // Definir la ruta de almacenamiento
-	                String uploadDir = DIRECTORIO_BASE;
+	                String uploadDir = DIRECTORIO_BASE+"/";
 	                
 	                // Guardar el archivo en el directorio definido
 	                String fileName = file.getOriginalFilename();
@@ -367,13 +424,27 @@ public class ExpenseDisclaimersController {
 	            }
 	        	//expenseDisclaimersService.saveExpenseDisclaimers(expenseDisclaimer,expenseId);
 	        	expenseDisclaimersService.saveExpenseDisclaimers(expenseDisclaimer);
-	            redirectAttributes.addFlashAttribute("message", "Expense Disclaimer saved success.");
+	            redirectAttributes.addFlashAttribute("message", "Expense voucher saved success.");
 	            redirectAttributes.addFlashAttribute("messageType", "success");
-	            return "redirect:/gastos/registro-descargoBeneficiario/"+projectId;
+		        if (tipo == 1){//rol:ADMIN
+		        	return "redirect:/gastos/registro-descargo/"+projectId;
+		        }
+		        else
+		        {
+		        	return "redirect:/gastos/registro-descargoBeneficiario/"+projectId;
+		        }
+	            //return "redirect:/gastos/registro-descargoBeneficiario/"+projectId;
 	        } catch (Exception e) {
-	            redirectAttributes.addFlashAttribute("message", "Error saving expense disclaimer: " + e.getMessage());
+	            redirectAttributes.addFlashAttribute("message", "Error saving expense voucher: " + e.getMessage());
 	            redirectAttributes.addFlashAttribute("messageType", "error");
-	            return "redirect:/gastos/registro-descargoBeneficiario/"+projectId;
+		        if (tipo == 1){//rol:ADMIN
+		        	return "redirect:/gastos/registro-descargo/"+projectId;
+		        }
+		        else
+		        {
+		        	return "redirect:/gastos/registro-descargoBeneficiario/"+projectId;
+		        }
+	            //return "redirect:/gastos/registro-descargoBeneficiario/"+projectId;
 	        }
 	    }
 	    
@@ -386,7 +457,7 @@ public class ExpenseDisclaimersController {
 	        model.addAttribute("project", projectService.getProject(expenseService.getExpense(expenseId).getProyectoFase().getProyecto().getId())); 
 	        model.addAttribute("expenseSelected", expenseService.getExpense(expenseId)); 
 	        model.addAttribute("categoriesGastos",expenseCategoryService.getExpenseCategoryByPhase(expenseService.getExpense(expenseId).getProyectoFase().getFase().getId())); 
-	        model.addAttribute("gastoDescargos", expenseDisclaimersService.getExpenseDisclaimersByExpenseId(expenseId));    
+	        model.addAttribute("planPagosList", expenseDisclaimersService.getExpenseDisclaimersByExpenseId(expenseId));    
 
 	        model.addAttribute("expensePaymentPlan", new ExpenseDisclaimers());
              /*
@@ -398,5 +469,29 @@ public class ExpenseDisclaimersController {
   	         */
 	          return "registro_planPagos";
 	    }
-	
+		   @GetMapping("/getPago")
+		   @ResponseBody
+		   public ExpenseDisclaimers getPago(@RequestParam Long pagoId) {
+		       return expenseDisclaimersService.getExpenseDisclaimer(pagoId);
+		   }	 
+		// Eliminar 
+		@GetMapping("/eliminar-voucherBeneficiario/{projectId}/{id}/{tipo}")
+		public String deleteBeneficiary(@PathVariable("projectId") long projectId, @PathVariable("id") Integer id, @PathVariable("tipo") long tipo,RedirectAttributes redirectAttributes) {
+		        try {
+		        	expenseDisclaimersService.deleteExpenseDisclaimers(id);
+		            redirectAttributes.addFlashAttribute("message", "Register deleted successfully..");
+		            redirectAttributes.addFlashAttribute("messageType", "success");
+		        } catch (Exception e) {
+		            redirectAttributes.addFlashAttribute("message", "Error deleting registry: " + e.getMessage());
+		            redirectAttributes.addFlashAttribute("messageType", "error");
+		        }
+		        if (tipo == 1){//rol:ADMIN
+		        	return "redirect:/gastos/registro-descargo/"+projectId;
+		        }
+		        else
+		        {
+		        	return "redirect:/gastos/registro-descargoBeneficiario/"+projectId;
+		        }
+		    }
+
 }

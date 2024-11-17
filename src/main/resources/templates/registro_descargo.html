@@ -75,25 +75,73 @@
 	
 							</div>
 						</div>
-						
+						  <div class="box box-secondary">
+						   <div class="table-responsive">
+                                <table class="table table-descargo" id="dataTableExpenses" cellspacing="0">
+                                    <thead>
+									    <!-- Primera fila con los encabezados agrupados -->
+									    <tr>
+									    	<th></th>
+									        <th colspan="2" class="th-details-descargo">Expense transferred</th>
+									        <th colspan="2" class="th-details-descargo">Declared vouchers</th>
+									    </tr>
+									    <!-- Segunda fila con los encabezados de las columnas -->
+									    <tr>
+									        <th class="th-details-descargo">Beneficiaries with transferred expenses</th>
+									        <th class="th-details-descargo">Total (USD)</th>
+									        <th class="th-details-descargo">Total LCA</th>
+									        <th class="th-details-descargo">Total (USD)</th>
+									        <th class="th-details-descargo">Total LCA</th>
+									        <th></th>
+									    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="expenseV : ${expenseTransferred}">
+	                                        
+	 										<td class="td-details-descargo" th:text="${expenseV.fullname}"></td>
+	                                        <td class="td-details-descargo td-montos" th:text="${#numbers.formatDecimal(expenseV.totalUsd, 1, 'COMMA', 2, 'POINT')}">
+	                                        <td class="td-details-descargo td-montos" th:text="${#numbers.formatDecimal(expenseV.totalLcu, 1, 'COMMA', 2, 'POINT')}">
+	                                        
+	                                        <td class="td-details-descargo td-montos" th:classappend="${expenseV.gtotalUsd == 0} ? 'text-negativo' : ''" 
+	                                        										th:text="${#numbers.formatDecimal(expenseV.gtotalUsd , 1, 'COMMA', 2, 'POINT')}">
+	                                        										
+	                                        <td class="td-details-descargo td-montos" th:classappend="${expenseV.gtotalLCU == 0} ? 'text-negativo' : ''" 
+	                                        										th:text="${#numbers.formatDecimal(expenseV.gtotalLCU, 1, 'COMMA', 2, 'POINT')}">
+	                                        <td class="td-details-descargo" >
+												<!-- Botón para abrir el modal -->
+												<button type="button" class="btn btn-light btn-icon-split btn-sm" data-toggle="modal" 
+												        data-target="#expenseDisclaimerModal" 
+												        th:data-beneficiary-id="${expenseV.ben_id}"
+												        th:data-beneficiary-fullname="${expenseV.fullname}">
+												    <span>Add voucher</span>
+												</button>
+											</td>
+                                        </tr>
+
+                                    </tbody>                                 
+                                </table>
+                            </div>
+						</div>
                    <!-- Page Heading -->
                     <h1 class="h3 mb-2 text-gray-800">Expense Vouchers by Beneficiary</h1>
            
 <div th:each="beneficiaryEntry : ${gastosGroupedByBeneficiaryAndExpense}">
     <!-- Mostrar el ID del beneficiario -->
     <h6>Beneficiary: <span th:text="${beneficiaryEntry.key.split('_')[0]}"></span></h6>
-    
     <!-- Caja de detalles del primer nivel -->
     <div class="box box-primary">
         <div class="box-header with-border">
            
             <div class="box-tools pull-right">
                 <!-- Botón para expandir/collapse -->
-                <button type="button" class="btn btn-box-tool" onclick="toggleDetails(this, 'details-{{beneficiaryEntry.key}}'); return false;">
-                    <span>Show vouchers by expense</span>
-                </button>
+					<button type="button" class="btn btn-light btn-icon-split"
+					        th:attr="data-target-id=${'details-' + #strings.replace(beneficiaryEntry.key, '_', '-')}"
+					        onclick="toggleDetails(this);">
+					    <span>Show vouchers by expense</span>
+					</button>
+
 				<!-- Botón para abrir el modal -->
-				<button type="button" class="btn btn-box-tool" data-toggle="modal" 
+				<button type="button" class="btn btn-light btn-icon-split" data-toggle="modal" 
 				        data-target="#expenseDisclaimerModal" 
 				        th:data-beneficiary-id="${beneficiaryEntry.key.split('_')[1]}"
 				        th:data-beneficiary-fullname="${beneficiaryEntry.key.split('_')[0]}">
@@ -102,9 +150,10 @@
 
             </div>
         </div>
-        
+       
         <!-- Segundo nivel de agrupación: Por tipo de gasto (expense) dentro del beneficiario -->
-        <div id="details-{{beneficiaryEntry.key}}" class="details-section" style="display: none;">
+        <div  th:id="'details-' + ${#strings.replace(beneficiaryEntry.key, '_', '-')}"
+				class="details-section" style="display: none;">
             
             <div th:each="expenseEntry : ${beneficiaryEntry.value}">
                 &nbsp;&nbsp;<h6 th:text="${expenseEntry.key.nombreClaseCargoItem}"></h6>
@@ -113,6 +162,7 @@
                     <table class="table">
                         <thead>
                             <tr>
+                            	<th></th>
                                 <th>Description</th>
                                 <th>Phase</th>
                                 <th>Category</th>
@@ -124,6 +174,7 @@
                         </thead>
                         <tbody>
                             <tr th:each="descargo : ${expenseEntry.value}">
+                                <td>&nbsp;</td>
                                 <td>
                                     <span th:text="${descargo.descripcion}"></span><br>
                                     <a href="#" onclick="toggleSubDetails(this); return false;">+</a>
@@ -154,8 +205,8 @@
                                 </td>
                                 <td th:text="${descargo.categoriaGastos.fase.nombre}">Phase</td>
                                 <td th:text="${descargo.categoriaGastos.categoria}">Category</td>
-                                <td th:text="${#numbers.formatDecimal(descargo.costoTotal, 1, 'COMMA', 2, 'POINT')}">Total Cost</td>
-                                <td th:text="${#numbers.formatDecimal(descargo.totalUSD, 1, 'COMMA', 2, 'POINT')}">Total USD</td>
+                                <td class="td-montos" th:text="${#numbers.formatDecimal(descargo.costoTotal, 1, 'COMMA', 2, 'POINT')}">Total Cost</td>
+                                <td class="td-montos" th:text="${#numbers.formatDecimal(descargo.totalUSD, 1, 'COMMA', 2, 'POINT')}">Total USD</td>
                                 <td>
                                     <a th:if="${descargo.attach != null}" 
                                        th:href="@{'/gastos/descargar/' + ${#strings.substring(descargo.attach, descargo.attach.lastIndexOf('/') + 1)}}" 
@@ -165,22 +216,31 @@
                                     <span th:if="${descargo.attach == null}"> </span>
                                 </td>
                                 <td>
-                                    <span th:each="menuRole : ${menuRoles}">
-                                        <a th:href="@{/gastos/eliminar-descargo/} + ${descargo.id}"
-                                           th:if="${menuRole.menu.url == '/proyectos/lista-proyectos' and menuRole.adelete}"
-                                           class="btn btn-danger btn-circle btn-sm">
-                                           <img src="/imagenes/eliminar.png" alt="delete" width="17px" height="19px">
-                                           <i class="fas fa-exclamation-triangle"></i>
-                                        </a>
-                                    </span>
+				                    <span>
+				                        <a href="#" data-toggle="modal" data-target="#deleteModal" 
+				                           th:onclick="setDeleteUrl([[${project.id}]],[[${descargo.id}]],1)" 
+				                           class="btn btn-danger btn-circle btn-sm"> 
+				                           <img src="/imagenes/eliminar.png" alt="eliminar registro" width="17px" height="19px">
+				                           <i class="fas fa-exclamation-triangle"></i>
+				                        </a>
+				                    </span>
                                 </td>
                             </tr>
+							<tfoot>
+							    <tr>
+							        <td colspan="4" style="text-align: right;"><strong>Subtotal:</strong></td>
+							        <td class="td-montos" th:text="${#numbers.formatDecimal(subtotalesPorGrupo[expenseEntry.key]['costoTotal'], 1, 'COMMA', 2, 'POINT')}"></td>
+							        <td class="td-montos" th:text="${#numbers.formatDecimal(subtotalesPorGrupo[expenseEntry.key]['totalUSD'], 1, 'COMMA', 2, 'POINT')}"></td>
+							        <td colspan="2"></td>
+							    </tr>
+							</tfoot>
+                            
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    </div>
+    </div> 
 </div>
 
 
@@ -203,10 +263,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="miFormulario" class="user" th:action="@{/gastos/guardar-descargoNonRecurring}" th:method="post" th:object="${expenseDisclaimer}" enctype="multipart/form-data">
+                <form id="miFormulario" class="user" th:action="@{/gastos/guardar-descargoNonRecurring}" th:method="post" 
+                		th:object="${expenseDisclaimer}" enctype="multipart/form-data"  onsubmit="return validateAttach()">
                     <input type="hidden" th:if="${expenseDisclaimer.id!=0}" th:field="*{id}" th:value="${expenseDisclaimer.id}">
                     <input type="hidden" th:value="${project.id}" id="inputproyectoId" name="inputproyectoId">
                     <input type="hidden" id="beneficiaryIdField" class="form-control" value="${beneficiaryId}" readonly />
+                    <input type="hidden" value="1" id="inputTipoSend" name="inputTipoSend">
     				<!-- Expenses by Project -->
                     <div class="mb-3">
                         <label for="labelBeneficiaryFullName" id= "labelBeneficiaryFullName" class="form-label" ></label>
@@ -254,22 +316,25 @@
                     <!-- Description -->
                     <div class="mb-3">
                         <label for="inputDescripcion" class="form-label">Description</label>
-                        <input th:field="*{descripcion}" type="text" class="form-control form-control-user" id="inputDescripcion" name="inputDescripcion" placeholder="Enter description of expense">
+                        <input th:field="*{descripcion}" type="text" class="form-control form-control-user" id="inputDescripcion" name="inputDescripcion" placeholder="Enter description of expense" required>
                     </div>
 
                     <!-- Quantity, Quantity of Pays, and Unit Cost -->
                     <div class="row">
                         <div class="col-md-3">
                             <label for="inputCantidad" class="form-label">Quantity</label>
-                            <input th:field="*{cantidad}" type="number" class="form-control form-control-user" id="inputCantidad" name="inputCantidad" step="0.01" oninput="calculateTotalCosto()">
+                            <input th:field="*{cantidad}" type="number" class="form-control form-control-user" id="inputCantidad" name="inputCantidad" 
+                            		step="0.01" min = "1" oninput="calculateTotalCosto()" required>
                         </div>
                         <div class="col-md-3">
                             <label for="inputCantidadPagos" class="form-label">Quantity of Pays</label>
-                            <input th:field="*{cantidadPagos}" type="number" class="form-control form-control-user" id="inputCantidadPagos" name="inputCantidadPagos" step="0.01" oninput="calculateTotalCosto()">
+                            <input th:field="*{cantidadPagos}" type="number" class="form-control form-control-user" id="inputCantidadPagos" name="inputCantidadPagos" 
+                            		step="0.01" min = "1" oninput="calculateTotalCosto()" required>
                         </div>
                         <div class="col-md-3">
                             <label for="inputPrecioUnitario" class="form-label">Unit Cost</label>
-                            <input th:field="*{costoUnitario}" type="number" class="form-control form-control-user" id="inputPrecioUnitario" name="inputPrecioUnitario" step="0.01" oninput="calculateTotalCosto()">
+                            <input th:field="*{costoUnitario}" type="number" class="form-control form-control-user" id="inputPrecioUnitario" name="inputPrecioUnitario" 
+                            		step="0.01" min = "1" oninput="calculateTotalCosto()" required>
                         </div>
                         <div class="col-md-3">
                             <label id="labelDivisa" class="form-label"></label>
@@ -282,15 +347,19 @@
                         <div class="row">
 									    <div class="col-10">
 									        <label for="inputAttach" class="form-label">Attach</label>
-									        <input th:field="*{attach}" type="text" class="form-control form-control-user" id="inputAttach" name="inputAttach" readonly>
+									        <input th:field="*{attach}" type="text" class="form-control form-control-user" 
+									        	id="inputAttach" name="inputAttach" nchange="updateFileName()" readonly required>
+									        <div class="invalid-feedback">Please select a file.</div>
 									    </div>
 									    <div class="col-1">
 									        <label for="inputAttachbtn" class="form-label">&nbsp;&nbsp;</label>
 									        
-									        <button id="btnAttach" type="button" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales">
+									        <button id="btnAttach" type="button" class="btn btn-outline-info text-sistemasIntegralesBtn custom-hover-sistemasIntegrales"
+									        		onclick="triggerFileInput()">
 									            Add
 									        </button>
-									        <input type="file" id="fileInput" name ="file" style="display:none;" />
+									        <input type="hidden" id="hiddenAttach" name="hiddenAttach" th:value="*{attach}"  onchange="updateFileName()"  >
+									        <input type="file" id="fileInput" name ="file" style="display:none;"  onchange="updateFileName()"/>
 									    </div>    
 									   <div class="col-1">
 										&nbsp;
@@ -308,7 +377,7 @@
 
                         <div class="col-md-3">
                             <label for="inputfecha" class="form-label">Date Transfer</label>
-                            <input th:field="*{fecha}" type="date" class="form-control form-control-user" id="inputfecha" onchange="formatDate(this.value)" required>
+                            <input th:field="*{fecha}" type="date" class="form-control form-control-user" id="inputfechaVoucherBeneficiario" onchange="formatDate(this.value)" required>
                         </div>
                         <div class="col-md-6">
                             <label for="inputObservacion" class="form-label">Observation</label>
@@ -316,10 +385,10 @@
                         </div>
                     </div>
 
-                    <!-- Error Message -->
-                    <div th:if="${error}" class="alert alert-danger mt-3" role="alert">
-                        <p th:text="${error}"></p>
-                    </div>
+                                <!-- Mostrar mensaje de error si existe -->
+                                <div th:if="${error}" class="alert alert-danger" role="alert" style="color: red;">
+                                    <p th:text="${error}"></p>
+                                </div>
 
                     <!-- Save Button and Back Link -->
                     <div class="modal-footer">
@@ -334,20 +403,46 @@
         </div>
     </div>
 </div>
-
+<!-- Modal de confirmación de eliminación -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                   Are you sure you want to delete this record?
+                </div>
+                <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Eliminate</a>
+                </div>
+            </div>
+        </div>
+    </div>
 <!-- Footer -->
 <footer th:replace="design/footerBar :: footerbar"></footer>
 <!-- End of Footer -->
 <div th:replace="design/script :: scripts"></div>
 	<!-- Custom scripts for all expenses / vouchers by benef and admin-->
 	<script th:src="@{/js/demo/scriptExpense.js}"></script>
+	<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Aquí va tu código de toggleDetails
+});
+</script>
+	
+
 <script type='text/javascript'>
 $(function(){
     $(document).bind("contextmenu",function(e){
         return false;
     });
 });
-
+/// onclick="toggleDetails(this, 'details-{{beneficiaryEntry.key}}'); return false;">
 // Obtener el valor de beneficiaryId cuando se abre el modal INTERFAZ ADMIN
 $('#expenseDisclaimerModal').on('show.bs.modal', function (event) {
     // Obtener el botón que abrió el modal
@@ -389,15 +484,6 @@ $('#expenseDisclaimerModal').on('show.bs.modal', function (event) {
     }
 });
 </script>
-
-<style>
-/* Estilo para hacer que la tabla de detalles se vea indentada */
-.details-table {
-    margin-top: 5px;
-    padding-left: 15px;
-}
-</style>
-
 </body>
 
 </html>

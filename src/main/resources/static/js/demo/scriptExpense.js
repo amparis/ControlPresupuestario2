@@ -1,3 +1,14 @@
+        // Función para hacer desaparecer el mensaje después de 4 segundos
+        function hideMessage() {
+            setTimeout(function() {
+                var message = document.getElementById("notificationMessage");
+                if (message) {
+                    message.style.display = 'none';
+                }
+            }, 4000);  // 4000 milisegundos = 4 segundos
+        }
+
+
 
 //FUNCTIONS  BY EXPENSE REGISTER
 // Función para actualizar 'inputCargoItem' con el valor de 'inputItem' o 'selectCargo'
@@ -546,14 +557,31 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
     }
 });
 //despliega el detalle de cada voucher INTERFAZ ADMIN
+/*
 function toggleDetails(button, detailsId) {
-    var detailsSection = document.getElementById(detailsId);
+    //var detailsSection = document.getElementById(detailsId);
+    const detailsSection = document.getElementById(detailsId);
     if (detailsSection.style.display === "none") {
         detailsSection.style.display = "block";
-        button.innerHTML = "Hide vouchers by expense";
+        //button.innerHTML = "Hide vouchers by expense";
+        button.querySelector('span').textContent = "Hide vouchers by expense";
     } else {
         detailsSection.style.display = "none";
-        button.innerHTML = "Show vouchers by expense";
+        //button.innerHTML = "Show vouchers by expense";
+        button.querySelector('span').textContent = "Show vouchers by expense";
+    }
+}*/
+///DESPLIEGA EL DETALLE DE XPENSE BY BENEFICIARY	
+	function toggleDetails(button) {
+    const targetId = button.getAttribute('data-target-id');
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+        const isHidden = targetElement.style.display === 'none';
+        targetElement.style.display = isHidden ? 'block' : 'none';
+        button.querySelector('span').textContent = isHidden ? 'Hide vouchers by expense' : 'Show vouchers by expense';
+    }
+    else {
+        alert('Element with ID '+targetId+ 'not found.');
     }
 }
 
@@ -566,7 +594,9 @@ function toggleSubDetails(link) {
         subDetails.style.display = "none";
         link.innerHTML = "+";
     }
-}// Obtener el valor de beneficiaryId cuando se abre el modal INTERFAZ ADMIN
+}
+
+// Obtener el valor de beneficiaryId cuando se abre el modal INTERFAZ ADMIN
     $('#expenseDisclaimerModal').on('show.bs.modal', function (event) {
         // Obtener el botón que abrió el modal
         var button = $(event.relatedTarget); 
@@ -625,4 +655,50 @@ function toggleSubDetails(link) {
             fasesSelect.appendChild(option);
         }
     });*/
+ 
+    function setDeleteUrl(projectId,id,tipo) {
+        // Establecer la URL del botón de confirmación de eliminación
+        document.getElementById("confirmDeleteBtn").setAttribute("href", "/gastos/eliminar-voucherBeneficiario/"+projectId+"/" + id+"/"+tipo);
+    }
+
+    // Trigger para abrir el selector de archivo EN DESCARGO/ VOUCHER
+    function triggerFileInput() {
+        document.getElementById("fileInput").click();
+    }
+
+    // Actualiza el campo de texto con el nombre del archivo seleccionado
+    function updateFileName() {
+        const fileInput = document.getElementById("fileInput");
+        const inputAttach = document.getElementById("inputAttach");
+        if (fileInput.files.length > 0) {
+        	inputAttach.value = fileInput.files[0].name;
+            // Eliminar la clase de error si existía
+            inputAttach.classList.remove("is-invalid");
+        }
+
+    }
+    // Validar el formulario
+    function validateAttach() {
+    	const attachField = document.getElementById("inputAttach");
+
+       if (!attachField.value.trim()) {
+		    attachField.classList.add("is-invalid");
+		    return false; // Detener el envío
+		} else {
+		    attachField.classList.remove("is-invalid");
+		    return true; // Permitir el envío
+		}
+	}
+	
+	// Función para establecer la fecha máxima como la fecha actual
+    window.onload = function() {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); // Enero es 0!
+        var yyyy = today.getFullYear();
+
+        today = yyyy + '-' + mm + '-' + dd; // Formato YYYY-MM-DD
+
+        document.getElementById("inputfechaVoucherBeneficiario").setAttribute("max", today);
+    }
 

@@ -2,6 +2,7 @@ package com.springmvc.ControlPresupuestario.service;
 
 import com.springmvc.ControlPresupuestario.model.Beneficiary;
 import com.springmvc.ControlPresupuestario.model.PaymentPlan;
+import com.springmvc.ControlPresupuestario.model.Phase;
 import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.model.ProjectHistory;
 import com.springmvc.ControlPresupuestario.model.ProjectPhase;
@@ -458,4 +459,8 @@ public class ProjectService {
 		this.projectRepository.deleteById(id);
 	}
 
+    public List<Project> getProjectsByListId(List<Long> projectsId) {
+
+    	return projectRepository.findProjectByListId(projectsId);
+    }
 }

@@ -3,7 +3,17 @@
 
 /* Reseting */
 
+        /* Transición suave para desvanecimiento */
+        #notificationMessage {
+            opacity: 1; /* El mensaje aparece con opacidad completa */
+            transition: opacity 1s ease-in-out; /* Transición de opacidad */
+        }
 
+        /* Clase para ocultar el mensaje con desvanecimiento */
+        #notificationMessage.hidden {
+            opacity: 0; /* El mensaje se desvanece */
+        }
+        
 body {
     background: #ecf0f3;
 }
@@ -311,6 +321,31 @@ table-details {
 	margin: 0 0 0 0 !important;
     padding: 0; /* Mínimo padding */
     font-size: 13px; /* Tamaño de letra pequeño */
+}
+
+.input-error {
+    border: 2px solid red;
+}
+.is-invalid {
+    border: 1px solid red;
+    background-color: #f8d7da;
+}
+
+.invalid-feedback {
+    color: red;
+    font-size: 0.9em;
+    display: none;
+}
+
+.is-invalid + .invalid-feedback {
+    display: block;
+}
+
+
+/* Estilo para hacer que la tabla de detalles se vea indentada */
+.details-table {
+    margin-top: 5px;
+    padding-left: 20px;
 }
 
    

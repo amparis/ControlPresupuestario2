@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.springmvc.ControlPresupuestario.model.BeneficiaryExpenseSummaryDTO;
 import com.springmvc.ControlPresupuestario.model.Expense;
+import com.springmvc.ControlPresupuestario.model.Project;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense,Long>  {
@@ -29,6 +30,9 @@ public interface ExpenseRepository extends JpaRepository<Expense,Long>  {
 	  
 	  @Query("SELECT e FROM Expense e WHERE e.proyectoFase.proyecto.id = :projectId and e.descargo= true and estado='V'")
 	  public List<Expense> findAllExpensesVigentesWithDescargoByProjectId(Long projectId);//para beneficiary
-
+	  
+	  @Query("SELECT e.proyectoFase.proyecto FROM Expense e  WHERE  e.beneficiario.id = :beneficiaryId")
+	  public List<Project> findExpenseByBeneficiaryId(Integer beneficiaryId);
+	  
 	  
 }

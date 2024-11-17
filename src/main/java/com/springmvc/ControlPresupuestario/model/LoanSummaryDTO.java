@@ -10,7 +10,7 @@ public class LoanSummaryDTO {
 	    private String nombre;
 	    private Integer cuentaId;
 	    private String nameBank;
-	    private BigDecimal  devuelto;
+   private BigDecimal  devuelto;
 	    private BigDecimal  saldo;
 
 	    // Getters y setters

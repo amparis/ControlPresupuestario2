@@ -32,15 +32,7 @@
 -->
     
     <script>
-        // Función para hacer desaparecer el mensaje después de 4 segundos
-        function hideMessage() {
-            setTimeout(function() {
-                var message = document.getElementById("notificationMessage");
-                if (message) {
-                    message.style.display = 'none';
-                }
-            }, 4000);  // 4000 milisegundos = 4 segundos
-        }
+
     </script>
     	<!-- Para traducir la pagina a espaniol -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">      
@@ -54,19 +46,7 @@
 		    }
 		</script>
 		<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    
-        <style>
-        /* Transición suave para desvanecimiento */
-        #notificationMessage {
-            opacity: 1; /* El mensaje aparece con opacidad completa */
-            transition: opacity 1s ease-in-out; /* Transición de opacidad */
-        }
 
-        /* Clase para ocultar el mensaje con desvanecimiento */
-        #notificationMessage.hidden {
-            opacity: 0; /* El mensaje se desvanece */
-        }
-    </style>
 </head>
 
 <body>
