@@ -146,7 +146,7 @@ function toggleFechaFin(selectElement) {
 
 
     
-    function checkDates() {
+    /*function checkDates() {
         const fechaInicioStr = document.getElementById('inputfechaInicio').value;
         const fechaFinStr = document.getElementById('inputfechaFin').value;
         const formaPago = document.getElementById('inputPago').value;
@@ -184,13 +184,13 @@ function toggleFechaFin(selectElement) {
             }
 
             // Llamar a la función para calcular el tiempo con fechaInicio y fechaFin
-            calculateInputTiempo(fechaInicio, fechaFin);
+           // calculateInputTiempo(fechaInicio, fechaFin);
 
         } else {
             alert("Please, fill in the start date.");
         }
     }
-
+*/
     function calculateInputTiempo(fechaInicial, fechaFinal) {
         if (!fechaInicial || !fechaFinal) {
             return; // No calcular si alguna fecha es nula o indefinida
