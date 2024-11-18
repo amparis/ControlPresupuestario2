@@ -1,5 +1,5 @@
 # Etapa 1: Compilar el proyecto
-FROM maven:3.8.7-openjdk-8 AS build
+FROM maven:3.8-openjdk-8 AS build
 WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
