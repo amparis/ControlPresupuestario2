@@ -21,7 +21,7 @@ public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Intege
 	// Ya puedo trabajar con las operaciones CRUD
 		boolean existsByNombresAndApellidosAndDocumento(String nombres,String apellidos, String documento);//Metodo para buscar por nombre, fecha inicla y fecha final
 
-		Optional<Beneficiary> findById(Long beneficiaryId);
+		Beneficiary findById(Long beneficiaryId);
 
 	//@Query("SELECT u.beneficiario.id FROM UserAdmProject up JOIN FETCH UserAdm u WHERE up.project.id= :projectId and u.perfil.id= :roleId")
 	  //public Integer findByProjectIdAndRole(Long projectId, Long roleId);
