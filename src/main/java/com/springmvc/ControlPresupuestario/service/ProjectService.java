@@ -244,8 +244,8 @@ public class ProjectService {
 	        return userAdmOptional.get().getId();
 	    } else {
 	        // Obtener datos del beneficiario
-	        Beneficiary beneficiary = beneficiaryRepository.findById(beneficiaryId)
-	                .orElseThrow(() -> new IllegalStateException("Beneficiario no encontrado"));
+	        Beneficiary beneficiary = beneficiaryRepository.findById((long)beneficiaryId);
+	               // .orElseThrow(() -> new IllegalStateException("Beneficiario no encontrado"));
 
 	        // Crear el nuevo usuario
 	        UserAdm newUser = new UserAdm();
