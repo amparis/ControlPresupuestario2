@@ -3,5 +3,5 @@ MAINTAINER edissonfullstackdeveloper.com
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} contabilidad-0.0.1-SNAPSHOT.jar
-ENTRYPOINT ["java","-jar","/contabilidad-0.0.1-SNAPSHOT.jar"]
+COPY ${JAR_FILE} ControlPresupuestario-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["java","-jar","/ControlPresupuestario-0.0.1-SNAPSHOT.jar"]
