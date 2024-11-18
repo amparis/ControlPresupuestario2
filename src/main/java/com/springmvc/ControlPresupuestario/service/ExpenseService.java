@@ -11,9 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.springmvc.ControlPresupuestario.model.BeneficiaryExpenseSummaryDTO;
 import com.springmvc.ControlPresupuestario.model.Expense;
-import com.springmvc.ControlPresupuestario.model.ExpenseDisclaimers;
-import com.springmvc.ControlPresupuestario.model.Income;
-import com.springmvc.ControlPresupuestario.model.LoanSummaryDTO;
 import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.model.UserAdm;
 import com.springmvc.ControlPresupuestario.repository.ExpenseRepository;
@@ -80,9 +77,9 @@ public class ExpenseService {
 	    if (newExpense.getFee()>0)
 	    {
 	    	Expense expenseFee= new Expense();
-	    	expenseFee.setTipo("Non-recurring");
+	    	expenseFee.setTipo(newExpense.getTipo());
 	    	expenseFee.setProyectoFase(newExpense.getProyectoFase());
-	    	expenseFee.setClasificacionEgreso(expenditureClassificationService.getExpenditureClassificationByNombre("cargos bancarios"));//
+	    	//expenseFee.setClasificacionEgreso(expenditureClassificationService.getExpenditureClassificationByNombre("cargos bancarios"));//
 	    	expenseFee.setObjeto("FEE/CARGO BANCARIO");
 	    	expenseFee.setCargoItem("FEE/CARGO BANCARIO");
 	    	expenseFee.setCantidad(1);
@@ -104,23 +101,6 @@ public class ExpenseService {
 	    	expenseFee.setTotalLCU(newExpense.getTotalLCU());
 	    	expenseRepository.save(expenseFee);
 	    }
-	    //para plan de pagos, single payment
-	    /*if (newExpense.getPaymentMethod().getId() == 1)
-	    {
-	    	ExpenseDisclaimers planPagos= new ExpenseDisclaimers();
-	    	planPagos.setUnidadMedida(unitOfMeasurementService.getUnitOfMeasurement(14));
-	    	planPagos.setEgreso(newExpense);
-	    	planPagos.setCategoriaGastos(null);
-	    	planPagos.setCostoTotal(newExpense.getTotalLCU());//monto moneda local
-	    	planPagos.setTotalUSD(newExpense.getMontoTotal());//monto en usd
-	    	planPagos.setFecha(newExpense.getFechaInicio());
-	    	planPagos.setFechaRegistro(new Timestamp(millis));
-	    	planPagos.setUserId((int) loginUser.getId());
-	    	planPagos.setCantidadPagos(1);
-	    	planPagos.setAttach(newExpense.getAttach());
-	    	planPagos.setFechaEstimada(newExpense.getFechaInicio());
-	    	planPagos.setEstadoPago("PENDING");
-	    }*/
 	    return expenseRepository.save(newExpense);
 	}
 

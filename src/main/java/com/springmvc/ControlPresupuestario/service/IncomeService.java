@@ -16,6 +16,7 @@ import com.springmvc.ControlPresupuestario.model.LoanSummaryDTO;
 import com.springmvc.ControlPresupuestario.model.PaymentPlan;
 import com.springmvc.ControlPresupuestario.model.Account;
 import com.springmvc.ControlPresupuestario.model.AccountBalanceDTO;
+import com.springmvc.ControlPresupuestario.model.ExpenditureClassification;
 import com.springmvc.ControlPresupuestario.model.Expense;
 import com.springmvc.ControlPresupuestario.model.Project;
 import com.springmvc.ControlPresupuestario.model.ProjectHistory;
@@ -41,6 +42,10 @@ public class IncomeService {
 	ProjectService projectService;
 	@Autowired
 	PaymentPlanService paymentPlanService;
+	@Autowired
+	PaymentMethodService paymentMethodService;
+	@Autowired
+	ExpenditureClassificationService expenditureClassificationService;
 	
     public List<Income> getIncomes(){
     	
@@ -164,8 +169,7 @@ public class IncomeService {
 	    newIncome.setUsuarioId((int) loginUser.getId());
 	    newIncome.setPlanPago(paymentPlanService.getPaymentPlanById(pagoSelected));
 		
-	    PaymentPlan montoPago = paymentPlanService.getPaymentPlanById(pagoSelected);
-	   
+	    PaymentPlan montoPago = paymentPlanService.getPaymentPlanById(pagoSelected);	   
 	    
 	    if((montoTask+ newIncome.getMonto()+montoPago.getMontoPagado())== montoPago.getMonto())
 	    {
@@ -182,7 +186,8 @@ public class IncomeService {
 	    //save TASK en Expense
         Expense savedExpenseTask= new Expense();
         //savedExpenseTask.setProyecto(proyecto);
-        savedExpenseTask.setTipo("");
+        savedExpenseTask.setTipo("Non-recurring");
+        savedExpenseTask.setClasificacionEgreso(expenditureClassificationService.getExpenditureClassification(7)); // clase nro 7 = BANK CHARGE
         savedExpenseTask.setObjeto(newIncome.getConcepto().toUpperCase());
         savedExpenseTask.setCargoItem("BANK CHARGE");
         savedExpenseTask.setCantidad(1);
@@ -195,6 +200,7 @@ public class IncomeService {
         savedExpenseTask.setAguinaldo(0);
         savedExpenseTask.setEstado("V");
         savedExpenseTask.setUsuarioId((int) loginUser.getId());
+        savedExpenseTask.setPaymentMethod(paymentMethodService.getPaymentMethodById(1L));// method payment 1= single payment
         expenseRepository.save(savedExpenseTask);
 	    }
 	    return incomeRepository.save(newIncome);

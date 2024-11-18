@@ -224,7 +224,7 @@
 		                                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" data-search="false">
 		                                    <thead>
 		                                        <tr>
-		                                        	<th>Type</th>
+		                                        	
 		                                        	<th>Beneficiary</th>
 		                                        	<th>Classification</th>
 		                                        	<th>Object</th>
@@ -237,8 +237,10 @@
 		                                    </thead>
 		                                    <tbody>
 		                                        <tr th:each="expense : ${expenses}">
-			                                        <td th:text="${expense.tipo}"></td>
-			     									<td th:text="${expense.beneficiario != null ? expense.beneficiario.nombres + ' ' + (expense.beneficiario.apellidos != null ? expense.beneficiario.apellidos : '') : ''}"></td>
+			                                        
+			     									<td th:text="${expense.beneficiario != null ? (expense.beneficiario.tipo != 'LEGAL ENTITY' 
+							                     ? expense.beneficiario.nombres + ' ' + (expense.beneficiario.apellidos != null ? expense.beneficiario.apellidos : '') 
+							                     : expense.beneficiario.razonSocial): ''}"></td>
 			                                   		<td th:text="${expense.clasificacionEgreso != null ? expense.clasificacionEgreso.nombreClase : ''}"></td>
 			                                   		<td th:text="${expense.objeto}"></td>
 			                                        <td th:text="${expense.cargoItem}"></td>
@@ -284,29 +286,6 @@
     </div>
 
 </div>
-<!-- Modal -->
-<div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="fileModalLabel">File Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se muestra el archivo -->
-                <div id="filePreviewContainer">
-                    <!-- Usamos un iframe para mostrar un PDF o imágenes -->
-                    <iframe id="filePreview" style="width: 100%; height: 500px;" type="application/pdf" runat="server" frameborder="0"></iframe>
-                    <embed src="http://localhost:8080/expenses/descargar/N2-4-3.pdf" frameborder="0" width="100%" height="400px">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 
             <!-- Footer -->
             <footer th:replace="design/footerBar :: footerbar"></footer>

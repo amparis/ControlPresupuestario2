@@ -157,7 +157,7 @@ function toggleFechaFin(selectElement) {
             const fechaInicio = new Date(Date.UTC(yearInicio, monthInicio - 1, dayInicio));
 
             if (isNaN(fechaInicio.getTime())) {
-                alert("Por favor, ingresa una fecha de inicio válida.");
+                alert("Please, enter start date validate.");
                 return;
             }
 
@@ -165,16 +165,17 @@ function toggleFechaFin(selectElement) {
             
             // Si el tipo de forma de pago no es 'single payment', se requiere una fecha de fin válida
             if (formaPago !== 'single payment') {
+               
                 if (fechaFinStr) {
                     const [yearFin, monthFin, dayFin] = fechaFinStr.split("-");
                     fechaFin = new Date(Date.UTC(yearFin, monthFin - 1, dayFin));
 
                     if (isNaN(fechaFin.getTime())) {
-                        alert("Por favor, ingresa una fecha de fin válida.");
+                        alert("Please, enter end date validate.");
                         return;
                     }
                 } else {
-                    alert("Por favor, ingresa la fecha de fin.");
+                    alert("Please, enter end date.");
                     return;
                 }
             } else {
@@ -186,7 +187,7 @@ function toggleFechaFin(selectElement) {
             calculateInputTiempo(fechaInicio, fechaFin);
 
         } else {
-            alert("Por favor, completa la fecha de inicio.");
+            alert("Please, fill in the start date.");
         }
     }
 
